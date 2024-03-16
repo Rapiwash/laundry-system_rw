@@ -35,7 +35,7 @@ const Negocio = () => {
     },
     //validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
-      // Verificar si "master" está presente en el array rolQAnulan
+      // Verificar si "gerente" está presente en el array rolQAnulan
 
       openModal(values);
       setSubmitting(false);
@@ -99,11 +99,11 @@ const Negocio = () => {
   }, [InfoNegocio]);
 
   useEffect(() => {
-    if (!formik.values.rolQAnulan.includes("master")) {
+    if (!formik.values.rolQAnulan.includes("admin")) {
       // Si no está presente, agregarlo al array
       formik.setFieldValue("rolQAnulan", [
         ...formik.values.rolQAnulan,
-        "master",
+        "admin",
       ]);
     }
   }, [formik.values.rolQAnulan]);
@@ -222,8 +222,8 @@ const Negocio = () => {
                   maxSelectedValues={3}
                   searchable
                   data={[
-                    { value: "master", label: "Gerente" },
                     { value: "admin", label: "Administrador" },
+                    { value: "gerente", label: "Gerente" },
                     { value: "coord", label: "Coordinador" },
                   ]}
                   maxDropdownHeight={150}

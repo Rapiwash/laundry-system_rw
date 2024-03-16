@@ -23,6 +23,10 @@ const Items = () => {
         );
 
         const data = response.data;
+        data.forEach((dato) => {
+          dato.montoGenerado = Number(dato.montoGenerado.toFixed(2));
+          dato.cantidad = Number(dato.cantidad.toFixed(2));
+        });
         const iProd = data.filter((item) => item.tipo === "productos");
         const iServ = data.filter((item) => item.tipo === "servicios");
         setInfoProductos(iProd);
@@ -55,42 +59,6 @@ const Items = () => {
 
   // Luego tomamos solo los primeros 10 elementos después de ordenar
   const bottomData = ascendingData.slice(0, minPrendas).reverse();
-
-  const PruebaData = [
-    {
-      nombre: "Juan",
-      Efectivo: [
-        {
-          descripcion: "Orden n° 102",
-          monto: "52",
-        },
-        {
-          descripcion: "Orden n° 58",
-          monto: "62",
-        },
-        {
-          descripcion: "Orden n° 720",
-          monto: "12",
-        },
-      ],
-      Yape: [
-        {
-          descripcion: "Orden n° 925",
-          monto: "12",
-        },
-        {
-          descripcion: "Orden n° 102",
-          monto: "35",
-        },
-      ],
-      Tarjeta: [
-        {
-          descripcion: "Orden n° 223",
-          monto: "100",
-        },
-      ],
-    },
-  ];
 
   const exportToExcel = async () => {
     // const workbook = new ExcelJS.Workbook();
@@ -301,7 +269,11 @@ const Items = () => {
           </h1>
           <ResponsiveBar
             data={newdata} // Usar los datos ajustados
-            keys={["cantidad"]}
+            keys={[
+              `${
+                valorizarX === "montoGenerado" ? "montoGenerado" : "cantidad"
+              }`,
+            ]}
             indexBy="nombre"
             layout="horizontal"
             margin={{ top: 10, right: 40, bottom: 60, left: 120 }}
@@ -418,7 +390,11 @@ const Items = () => {
           </h1>
           <ResponsiveBar
             data={bottomData} // Usar los datos de los menos vendidos
-            keys={["cantidad"]}
+            keys={[
+              `${
+                valorizarX === "montoGenerado" ? "montoGenerado" : "cantidad"
+              }`,
+            ]}
             indexBy="nombre"
             layout="horizontal"
             margin={{ top: 20, right: 120, bottom: 70, left: 40 }}

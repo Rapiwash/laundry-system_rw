@@ -228,7 +228,7 @@ const CuadreCaja = () => {
     <div className="report-container">
       <div className="title-h">
         <h1>Reporte de Cuadres Diarios</h1>
-        {InfoUsuario.rol === Roles.MASTER && infoCuadres.length > 0 ? (
+        {InfoUsuario.rol === Roles.GERENTE && infoCuadres.length > 0 ? (
           <button
             className={`button_wrapper ${loading ? "loading" : ""}`}
             onClick={handleExport}
@@ -263,7 +263,7 @@ const CuadreCaja = () => {
             console.log(date);
           }}
         />
-        {InfoUsuario.rol === Roles.MASTER && infoCuadres.length > 0 ? (
+        {InfoUsuario.rol === Roles.GERENTE && infoCuadres.length > 0 ? (
           <Button
             type="button"
             className="btn-save"
@@ -279,7 +279,7 @@ const CuadreCaja = () => {
             <tr>
               <th
                 colSpan={
-                  InfoUsuario.rol === Roles.MASTER && showMore ? "13" : "5"
+                  InfoUsuario.rol === Roles.GERENTE && showMore ? "13" : "5"
                 }
                 style={{
                   border: `solid 1px ${colorBorder}`,
@@ -308,7 +308,7 @@ const CuadreCaja = () => {
               >
                 Usuario
               </th>
-              {InfoUsuario.rol === Roles.MASTER && showMore ? (
+              {InfoUsuario.rol === Roles.GERENTE && showMore ? (
                 <>
                   <th
                     style={{
@@ -378,7 +378,7 @@ const CuadreCaja = () => {
               >
                 Nota
               </th>
-              {InfoUsuario.rol === Roles.MASTER && showMore ? (
+              {InfoUsuario.rol === Roles.GERENTE && showMore ? (
                 <>
                   <th
                     style={{
@@ -483,7 +483,7 @@ const CuadreCaja = () => {
                             >
                               {cuadresTransformados[rowIndex]?.infoUser?.name}{" "}
                             </td>
-                            {InfoUsuario.rol === Roles.MASTER && showMore ? (
+                            {InfoUsuario.rol === Roles.GERENTE && showMore ? (
                               <>
                                 <td
                                   style={{
@@ -653,7 +653,7 @@ const CuadreCaja = () => {
                                 </button>
                               ) : null}
                             </td>
-                            {InfoUsuario.rol === Roles.MASTER && showMore ? (
+                            {InfoUsuario.rol === Roles.GERENTE && showMore ? (
                               <>
                                 <td
                                   style={{

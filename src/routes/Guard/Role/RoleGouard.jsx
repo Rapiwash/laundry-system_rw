@@ -9,7 +9,7 @@ function RoleGuard({ rol }) {
   const userState = useSelector((store) => store.user.infoUsuario);
 
   // Verifica si el usuario tiene el rol de ADMIN o el rol proporcionado
-  const hasPermission = [Roles.ADMIN, Roles.MASTER, rol].includes(
+  const hasPermission = [Roles.ADMIN, Roles.GERENTE, rol].includes(
     userState.rol
   );
 

@@ -4,11 +4,10 @@ import React, { useEffect, useLayoutEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { Link, useLocation } from "react-router-dom";
 import { PrivateRoutes, Roles } from "../../../../models/index";
+import { ReactComponent as Logo } from "../../../../utils/img/Logo/logoRapiwash.svg";
 import Logout from "../../Logout/Logout";
 import "./headerCoord.scss";
 import { oldOrder } from "../../../../services/global";
-
-// import { ReactComponent as Logo } from '../../../../utils/img/Logo/logoMasterClean.svg';
 
 const HeaderUser = () => {
   const userState = useSelector((store) => store.user.infoUsuario);
@@ -123,8 +122,7 @@ const HeaderUser = () => {
   return (
     <header className="header-general">
       <div className="logo">
-        {/* <Logo className="svg-logo" /> */}
-        <h1>{InfoNegocio?.name}</h1>
+        <Logo className="svg-logo" />
       </div>
       <button type="button" className="hamburger" onClick={toggleNavBar}>
         <div className="line" />
@@ -145,9 +143,7 @@ const HeaderUser = () => {
               Listado de Pedido
             </Link>
           </li>
-          {userState.rol === Roles.ADMIN ||
-          userState.rol === Roles.MASTER ||
-          userState.rol === Roles.COORD ? (
+          {userState.rol === Roles.ADMIN || userState.rol === Roles.COORD ? (
             <>
               <li>
                 <Link to={`./${PrivateRoutes.REGISTER_TIENDA}`}>Tienda</Link>
@@ -168,8 +164,7 @@ const HeaderUser = () => {
             </>
           ) : null}
 
-          {(userState.rol === Roles.ADMIN || userState.rol === Roles.MASTER) &&
-          isSmallScreen ? (
+          {userState.rol === Roles.ADMIN && isSmallScreen ? (
             <>
               <li>
                 <Link to={`./${PrivateRoutes.PROMOCIONES}`}>Promociones</Link>

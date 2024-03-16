@@ -1,18 +1,27 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
-import React, { useEffect, useState } from 'react';
-import { DiasAttencion, HoraAttencion, handleGetInfoPago, roundDecimal } from '../../../../../../../utils/functions';
-import './ticket.scss';
+import React, { useEffect, useState } from "react";
+import {
+  DiasAttencion,
+  HoraAttencion,
+  handleGetInfoPago,
+  roundDecimal,
+} from "../../../../../../../utils/functions";
+import "./ticket.scss";
 
-import Pet from './pet.jpg';
-import AhorroPet from './petAhorro.jpg';
-// import { ReactComponent as Logo } from '../../../../../../../utils/img/Logo/logoMasterClean.svg';
+import Pet from "./pet.jpg";
+import AhorroPet from "./petAhorro.jpg";
+import { ReactComponent as Logo } from "../../../../../../../utils/img/Logo/logoRapiwash.svg";
 
-import moment from 'moment';
-import axios from 'axios';
-import { nameImpuesto, politicaAbandono, simboloMoneda } from '../../../../../../../services/global';
-import { useSelector } from 'react-redux';
+import moment from "moment";
+import axios from "axios";
+import {
+  nameImpuesto,
+  politicaAbandono,
+  simboloMoneda,
+} from "../../../../../../../services/global";
+import { useSelector } from "react-redux";
 
 const Ticket = React.forwardRef((props, ref) => {
   const { forW, infoOrden, InfoNegocio } = props;
@@ -20,20 +29,23 @@ const Ticket = React.forwardRef((props, ref) => {
   const [sPago, setSPago] = useState();
 
   const InfoServicios = useSelector((state) => state.servicios.listServicios);
-  const InfoCategorias = useSelector((state) => state.categorias.listCategorias);
+  const InfoCategorias = useSelector(
+    (state) => state.categorias.listCategorias
+  );
 
   const getInfoDelivery = () => {
-    const ICategory = InfoCategorias.find((cat) => cat.nivel === 'primario');
+    const ICategory = InfoCategorias.find((cat) => cat.nivel === "primario");
     const IService = InfoServicios.find(
-      (service) => service.idCategoria === ICategory._id && service.nombre === 'Delivery'
+      (service) =>
+        service.idCategoria === ICategory._id && service.nombre === "Delivery"
     );
 
     return IService;
   };
 
   const montoDelivery = (dataC) => {
-    if (dataC.Modalidad === 'Delivery') {
-      return infoOrden.Items.find((p) => p.item === 'Delivery').total;
+    if (dataC.Modalidad === "Delivery") {
+      return infoOrden.Items.find((p) => p.item === "Delivery").total;
     } else {
       return 0;
     }
@@ -41,17 +53,23 @@ const Ticket = React.forwardRef((props, ref) => {
 
   const calcularFechaFutura = (numeroDeDias) => {
     const fechaActual = moment();
-    const nuevaFecha = fechaActual.clone().add(numeroDeDias, 'days');
-    return nuevaFecha.format('D [de] MMMM[, del] YYYY');
+    const nuevaFecha = fechaActual.clone().add(numeroDeDias, "days");
+    return nuevaFecha.format("D [de] MMMM[, del] YYYY");
   };
 
   const handleGetInfoPromo = async (codigoCupon) => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-info-promo/${codigoCupon}`);
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/lava-ya/get-info-promo/${codigoCupon}`
+      );
       return response.data;
     } catch (error) {
       // Maneja los errores aquí
-      console.error(`No se pudo obtener información de la promoción - ${error}`);
+      console.error(
+        `No se pudo obtener información de la promoción - ${error}`
+      );
       throw error; // Lanza el error para que pueda ser capturado por Promise.all
     }
   };
@@ -61,14 +79,14 @@ const Ticket = React.forwardRef((props, ref) => {
     const datetimeString = `${date} ${hour}`;
 
     // Parsea la fecha y hora usando Moment.js
-    const dateTime = moment(datetimeString, 'YYYY-MM-DD HH:mm');
+    const dateTime = moment(datetimeString, "YYYY-MM-DD HH:mm");
 
-    return dateTime.format('D [de] MMMM, YYYY / hh:mm a');
+    return dateTime.format("D [de] MMMM, YYYY / hh:mm a");
   };
 
   const spaceLine = (txt) => {
     // Separar el string por saltos de línea ("\n")
-    const lines = txt.split('\n');
+    const lines = txt.split("\n");
 
     // Devolver un elemento <ol> con elementos <li> numerados para cada línea
     return (
@@ -76,9 +94,9 @@ const Ticket = React.forwardRef((props, ref) => {
         {lines.map((line, index) => (
           <li key={index} className="formatted-line">
             <p>
-              {line.includes('✔ ') ? (
+              {line.includes("✔ ") ? (
                 <>
-                  {line.replace('✔ ', ``)}
+                  {line.replace("✔ ", ``)}
                   <br />
                 </>
               ) : (
@@ -107,7 +125,10 @@ const Ticket = React.forwardRef((props, ref) => {
           setListPromos(results);
         } catch (error) {
           // Maneja los errores aquí
-          console.error('Error al obtener información de las promociones:', error);
+          console.error(
+            "Error al obtener información de las promociones:",
+            error
+          );
         }
       }
     };
@@ -128,8 +149,14 @@ const Ticket = React.forwardRef((props, ref) => {
           <div className="body-orden-service">
             <div className="receipt_header">
               <div className="name-bussiness">
-                <h1 className="title">LAVANDERIA</h1>
-                <h1 className="name">{InfoNegocio?.name}</h1>
+                <Logo className="img-logo" />
+                <div className="data-text">
+                  {/* <h1>LAVANDERIA</h1>
+                  <h1 className="name">{InfoNegocio?.name}</h1> */}
+                  {InfoNegocio.numero.state ? (
+                    <span>telf : {InfoNegocio?.numero?.info}</span>
+                  ) : null}
+                </div>
               </div>
               <table className="info-table">
                 <tbody>
@@ -142,7 +169,8 @@ const Ticket = React.forwardRef((props, ref) => {
                     <td>
                       {Object.keys(InfoNegocio).length > 0 ? (
                         <>
-                          {DiasAttencion(InfoNegocio?.horario.dias)} {HoraAttencion(InfoNegocio?.horario.horas)}
+                          {DiasAttencion(InfoNegocio?.horario.dias)}{" "}
+                          {HoraAttencion(InfoNegocio?.horario.horas)}
                           {/* <hr style={{ visibility: 'hidden' }} /> */}
                         </>
                       ) : null}
@@ -155,7 +183,7 @@ const Ticket = React.forwardRef((props, ref) => {
               <div className="cod-rec">
                 <p className="l-text">
                   ORDEN DE SERVICIO &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-                  <span>N° {String(infoOrden.codRecibo).padStart(4, '0')}</span>
+                  <span>N° {String(infoOrden.codRecibo).padStart(4, "0")}</span>
                 </p>
               </div>
               <div className="info-detail">
@@ -165,7 +193,12 @@ const Ticket = React.forwardRef((props, ref) => {
                       <td>Ingreso:</td>
                       <td>
                         <div className="date-time">
-                          <span>{handleShowDateTime(infoOrden.dateRecepcion.fecha, infoOrden.dateRecepcion.hora)}</span>
+                          <span>
+                            {handleShowDateTime(
+                              infoOrden.dateRecepcion.fecha,
+                              infoOrden.dateRecepcion.hora
+                            )}
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -173,7 +206,12 @@ const Ticket = React.forwardRef((props, ref) => {
                       <td>Entrega:</td>
                       <td>
                         <div className="date-time">
-                          <span>{handleShowDateTime(infoOrden.datePrevista.fecha, infoOrden.datePrevista.hora)}</span>
+                          <span>
+                            {handleShowDateTime(
+                              infoOrden.datePrevista.fecha,
+                              infoOrden.datePrevista.hora
+                            )}
+                          </span>
                         </div>
                       </td>
                     </tr>
@@ -213,7 +251,9 @@ const Ticket = React.forwardRef((props, ref) => {
                     </tr>
                   </thead>
                   <tbody>
-                    {infoOrden.Items.filter((p) => p.identificador !== getInfoDelivery()._id).map((p, index) => (
+                    {infoOrden.Items.filter(
+                      (p) => p.identificador !== getInfoDelivery()._id
+                    ).map((p, index) => (
                       <React.Fragment key={`${infoOrden._id}-${index}`}>
                         <tr>
                           <td>•</td>
@@ -234,8 +274,10 @@ const Ticket = React.forwardRef((props, ref) => {
                       <td colSpan="3">Subtotal :</td>
                       <td>
                         {roundDecimal(
-                          infoOrden.Items.reduce((total, p) => total + parseFloat(p.total), 0) -
-                            montoDelivery(infoOrden)
+                          infoOrden.Items.reduce(
+                            (total, p) => total + parseFloat(p.total),
+                            0
+                          ) - montoDelivery(infoOrden)
                         )}
                       </td>
                     </tr>
@@ -246,7 +288,8 @@ const Ticket = React.forwardRef((props, ref) => {
                     {infoOrden.factura ? (
                       <tr>
                         <td colSpan="3">
-                          {nameImpuesto} ({infoOrden.cargosExtras.igv.valor * 100} %) :
+                          {nameImpuesto} (
+                          {infoOrden.cargosExtras.igv.valor * 100} %) :
                         </td>
                         <td>{infoOrden.cargosExtras.igv.importe}</td>
                       </tr>
@@ -259,7 +302,7 @@ const Ticket = React.forwardRef((props, ref) => {
                       <td colSpan="3">Total a Pagar :</td>
                       <td>{roundDecimal(infoOrden.totalNeto)}</td>
                     </tr>
-                    {sPago?.estado === 'Incompleto' ? (
+                    {sPago?.estado === "Incompleto" ? (
                       <>
                         <tr>
                           <td colSpan="3">A Cuenta :</td>
@@ -273,17 +316,22 @@ const Ticket = React.forwardRef((props, ref) => {
                     ) : null}
                   </tfoot>
                 </table>
-                {infoOrden.modoDescuento === 'Promocion' && infoOrden.descuento > 0 ? (
+                {infoOrden.modoDescuento === "Promocion" &&
+                infoOrden.descuento > 0 ? (
                   <div className="space-ahorro">
-                    <h2 className="title">! Felicidades Ahorraste S/{infoOrden?.descuento} ¡</h2>
+                    <h2 className="title">
+                      ! Felicidades Ahorraste S/{infoOrden?.descuento} ¡
+                    </h2>
                     <div className="info-promo">
                       <span>Usando nuestras promociones :</span>
                       <div className="body-ahorro">
                         <div className="list-promo">
                           <ul>
-                            {infoOrden.cargosExtras.beneficios.promociones.map((p) => (
-                              <li key={p.codigoCupon}>{p.descripcion}</li>
-                            ))}
+                            {infoOrden.cargosExtras.beneficios.promociones.map(
+                              (p) => (
+                                <li key={p.codigoCupon}>{p.descripcion}</li>
+                              )
+                            )}
                           </ul>
                         </div>
                         <div className="img-pet">
@@ -297,12 +345,23 @@ const Ticket = React.forwardRef((props, ref) => {
             </div>
             <div className="monto-final">
               <h2>
-                Pago : {simboloMoneda} {handleGetInfoPago(infoOrden.ListPago, infoOrden.totalNeto).pago}
+                Pago : {simboloMoneda}{" "}
+                {
+                  handleGetInfoPago(infoOrden.ListPago, infoOrden.totalNeto)
+                    .pago
+                }
               </h2>
-              <h3 className={`${infoOrden.factura ? null : 'sf'} estado`}>
-                {handleGetInfoPago(infoOrden.ListPago, infoOrden.totalNeto).estado.toUpperCase()}
+              <h3 className={`${infoOrden.factura ? null : "sf"} estado`}>
+                {handleGetInfoPago(
+                  infoOrden.ListPago,
+                  infoOrden.totalNeto
+                ).estado.toUpperCase()}
               </h3>
-              {infoOrden.factura ? <h2 className="cangeo-factura">Canjear Orden de Servicio por Factura</h2> : null}
+              {infoOrden.factura ? (
+                <h2 className="cangeo-factura">
+                  Canjear Orden de Servicio por Factura
+                </h2>
+              ) : null}
             </div>
             <p className="aviso">
               NOTA: <span>{politicaAbandono.mResaltado}</span>
@@ -316,7 +375,9 @@ const Ticket = React.forwardRef((props, ref) => {
                   <div className="info-promo">
                     <div>
                       <h1>PROMOCION:</h1>
-                      <h2 style={{ fontSize: '0.8em', textAlign: 'justify' }}>{promo.descripcion}</h2>
+                      <h2 style={{ fontSize: "0.8em", textAlign: "justify" }}>
+                        {promo.descripcion}
+                      </h2>
                       <h2 className="cod-i">codigo: {promo.codigoCupon}</h2>
                     </div>
                     <div className="img-pet">
@@ -326,7 +387,10 @@ const Ticket = React.forwardRef((props, ref) => {
                   <div className="notice">
                     <span>CÁNJEELO EN SU PRÓXIMA ORDEN</span>
                   </div>
-                  <h2 className="vigencia" style={{ float: 'right', fontSize: '0.9em' }}>
+                  <h2
+                    className="vigencia"
+                    style={{ float: "right", fontSize: "0.9em" }}
+                  >
                     Vencimiento : {calcularFechaFutura(promo.vigencia)}
                   </h2>
                 </div>

@@ -20,8 +20,8 @@ import Portal from "../Portal/Portal";
 import "./ordernServicio.scss";
 
 import { ReactComponent as Eliminar } from "../../../utils/img/OrdenServicio/eliminar.svg";
-import { ReactComponent as Lavadora } from "../../../utils/img/OrdenServicio/lavadora.svg";
-// import { ReactComponent as Logo } from '../../../utils/img/Logo/logoMasterClean.svg';
+// import { ReactComponent as Lavadora } from '../../../utils/img/OrdenServicio/lavadora.svg';
+import { ReactComponent as Logo } from "../../../utils/img/Logo/logoRapiwash.svg";
 
 import Tranferencia from "../../../utils/img/OrdenServicio/Transferencia.png";
 import Efectivo from "../../../utils/img/OrdenServicio/dinero.png";
@@ -892,19 +892,14 @@ const OrdenServicio = ({
         <div className="body-form">
           <div className="c-title">
             <div className="info-t">
-              <Lavadora className="ico-lava-ya" />
               <div className="title">
-                <h1>{InfoNegocio?.name}</h1>
-                <h2>LAVANDERIA</h2>
+                <Logo className="ico-logo" />
                 {Object.keys(InfoNegocio).length > 0 ? (
                   <h3>
                     {DiasAttencion(InfoNegocio?.horario.dias)}
                     <br />
                     {HoraAttencion(InfoNegocio?.horario.horas)}
                   </h3>
-                ) : null}
-                {InfoNegocio?.numero?.state ? (
-                  <h3>Cel.: {InfoNegocio?.numero?.info}</h3>
                 ) : null}
               </div>
             </div>

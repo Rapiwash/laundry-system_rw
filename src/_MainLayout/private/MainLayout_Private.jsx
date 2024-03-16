@@ -407,14 +407,14 @@ const PrivateMasterLayout = (props) => {
           <div className="header_pcp">
             <HeaderCoord />
             {InfoUsuario.rol === Roles.ADMIN ||
-            InfoUsuario.rol === Roles.MASTER ? (
+            InfoUsuario.rol === Roles.GERENTE ? (
               <HeaderAdmin />
             ) : null}
           </div>
           <section
             className={`body_pcp ${
               InfoUsuario.rol === Roles.ADMIN ||
-              InfoUsuario.rol === Roles.MASTER
+              InfoUsuario.rol === Roles.GERENTE
                 ? "mode-admin"
                 : "mode-user"
             }`}

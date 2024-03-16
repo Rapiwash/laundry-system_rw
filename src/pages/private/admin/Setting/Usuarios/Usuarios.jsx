@@ -140,13 +140,13 @@ const Usuarios = () => {
   };
 
   const validEnabledAccion = (user) => {
-    return InfoUsuario.rol === "master"
+    return InfoUsuario.rol === "admin"
       ? false
-      : InfoUsuario.rol === "admin" && user.rol === "admin"
+      : InfoUsuario.rol === "gerente" && user.rol === "gerente"
       ? user._id === InfoUsuario._id
         ? false
         : true
-      : InfoUsuario.rol === "admin" && user.rol !== "master"
+      : InfoUsuario.rol === "gerente" && user.rol !== "admin"
       ? false
       : true;
   };
@@ -278,7 +278,7 @@ const Usuarios = () => {
                   placeholder="Escoge el rol"
                   clearable={
                     initialValues.rol === "admin" ||
-                    initialValues.rol === "master"
+                    initialValues.rol === "gerente"
                       ? false
                       : true
                   }
@@ -286,25 +286,26 @@ const Usuarios = () => {
                   // disabled={validEnabledAccion(initialValues)}
                   readOnly={
                     initialValues._id === InfoUsuario._id ||
-                    initialValues.rol === "master"
+                    initialValues.rol === "gerente"
                   }
                   data={[
                     {
-                      value: "master",
-                      label: "Gerente",
+                      value: "admin",
+                      label: "Administrador",
                       disabled: true,
                     },
                     {
-                      value: "admin",
-                      label: "Administrador",
-                      disabled: InfoUsuario.rol === "master" ? false : true,
+                      value: "gerente",
+                      label: "Gerente",
+                      disabled: InfoUsuario.rol === "admin" ? false : true,
                     },
+
                     {
                       value: "coord",
                       label: "Coordinador",
                       disabled:
                         InfoUsuario.rol === "admin" ||
-                        InfoUsuario.rol === "master"
+                        InfoUsuario.rol === "gerente"
                           ? false
                           : true,
                     },
@@ -313,7 +314,7 @@ const Usuarios = () => {
                       label: "Personal",
                       disabled:
                         InfoUsuario.rol === "admin" ||
-                        InfoUsuario.rol === "master"
+                        InfoUsuario.rol === "gerente"
                           ? false
                           : true,
                     },

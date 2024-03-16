@@ -1,7 +1,6 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import "./reportes.scss";
-import { Link } from "react-router-dom";
 import { PrivateRoutes, Roles } from "../../../../models";
 import Ordenes from "./Ordenes/Ordenes";
 import Gasto from "./Gastos/Gasto";
@@ -62,7 +61,7 @@ const Reportes = () => {
       imgIco: iRPendiente,
       imgBack: rBPendiente,
       type_show: "page",
-      acceso: [Roles.ADMIN, Roles.MASTER],
+      acceso: [Roles.ADMIN, Roles.GERENTE],
       title: "Ordenes Pendientes",
       descripcion:
         "Listado Ordenes pendiente, tiempo en custodia, reenviar Almacen",
@@ -72,7 +71,7 @@ const Reportes = () => {
       imgIco: iRGastos,
       imgBack: rBGastos,
       type_show: "modal",
-      acceso: [Roles.ADMIN, Roles.MASTER],
+      acceso: [Roles.ADMIN, Roles.GERENTE],
       title: "Gastos",
       descripcion:
         "Margen de gasto Mensual, exportacion excel, flujo de gastos",
@@ -82,7 +81,7 @@ const Reportes = () => {
       imgIco: iRPortafolio,
       imgBack: rBPortafolio,
       type_show: "page",
-      acceso: [Roles.MASTER],
+      acceso: [Roles.ADMIN],
       title: "Productos y Servicios",
       descripcion:
         "Listado Ordenes pendiente, tiempo en custodia, reenviar Almacen",
@@ -92,7 +91,7 @@ const Reportes = () => {
       imgIco: iRCuadreCaja,
       imgBack: rBCuadredCaja,
       type_show: "page",
-      acceso: [Roles.ADMIN, Roles.MASTER],
+      acceso: [Roles.ADMIN, Roles.GERENTE],
       title: "Cuadres de Caja",
       descripcion:
         "Listado Cuadres Diarios y Movimientos no Guardados o Cuadrados, exportar a excel",
@@ -102,7 +101,7 @@ const Reportes = () => {
       imgIco: iRMensual,
       imgBack: rBMensual,
       type_show: "modal",
-      acceso: [Roles.MASTER],
+      acceso: [Roles.GERENTE],
       title: "Ordenes Mensual",
       descripcion:
         "Listado Ordenes mensual, exportacion en excel, montos pagados y facturados",
@@ -113,7 +112,7 @@ const Reportes = () => {
       imgIco: iRAlmacen,
       imgBack: rBAlmacen,
       type_show: "page",
-      acceso: [Roles.ADMIN, Roles.MASTER],
+      acceso: [Roles.ADMIN, Roles.GERENTE],
       title: "Almacen",
       descripcion:
         "Listado Ordenes en Almacen, tiempo en custodia, Enviar a DONACION",
