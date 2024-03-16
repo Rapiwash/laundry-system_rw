@@ -184,7 +184,7 @@ const Items = () => {
     // Agregar la cabecera
     worksheet
       .addRow([
-        "Codigo",
+        "N° ",
         `${tipoFiltro === "productos" ? "Producto" : "Servicio"}`,
         "Cantidad",
         "Monto Generado",
@@ -193,9 +193,10 @@ const Items = () => {
         cell.fill = headerStyle.fill;
         cell.font = headerStyle.font;
       });
-    data.forEach((item) => {
+    data.forEach((item, index) => {
       worksheet.addRow([
-        item.codigo,
+        // item.codigo,
+        index + 1,
         item.nombre,
         `${item.cantidad} ${item.simboloMedida} `,
         `${simboloMoneda} ${item.montoGenerado}`,
