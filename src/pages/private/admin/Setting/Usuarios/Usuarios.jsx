@@ -24,6 +24,7 @@ import {
 } from "../../../../../redux/states/user";
 import LoaderSpiner from "../../../../../components/LoaderSpinner/LoaderSpiner";
 import { socket } from "../../../../../utils/socket/connect";
+import { Roles } from "../../../../../models";
 
 const baseState = {
   _id: "",
@@ -140,13 +141,13 @@ const Usuarios = () => {
   };
 
   const validEnabledAccion = (user) => {
-    return InfoUsuario.rol === "admin"
+    return InfoUsuario.rol === Roles.ADMIN
       ? false
-      : InfoUsuario.rol === "gerente" && user.rol === "gerente"
+      : InfoUsuario.rol === Roles.GERENTE && user.rol === Roles.GERENTE
       ? user._id === InfoUsuario._id
         ? false
         : true
-      : InfoUsuario.rol === "gerente" && user.rol !== "admin"
+      : InfoUsuario.rol === Roles.GERENTE && user.rol !== Roles.ADMIN
       ? false
       : true;
   };
@@ -277,8 +278,8 @@ const Usuarios = () => {
                   }}
                   placeholder="Escoge el rol"
                   clearable={
-                    initialValues.rol === "admin" ||
-                    initialValues.rol === "gerente"
+                    initialValues.rol === Roles.ADMIN ||
+                    initialValues.rol === Roles.GERENTE
                       ? false
                       : true
                   }
@@ -286,26 +287,26 @@ const Usuarios = () => {
                   // disabled={validEnabledAccion(initialValues)}
                   readOnly={
                     initialValues._id === InfoUsuario._id ||
-                    initialValues.rol === "gerente"
+                    initialValues.rol === Roles.GERENTE
                   }
                   data={[
                     {
-                      value: "admin",
+                      value: Roles.ADMIN,
                       label: "Administrador",
                       disabled: true,
                     },
                     {
-                      value: "gerente",
+                      value: Roles.GERENTE,
                       label: "Gerente",
-                      disabled: InfoUsuario.rol === "admin" ? false : true,
+                      disabled: InfoUsuario.rol === Roles.ADMIN ? false : true,
                     },
 
                     {
                       value: "coord",
                       label: "Coordinador",
                       disabled:
-                        InfoUsuario.rol === "admin" ||
-                        InfoUsuario.rol === "gerente"
+                        InfoUsuario.rol === Roles.ADMIN ||
+                        InfoUsuario.rol === Roles.GERENTE
                           ? false
                           : true,
                     },
@@ -313,8 +314,8 @@ const Usuarios = () => {
                       value: "pers",
                       label: "Personal",
                       disabled:
-                        InfoUsuario.rol === "admin" ||
-                        InfoUsuario.rol === "gerente"
+                        InfoUsuario.rol === Roles.ADMIN ||
+                        InfoUsuario.rol === Roles.GERENTE
                           ? false
                           : true,
                     },

@@ -59,7 +59,7 @@ const Private = () => {
           element={<ListOrdenService />}
         />
         {/* PAGES ADMINISTRADOR O PAGES GERENTE */}
-        <Route element={<RoleGuard rol={Roles.ADMIN} />}>
+        <Route element={<RoleGuard rol={Roles.GERENTE} />}>
           <Route path={PrivateRoutes.PROMOCIONES} element={<Promociones />} />
           {/* <Route path={PrivateRoutes.GRAFICOS} element={<Graficos />} /> */}
           <Route path={PrivateRoutes.SETTING} element={<Setting />} />

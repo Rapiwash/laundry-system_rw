@@ -9,7 +9,7 @@ import { modals } from "@mantine/modals";
 import { Button, MultiSelect, Text } from "@mantine/core";
 import { TextInput } from "@mantine/core";
 import { TimeInput } from "@mantine/dates";
-import { PrivateRoutes } from "../../../../../models";
+import { PrivateRoutes, Roles } from "../../../../../models";
 import { useNavigate } from "react-router-dom";
 import { UpdateInfoNegocio } from "../../../../../redux/actions/aNegocio";
 
@@ -99,11 +99,11 @@ const Negocio = () => {
   }, [InfoNegocio]);
 
   useEffect(() => {
-    if (!formik.values.rolQAnulan.includes("admin")) {
+    if (!formik.values.rolQAnulan.includes(Roles.ADMIN)) {
       // Si no está presente, agregarlo al array
       formik.setFieldValue("rolQAnulan", [
         ...formik.values.rolQAnulan,
-        "admin",
+        Roles.ADMIN,
       ]);
     }
   }, [formik.values.rolQAnulan]);
@@ -222,9 +222,9 @@ const Negocio = () => {
                   maxSelectedValues={3}
                   searchable
                   data={[
-                    { value: "admin", label: "Administrador" },
-                    { value: "gerente", label: "Gerente" },
-                    { value: "coord", label: "Coordinador" },
+                    { value: Roles.ADMIN, label: "Administrador" },
+                    { value: Roles.GERENTE, label: "Gerente" },
+                    { value: Roles.COORD, label: "Coordinador" },
                   ]}
                   maxDropdownHeight={150}
                   max={250}
