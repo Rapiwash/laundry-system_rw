@@ -6,6 +6,8 @@ import ExcelJS from "exceljs";
 import "./items.scss";
 import { simboloMoneda } from "../../../../../services/global";
 import SwitchModel from "../../../../../components/SwitchModel/SwitchModel";
+import { MonthPickerInput } from "@mantine/dates";
+import moment from "moment";
 
 const Items = () => {
   const [data, setData] = useState([]);
@@ -15,14 +17,20 @@ const Items = () => {
   const [infoServicios, setInfoServicios] = useState([]);
   const [loading, setLoading] = useState(false);
 
+  const [datePrincipal, setDatePrincipal] = useState(new Date());
+
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const fechaConsulta = moment(datePrincipal).format("YYYY-MM-DD");
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-informacion`
+          `${
+            import.meta.env.VITE_BACKEND_URL
+          }/api/lava-ya/get-informacion/${fechaConsulta}`
         );
 
         const data = response.data;
+        console.log(data);
         data.forEach((dato) => {
           dato.montoGenerado = Number(dato.montoGenerado.toFixed(2));
           dato.cantidad = Number(dato.cantidad.toFixed(2));
@@ -39,7 +47,7 @@ const Items = () => {
     };
 
     fetchData();
-  }, []);
+  }, [datePrincipal]);
 
   const minPrendas = 10;
 
@@ -152,7 +160,7 @@ const Items = () => {
     // Agregar la cabecera
     worksheet
       .addRow([
-        "N° ",
+        "Codigo",
         `${tipoFiltro === "productos" ? "Producto" : "Servicio"}`,
         "Cantidad",
         "Monto Generado",
@@ -161,10 +169,9 @@ const Items = () => {
         cell.fill = headerStyle.fill;
         cell.font = headerStyle.font;
       });
-    data.forEach((item, index) => {
+    data.forEach((item) => {
       worksheet.addRow([
-        // item.codigo,
-        index + 1,
+        item.codigo,
         item.nombre,
         `${item.cantidad} ${item.simboloMedida} `,
         `${simboloMoneda} ${item.montoGenerado}`,
@@ -243,6 +250,17 @@ const Items = () => {
           <h1>
             Reporte de {tipoFiltro === "productos" ? "Productos" : "Servicios"}
           </h1>
+          <MonthPickerInput
+            style={{ position: "relative", width: "100%", textAlign: "center" }}
+            label="Seleccion de Fecha"
+            placeholder="Pick date"
+            value={datePrincipal}
+            onChange={(date) => {
+              setDatePrincipal(date);
+            }}
+            mx="auto"
+            maw={400}
+          />
         </div>
         <SwitchModel
           title="Tipo :"
