@@ -1,25 +1,37 @@
 /* eslint-disable react-hooks/rules-of-hooks */
-import React, { useState } from 'react';
-import ReactToPrint from 'react-to-print';
-import Ticket from './Ticket/Ticket';
-import whatsappApp from './whatsappApp.png';
-import './imprimir.scss';
-import SwtichModel from '../../../../../../components/SwitchModel/SwitchModel';
-import { useParams } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { Notify } from '../../../../../../utils/notify/Notify';
-import { codigoPhonePais, simboloMoneda } from '../../../../../../services/global';
-import { DateDetail, handleGetInfoPago } from '../../../../../../utils/functions';
-import { WSendMessage } from '../../../../../../services/default.services';
-import moment from 'moment';
+import React, { useState } from "react";
+import ReactToPrint from "react-to-print";
+import Ticket from "./Ticket/Ticket";
+import whatsappApp from "./whatsappApp.png";
+import "./imprimir.scss";
+import SwtichModel from "../../../../../../components/SwitchModel/SwitchModel";
+import { useParams } from "react-router-dom";
+import { useSelector } from "react-redux";
+import { Notify } from "../../../../../../utils/notify/Notify";
+import {
+  codigoPhonePais,
+  simboloMoneda,
+} from "../../../../../../services/global";
+import {
+  DateDetail,
+  handleGetInfoPago,
+} from "../../../../../../utils/functions";
+import { WSendMessage } from "../../../../../../services/default.services";
+import moment from "moment";
 
 const index = () => {
   const { id } = useParams();
-  const infoOrden = useSelector((state) => state.orden.registered.find((item) => item._id === id));
+  const infoOrden = useSelector((state) =>
+    state.orden.registered.find((item) => item._id === id)
+  );
   const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
 
   const [fCli, setFCli] = useState(false);
-  const [phoneA, setPhoneA] = useState(infoOrden.celular ? `${codigoPhonePais}${infoOrden.celular}` : '');
+  const [phoneA, setPhoneA] = useState(
+    infoOrden.celular
+      ? `${codigoPhonePais}${infoOrden.celular.replace(/\s/g, "")}`
+      : ""
+  );
   const componentRef = React.useRef();
 
   const handleSendMessage = () => {
@@ -27,23 +39,22 @@ const index = () => {
     const sPago = handleGetInfoPago(infoOrden.ListPago, infoOrden.totalNeto);
 
     if (number) {
-      const mensaje = `¡Hola *${infoOrden.Nombre}* ! Le saluda la *Lavanderia ${InfoNegocio.name}*, Su Orden es la *#${
-        infoOrden.codRecibo
-      }*, ${
-        infoOrden.Pago === 'Completo'
+      const mensaje = `¡Hola *${infoOrden.Nombre}* ! Le saluda la *Lavanderia ${
+        InfoNegocio.name
+      }*, Su Orden es la *#${infoOrden.codRecibo}*, ${
+        infoOrden.Pago === "Completo"
           ? `ya esta *PAGADO*`
-          : infoOrden.Pago === 'Incompleto'
+          : infoOrden.Pago === "Incompleto"
           ? `con monto pendiente de *${simboloMoneda}${sPago.falta}*`
           : `con monto a pagar *${simboloMoneda}${infoOrden.totalNeto}*`
-      }, su entrega es el día ${DateDetail(infoOrden.datePrevista.fecha)} / ${moment(
-        infoOrden.datePrevista.hora,
-        'HH:mm'
-      ).format('hh:mm A')}`;
+      }, su entrega es el día ${DateDetail(
+        infoOrden.datePrevista.fecha
+      )} / ${moment(infoOrden.datePrevista.hora, "HH:mm").format("hh:mm A")}`;
       for (let index = 0; index < 2; index++) {
         WSendMessage(mensaje, number);
       }
     } else {
-      Notify('Cliente sin numero', '', 'fail');
+      Notify("Cliente sin numero", "", "fail");
     }
   };
 
@@ -58,12 +69,13 @@ const index = () => {
           )}
           content={() => componentRef.current}
         />
+
         {phoneA ? (
           <div className="send-whatsapp">
             <button
               type="button"
               onClick={() => {
-                handleSendMessage('App');
+                handleSendMessage("App");
               }}
               className="btn-send-whatsapp app"
             >
@@ -77,7 +89,9 @@ const index = () => {
                 defaultValue={phoneA}
                 onChange={(e) => {
                   const inputValue = e.target.value;
-                  const validInput = inputValue ? inputValue.replace(/[^0-9.]/g, '') : '';
+                  const validInput = inputValue
+                    ? inputValue.replace(/[^0-9.]/g, "")
+                    : "";
                   setPhoneA(validInput);
                 }}
               />
@@ -97,7 +111,12 @@ const index = () => {
           setFCli(!fCli);
         }}
       />
-      <Ticket ref={componentRef} forW={fCli} infoOrden={infoOrden} InfoNegocio={InfoNegocio} />
+      <Ticket
+        ref={componentRef}
+        forW={fCli}
+        infoOrden={infoOrden}
+        InfoNegocio={InfoNegocio}
+      />
     </div>
   );
 };

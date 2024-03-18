@@ -78,11 +78,11 @@ const ReporteMesual = () => {
     const idsItems = InfoNegocio.itemsInformeDiario;
     setItemSelected(idsItems);
 
-    const orderedItems = idsItems.map((id, index) => {
-      const infoItem = listItems.find((objeto) => objeto.value === id);
+    const orderedItems = idsItems.map((item, index) => {
+      const infoItem = listItems.find((objeto) => objeto.value === item.id);
       return {
         name: infoItem?.label.slice(0, -4),
-        id: id.substring(3),
+        id: item.id.substring(3),
         order: index + 1, // Se suma 1 para iniciar el orden desde 1 en lugar de 0
       };
     });
@@ -122,9 +122,14 @@ const ReporteMesual = () => {
               <MultiSelect
                 size="sm"
                 label="Columnas de Reporte"
-                value={itemSelected}
+                value={itemSelected.map((item) => item.id)}
                 onChange={(e) => {
                   setItemSelected(e);
+                  const selectedItemsWithOrder = e.map((id, index) => ({
+                    order: index + 1,
+                    id: id,
+                  }));
+                  setItemSelected(selectedItemsWithOrder);
                 }}
                 placeholder="Escoge Servicios"
                 clearable
@@ -138,15 +143,9 @@ const ReporteMesual = () => {
                 <Button
                   className="btn-ajustar"
                   onClick={() => {
-                    const elementosFiltrados = listItems.filter((item) =>
-                      itemSelected.includes(item.value)
-                    );
-
                     dispatch(
                       UpdateInfoNegocio({
-                        itemsInformeDiario: elementosFiltrados.map(
-                          (identificador) => identificador.value
-                        ),
+                        itemsInformeDiario: itemSelected,
                       })
                     );
                   }}

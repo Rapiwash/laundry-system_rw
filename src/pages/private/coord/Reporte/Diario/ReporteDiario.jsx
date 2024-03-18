@@ -66,11 +66,11 @@ const ReporteDiario = ({ onClose }) => {
   useEffect(() => {
     const idsItems = InfoNegocio.itemsInformeDiario;
 
-    const orderedItems = idsItems.map((id, index) => {
-      const infoItem = listItems.find((objeto) => objeto.value === id);
+    const orderedItems = idsItems.map((item, index) => {
+      const infoItem = listItems.find((objeto) => objeto.value === item.id);
       return {
         name: infoItem?.label.slice(0, -4),
-        id: id.substring(3),
+        id: item.id.substring(3),
         order: index + 1, // Se suma 1 para iniciar el orden desde 1 en lugar de 0
       };
     });
