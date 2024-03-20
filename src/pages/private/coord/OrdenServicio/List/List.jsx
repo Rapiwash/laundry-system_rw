@@ -574,7 +574,8 @@ const List = () => {
           enableStickyHeader={true}
           mantineTableContainerProps={{
             sx: {
-              maxHeight: " clamp(370px, calc(100vh - 56px), 370px)",
+              // maxHeight: " clamp(370px, calc(100vh - 56px), 370px)",
+              maxHeight: "100vh",
               zIndex: "2",
             },
           }}

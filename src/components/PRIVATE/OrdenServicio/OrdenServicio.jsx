@@ -69,7 +69,7 @@ const OrdenServicio = ({
   iDelivery,
 }) => {
   const iCodigo = useSelector((state) => state.codigo.infoCodigo.codActual);
-  const infoPrendas = useSelector((state) => state.prenda.infoPrendas);
+  const infoPromocion = useSelector((state) => state.promocion.infoPromocion);
   const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
   const InfoUsuario = useSelector((state) => state.user.infoUsuario);
   const InfoLastCuadre = useSelector((state) => state.cuadre.lastCuadre);
@@ -247,7 +247,16 @@ const OrdenServicio = ({
         if (iEdit?.estado === "registrado") {
           openModal([]);
         } else {
-          open();
+          const thereIsPromo = infoPromocion.length > 0;
+          const thereIsPromoActiva = infoPromocion.some(
+            (promocion) => promocion.state === "activo"
+          );
+
+          if (thereIsPromo && thereIsPromoActiva) {
+            open();
+          } else {
+            openModal([]);
+          }
         }
       }
     },

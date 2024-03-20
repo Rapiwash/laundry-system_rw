@@ -54,6 +54,7 @@ const Ordenes = ({ onClose }) => {
       );
 
       const infoOrdenesM = response.data;
+
       if (infoOrdenesM) {
         // Crear un nuevo libro de Excel
         const workbook = new ExcelJS.Workbook();
@@ -110,7 +111,7 @@ const Ordenes = ({ onClose }) => {
             estadoPago.pago > 0 ? +estadoPago.pago : 0,
             estadoPago.estado,
             +item.totalNeto,
-            item.Celular ? item.Celular : "-",
+            item.celular ? item.celular : "-",
             item.dni,
             item.dateRecepcion.fecha,
             item.dateEntrega.fecha,

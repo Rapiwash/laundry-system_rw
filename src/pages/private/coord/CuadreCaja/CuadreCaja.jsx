@@ -1,4 +1,4 @@
-﻿/* eslint-disable react/no-unescaped-entities */
+﻿﻿/* eslint-disable react/no-unescaped-entities */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useState, useEffect, useRef } from "react";
@@ -399,8 +399,8 @@ const CuadreCaja = () => {
         egresos: { delivery, gastos },
         ingresos: {
           efectivo: pedidosPagadosEfectivo,
-          tarjeta: pedidosPagadosTransferencia,
-          transferencia: pedidosPagadosTarjeta,
+          tarjeta: pedidosPagadosTarjeta,
+          transferencia: pedidosPagadosTransferencia,
         },
         estado:
           stateCuadre > 0 ? "Sobra" : stateCuadre < 0 ? "Falta" : "Cuadro",

@@ -69,7 +69,6 @@ const index = () => {
           )}
           content={() => componentRef.current}
         />
-
         {phoneA ? (
           <div className="send-whatsapp">
             <button

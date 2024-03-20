@@ -8,6 +8,8 @@ import { simboloMoneda } from "../../../../../services/global";
 import SwitchModel from "../../../../../components/SwitchModel/SwitchModel";
 import { MonthPickerInput } from "@mantine/dates";
 import moment from "moment";
+import { Roles } from "../../../../../models";
+import { useSelector } from "react-redux";
 
 const Items = () => {
   const [data, setData] = useState([]);
@@ -19,6 +21,8 @@ const Items = () => {
 
   const [datePrincipal, setDatePrincipal] = useState(new Date());
 
+  const InfoUsuario = useSelector((store) => store.user.infoUsuario);
+
   useEffect(() => {
     const fetchData = async () => {
       try {
@@ -28,15 +32,15 @@ const Items = () => {
             import.meta.env.VITE_BACKEND_URL
           }/api/lava-ya/get-informacion/${fechaConsulta}`
         );
-
         const data = response.data;
-        console.log(data);
         data.forEach((dato) => {
           dato.montoGenerado = Number(dato.montoGenerado.toFixed(2));
           dato.cantidad = Number(dato.cantidad.toFixed(2));
         });
+
         const iProd = data.filter((item) => item.tipo === "productos");
         const iServ = data.filter((item) => item.tipo === "servicios");
+
         setInfoProductos(iProd);
         setInfoServicios(iServ);
         setTipoFiltro("servicios");
@@ -160,7 +164,8 @@ const Items = () => {
     // Agregar la cabecera
     worksheet
       .addRow([
-        "Codigo",
+        "N° ",
+        "Categoria",
         `${tipoFiltro === "productos" ? "Producto" : "Servicio"}`,
         "Cantidad",
         "Monto Generado",
@@ -169,12 +174,15 @@ const Items = () => {
         cell.fill = headerStyle.fill;
         cell.font = headerStyle.font;
       });
-    data.forEach((item) => {
+    data.forEach((item, index) => {
       worksheet.addRow([
-        item.codigo,
+        index + 1,
+        item.categoria.name,
         item.nombre,
-        `${item.cantidad} ${item.simboloMedida} `,
-        `${simboloMoneda} ${item.montoGenerado}`,
+        // `${item.cantidad} ${item.simboloMedida} `,
+        // `${simboloMoneda} ${item.montoGenerado}`,
+        +item.cantidad,
+        +item.montoGenerado,
       ]);
     });
 
@@ -232,20 +240,24 @@ const Items = () => {
   return (
     <div className="container-productos">
       <div className="header-p">
-        <SwitchModel
-          title="Valorizar por :"
-          onSwitch="Cantidad" // TRUE
-          offSwitch="Monto" // FALSE
-          name="valorizacion"
-          defaultValue={valorizarX === "cantidad" ? true : false}
-          onChange={(value) => {
-            if (value === true) {
-              setValorizarX("cantidad");
-            } else {
-              setValorizarX("montoGenerado");
-            }
-          }}
-        />
+        {InfoUsuario.rol === Roles.ADMIN ? (
+          <SwitchModel
+            title="Valorizar por :"
+            onSwitch="Cantidad" // TRUE
+            offSwitch="Monto" // FALSE
+            name="valorizacion"
+            defaultValue={valorizarX === "cantidad" ? true : false}
+            onChange={(value) => {
+              if (value === true) {
+                setValorizarX("cantidad");
+              } else {
+                setValorizarX("montoGenerado");
+              }
+            }}
+          />
+        ) : (
+          <div style={{ width: "200px" }} />
+        )}
         <div>
           <h1>
             Reporte de {tipoFiltro === "productos" ? "Productos" : "Servicios"}
@@ -358,7 +370,9 @@ const Items = () => {
                     {tipoFiltro === "productos" ? "Productos" : "Servicios"}
                   </th>
                   <th>Cantidad</th>
-                  <th>Monto Generado</th>
+                  {InfoUsuario.rol === Roles.ADMIN ? (
+                    <th>Monto Generado</th>
+                  ) : null}
                 </tr>
               </thead>
               <tbody>
@@ -370,35 +384,39 @@ const Items = () => {
                       <td>
                         {item.cantidad} {item.simboloMedida}
                       </td>
-                      <td>
-                        {simboloMoneda} {item.montoGenerado}
-                      </td>
+                      {InfoUsuario.rol === Roles.ADMIN ? (
+                        <td>
+                          {simboloMoneda} {item.montoGenerado}
+                        </td>
+                      ) : null}
                     </tr>
                   ))}
               </tbody>
             </table>
           </div>
           <div className="action-t">
-            <button
-              className={`button_wrapper ${loading ? "loading" : ""}`}
-              onClick={handleExport}
-            >
-              <div className="icon">
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  strokeWidth="1.75"
-                  stroke="currentColor"
-                >
-                  <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75"
-                  />
-                </svg>
-              </div>
-            </button>
+            {InfoUsuario.rol === Roles.ADMIN ? (
+              <button
+                className={`button_wrapper ${loading ? "loading" : ""}`}
+                onClick={handleExport}
+              >
+                <div className="icon">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    strokeWidth="1.75"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      d="M12 4.5v15m0 0l6.75-6.75M12 19.5l-6.75-6.75"
+                    />
+                  </svg>
+                </div>
+              </button>
+            ) : null}
           </div>
         </div>
         <div className="graf-prod">

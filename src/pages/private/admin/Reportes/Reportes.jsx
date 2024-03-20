@@ -1,6 +1,7 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import "./reportes.scss";
+import { Link } from "react-router-dom";
 import { PrivateRoutes, Roles } from "../../../../models";
 import Ordenes from "./Ordenes/Ordenes";
 import Gasto from "./Gastos/Gasto";
@@ -101,7 +102,7 @@ const Reportes = () => {
       imgIco: iRMensual,
       imgBack: rBMensual,
       type_show: "modal",
-      acceso: [Roles.GERENTE],
+      acceso: [Roles.ADMIN],
       title: "Ordenes Mensual",
       descripcion:
         "Listado Ordenes mensual, exportacion en excel, montos pagados y facturados",

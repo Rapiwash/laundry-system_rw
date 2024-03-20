@@ -2,10 +2,10 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable react/display-name */
 
-import { Group, Select, Text } from '@mantine/core';
-import { forwardRef, useEffect, useState } from 'react';
+import { Group, Select, Text } from "@mantine/core";
+import { forwardRef, useEffect, useState } from "react";
 
-import { useSelector } from 'react-redux';
+import { useSelector } from "react-redux";
 
 const SelectItem = forwardRef(({ /*image,*/ label, ...others }, ref) => (
   <div ref={ref} {...others}>
@@ -26,8 +26,6 @@ const InputSelectedPrenda = ({ listenClick, tabI, disabled }) => {
   const [defaultValue, setDefaultValue] = useState(null);
 
   const filtrarServicios = (servicios, categorias) => {
-
-
     const mapeoCategorias = categorias.reduce((acc, categoria) => {
       acc[categoria._id] = categoria;
       return acc;
@@ -35,8 +33,11 @@ const InputSelectedPrenda = ({ listenClick, tabI, disabled }) => {
 
     return servicios.filter((servicio) => {
       const categoria = mapeoCategorias[servicio.idCategoria];
-      // Excluir solo si el servicio es "Delivery" y su categoría es de nivel "primario"
-      return !(servicio.nombre === 'Delivery' && categoria.nivel === 'primario');
+      // Excluir si el servicio es "Delivery" y su categoría es de nivel "primario" o si el estado es false
+      return (
+        !(servicio.nombre === "Delivery" && categoria.nivel === "primario") &&
+        servicio.estado
+      );
     });
   };
 
@@ -67,7 +68,9 @@ const InputSelectedPrenda = ({ listenClick, tabI, disabled }) => {
       dropdownPosition="bottom"
       maxDropdownHeight={270}
       nothingFound="No encontrado"
-      filter={(value, item) => item.label.toLowerCase().includes(value.toLowerCase().trim())}
+      filter={(value, item) =>
+        item.label.toLowerCase().includes(value.toLowerCase().trim())
+      }
       hoverOnSearchChange={true}
       onChange={(value) => {
         listenClick(value);
