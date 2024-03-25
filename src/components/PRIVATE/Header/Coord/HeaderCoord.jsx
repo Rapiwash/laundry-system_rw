@@ -143,7 +143,9 @@ const HeaderUser = () => {
               Listado de Pedido
             </Link>
           </li>
-          {userState.rol === Roles.ADMIN || userState.rol === Roles.COORD ? (
+          {userState.rol === Roles.ADMIN ||
+          userState.rol === Roles.COORD ||
+          userState.rol === Roles.GERENTE ? (
             <>
               <li>
                 <Link to={`./${PrivateRoutes.REGISTER_TIENDA}`}>Tienda</Link>
@@ -164,7 +166,8 @@ const HeaderUser = () => {
             </>
           ) : null}
 
-          {userState.rol === Roles.ADMIN && isSmallScreen ? (
+          {userState.rol === Roles.ADMIN ||
+          (userState.rol === Roles.GERENTE && isSmallScreen) ? (
             <>
               <li>
                 <Link to={`./${PrivateRoutes.PROMOCIONES}`}>Promociones</Link>
