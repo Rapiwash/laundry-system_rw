@@ -62,7 +62,7 @@ export const GetListUser = createAsyncThunk("user/GetListUser", async () => {
 export const EditUser = createAsyncThunk("user/EditUser", async (data) => {
   try {
     const response = await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/edit-user/${data.id}`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/edit-user/${data._id}`,
       data
     );
     if (response) {
