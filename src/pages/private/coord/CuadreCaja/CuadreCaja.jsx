@@ -7,12 +7,14 @@ import { useSelector, useDispatch } from "react-redux";
 import { useNavigate } from "react-router-dom";
 import styled from "styled-components";
 
-import { DateCurrent, cLetter } from "../../../../utils/functions/index";
+import {
+  DateCurrent,
+  cLetter,
+  redondearNumero,
+} from "../../../../utils/functions/index";
 import { DatePickerInput } from "@mantine/dates";
 
-import { GetDeliverysDate } from "../../../../redux/actions/aDelivery";
-import { GetGastoDate } from "../../../../redux/actions/aGasto";
-import { GetOrdenServices_Date } from "../../../../redux/actions/aOrdenServices";
+import { GetGastosByDate } from "../../../../redux/actions/aGasto";
 import {
   GetCuadre,
   SaveCuadre,
@@ -30,9 +32,6 @@ import "./cuadreCaja.scss";
 import { jsPDF } from "jspdf";
 import { PrivateRoutes } from "../../../../models";
 
-import { LS_updateGasto } from "../../../../redux/states/gasto";
-import { LS_CancelarDeliveryDevolucion } from "../../../../redux/states/delivery";
-
 import LoaderSpiner from "../../../../components/LoaderSpinner/LoaderSpiner";
 import { socket } from "../../../../utils/socket/connect";
 import { Notify } from "../../../../utils/notify/Notify";
@@ -42,6 +41,7 @@ import InfoCuadre from "./InfoCuadre/InfoCuadre";
 import FinalBalance from "./FinalBalance/FinalBalance";
 import ListPagos from "./ListPagos/ListPagos";
 import Portal from "../../../../components/PRIVATE/Portal/Portal";
+import { GetPagosByDate } from "../../../../redux/actions/aPago";
 
 const CuadreCaja = () => {
   const navigate = useNavigate();
@@ -56,10 +56,11 @@ const CuadreCaja = () => {
     registroNoCuadrados,
   } = useSelector((state) => state.cuadre);
 
-  const infoGastos = useSelector((state) => state.gasto.infoGasto);
-  const infoDelivery = useSelector((state) => state.delivery.infoDeliveryDate);
-  const infoRegisteredDay = useSelector(
-    (state) => state.orden.infoRegisteredDay
+  // const infoPagosByDate = useSelector((state) => state.pago.listPagoByDate);
+  // const infoGastosByDate = useSelector((state) => state.gasto.listGastoByDate);
+
+  const infoRegistroNC = useSelector(
+    (state) => state.cuadre.registroNoCuadrados
   );
 
   const [datePrincipal, setDatePrincipal] = useState({
@@ -73,8 +74,6 @@ const CuadreCaja = () => {
   const [totalCaja, setTotalCaja] = useState(0);
 
   const [gastos, setGastos] = useState(0);
-  const [delivery, setDelivery] = useState(0);
-  const [gastosFinal, setGastosFinal] = useState(0);
   const [pedidosPagadosEfectivo, setPedidosPagadosEfectivo] = useState(0);
   const [pedidosPagadosTransferencia, setPedidosPagadosTransferencia] =
     useState(0);
@@ -85,7 +84,6 @@ const CuadreCaja = () => {
   const [iClienteTarjeta, setIClienteTarjeta] = useState();
 
   const [iGastosFinal, setIGastosFinal] = useState([]);
-
   const [montoPrevisto, setMontoPrevisto] = useState(0);
 
   const [stateCuadre, setStateCuadre] = useState();
@@ -96,9 +94,8 @@ const CuadreCaja = () => {
 
   const [showPortalCuadres, setShowPortalCuadres] = useState(false);
 
-  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [filteredPagos, setFilteredPagos] = useState([]);
   const [filteredGastos, setFilteredGastos] = useState([]);
-  const [filteredDeliverys, setFilteredDeliverys] = useState([]);
 
   const [posCuadre, setPosCuadre] = useState(-1);
   const [sButtonLeft, setSButtonLeft] = useState(false);
@@ -110,27 +107,28 @@ const CuadreCaja = () => {
   ////////////////////////////////////////////////////////////////////////
 
   const handleShowInfoNoSaved = (infoNS) => {
-    const { pagos, gastos, delivery } = infoNS;
-    const gastoGeneral = [...gastos, ...delivery];
+    const { pagos, gastos } = infoNS;
 
     let MontosNC = [];
     pagos.map((pay) => {
       MontosNC.push({
+        _id: pay._id,
         user: pay.infoUser?.name,
         monto: pay.total,
-        decripcion: `Orden N° ${pay.codRecibo} de ${pay.Nombre}, (${pay.Modalidad})`,
+        decripcion: `Orden N° ${pay.orden} de ${pay.nombre}, (${pay.Modalidad})`,
         tipo: "ingreso",
-        hora: pay.hora,
+        hora: pay.date.hora,
       });
     });
 
-    gastoGeneral.map((spend) => {
+    gastos.map((spend) => {
       MontosNC.push({
+        _id: spend._id,
         user: spend.infoUser?.name,
         monto: spend.monto,
-        decripcion: `Motivo : ${spend.descripcion}`,
+        decripcion: `Motivo : ${spend.motivo}`,
         tipo: "gasto",
-        hora: spend.hora,
+        hora: spend.date.hora,
       });
     });
 
@@ -241,117 +239,9 @@ const CuadreCaja = () => {
       (
         parseFloat(MontoInicial) +
         parseFloat(pedidosPagadosEfectivo) -
-        parseFloat(gastosFinal)
+        parseFloat(gastos)
       ).toFixed(2)
     );
-  };
-
-  const handleViewCuadre = (cuadre) => {
-    setIState();
-
-    const dPrincipal = moment(datePrincipal.fecha, "YYYY-MM-DD");
-    const dLastCuadre = moment(lastCuadre?.date?.fecha, "YYYY-MM-DD");
-
-    const sIgual = dPrincipal.isSame(dLastCuadre);
-
-    if (
-      InfoUsuario._id === cuadre.infoUser._id &&
-      sIgual &&
-      cuadre.index === lastCuadre.index
-    ) {
-      chageInfo({ ...cuadre, enable: false });
-    } else {
-      chageInfo(cuadre);
-    }
-  };
-
-  ////////////////////////////////////////////////////////////////////////
-
-  const GetFilteredOrders = (pagos) => {
-    const IdsPagos = {};
-
-    pagos.forEach((pago) => {
-      const { _id, idPago } = pago;
-      if (IdsPagos[_id]) {
-        IdsPagos[_id].idsPago.push(idPago);
-      } else {
-        IdsPagos[_id] = { idOrder: _id, idsPago: [idPago] };
-      }
-    });
-
-    // Convertimos el objeto a un array de sus valores para el resultado final
-    return Object.values(IdsPagos);
-  };
-
-  const AgruparPagosByMetodo = (pagos) => {
-    const resultado = {};
-
-    pagos.forEach(({ _id, metodoPago, total, ...resto }) => {
-      const clave = `${_id}-${metodoPago}`;
-
-      if (!resultado[clave]) {
-        resultado[clave] = {
-          _id,
-          metodoPago,
-          total,
-          ...resto,
-        };
-      } else {
-        resultado[clave].total += total;
-      }
-    });
-
-    return Object.values(resultado).map(({ idPago, ...resto }) => resto);
-  };
-
-  const handleGetPagos = (orders, fechaPrincipal) => {
-    const pagos = [];
-    let index = 0;
-
-    orders.forEach((order) => {
-      if (order.Pago !== "Pendiente") {
-        order.ListPago.forEach((pago) => {
-          const esPagoValido =
-            (order.modeRegistro !== "antiguo" &&
-              pago.date.fecha === fechaPrincipal) ||
-            (order.modeRegistro === "antiguo" &&
-              pago.date.fecha !== order.dateRecepcion.fecha &&
-              pago.date.fecha === fechaPrincipal);
-
-          if (
-            (esPagoValido &&
-              pago.idUser === iState?.infoUser._id &&
-              pago.idCuadre === "") ||
-            pago.idCuadre === iState?._id
-          ) {
-            pagos.push({
-              index: index++,
-              _id: order._id,
-              idPago: pago._id,
-              codRecibo: order.codRecibo,
-              Modalidad: order.Modalidad,
-              estadoPrenda: order.estadoPrenda,
-              metodoPago: pago.metodoPago,
-              Nombre: order.Nombre,
-              total: pago.total,
-              idUser: pago.idUser,
-              idCuadre: pago.idCuadre,
-            });
-          }
-        });
-      }
-    });
-
-    const pagosAprobados = pagos.filter(
-      (oa) => !(oa.estadoPrenda === "anulado" && oa.idCuadre === "")
-    );
-
-    const iOrdersFilter = GetFilteredOrders(pagosAprobados);
-    setFilteredOrders(iOrdersFilter);
-
-    const res = AgruparPagosByMetodo(pagosAprobados);
-
-    return res;
   };
 
   const openModal = (value) => {
@@ -373,6 +263,9 @@ const CuadreCaja = () => {
         setSavedActivated(false);
         setOnLoading(false);
       },
+      closeOnEscape: false,
+      withCloseButton: false,
+      closeOnClickOutside: false,
       onConfirm: () => {
         setOnLoading(true);
         setTimeout(() => {
@@ -396,7 +289,7 @@ const CuadreCaja = () => {
           hora: DateCurrent().format3,
         },
         cajaFinal: cajaFinal,
-        egresos: { delivery, gastos },
+        egresos: gastos,
         ingresos: {
           efectivo: pedidosPagadosEfectivo,
           tarjeta: pedidosPagadosTarjeta,
@@ -407,14 +300,11 @@ const CuadreCaja = () => {
         margenError: stateCuadre,
         totalCaja: totalCaja,
         userID: InfoUsuario._id,
+        Pagos: filteredPagos,
+        Gastos: filteredGastos,
       },
-      orders: filteredOrders,
-      deliverys: filteredDeliverys,
-      gastos: filteredGastos,
       rol: InfoUsuario.rol,
     };
-
-    // console.log(iCuadre);
 
     dispatch(
       type === "update"
@@ -457,13 +347,6 @@ const CuadreCaja = () => {
 
   const sumaMontos = (clientes) => {
     return clientes
-      .filter(
-        (cliente) =>
-          !(
-            cliente.typeRegistro === "pendiente" &&
-            cliente.estadoPrenda === "anulado"
-          )
-      )
       .reduce((sum, cliente) => sum + (parseFloat(cliente.total) || 0), 0)
       .toFixed(2);
   };
@@ -481,146 +364,101 @@ const CuadreCaja = () => {
       await dispatch(
         GetCuadre({ date: datePrincipal.fecha, id: InfoUsuario._id })
       );
-      await dispatch(GetDeliverysDate(datePrincipal.fecha));
-      await dispatch(GetGastoDate(datePrincipal.fecha));
-      await dispatch(GetOrdenServices_Date(datePrincipal.fecha));
     };
     handleGetInfoCuadre();
   }, [datePrincipal]);
 
   useEffect(() => {
     const procesarData = async () => {
-      if (infoRegisteredDay) {
-        const ordersByPay = await handleGetPagos(
-          infoRegisteredDay,
-          datePrincipal.fecha
-        );
+      const { gastos, pagos } = infoRegistroNC;
+      const ListPaysByDate = pagos;
+      const ListSpenseByDate = gastos;
 
-        let orderPaysByIds;
+      let ListPagos = [];
+      let ListGastos = [];
 
-        if (iState?.saved) {
-          orderPaysByIds = ordersByPay.filter(
-            (pay) =>
-              pay.idUser === iState?.infoUser._id &&
-              (pay.idCuadre === "" || pay.idCuadre === iState?._id)
+      if (iState) {
+        if (iState.type === "update") {
+          // update = ultimo cuadre
+          // Filtrar PAGOS y GASTOS para obtener solo los elementos con idUser correspondiente
+          const filteredPaysByUser = ListPaysByDate.filter(
+            (pago) => pago.idUser === iState.infoUser._id
           );
+
+          const filteredSpenseByUser = ListSpenseByDate.filter(
+            (gasto) => gasto.idUser === iState.infoUser._id
+          );
+
+          // Función para obtener elementos únicos basados en _id
+          const getUniqueItems = (listA) => {
+            const uniqueItems = new Set();
+            const uniqueArray = [];
+            listA.forEach((item) => {
+              if (item && item._id && !uniqueItems.has(item._id)) {
+                uniqueItems.add(item._id);
+                uniqueArray.push(item);
+              }
+            });
+            return uniqueArray;
+          };
+
+          // Obtener elementos únicos para pagos y gastos
+          ListPagos = getUniqueItems([...filteredPaysByUser, ...iState.Pagos]);
+          ListGastos = getUniqueItems([
+            ...filteredSpenseByUser,
+            ...iState.Gastos,
+          ]);
+        } else if (iState.type === "view") {
+          //  usar los pagos y gasto del cuadre y los pagos
+          ListPagos = iState.Pagos;
+          ListGastos = iState.Gastos;
         } else {
-          orderPaysByIds = ordersByPay.filter(
-            (pay) => pay.idUser === iState?.infoUser._id && pay.idCuadre === ""
+          // type === "new"
+          // consultar Pagos hechos la fecha principal y _id del  usuario
+          ListPagos = ListPaysByDate.filter(
+            (pago) => pago?.idUser === iState?.infoUser._id
+          );
+
+          ListGastos = ListSpenseByDate.filter(
+            (gasto) => gasto?.idUser === iState?.infoUser._id
           );
         }
-
-        const cEfectivo = orderPaysByIds.filter(
-          (d) => d.metodoPago === "Efectivo"
-        );
-        const cTransferencia = orderPaysByIds.filter(
-          (d) => d.metodoPago === ingresoDigital
-        );
-        const cTarjeta = orderPaysByIds.filter(
-          (d) => d.metodoPago === "Tarjeta"
-        );
-
-        setPedidosPagadosEfectivo(sumaMontos(cEfectivo));
-        setPedidosPagadosTransferencia(sumaMontos(cTransferencia));
-        setPedidosPedidosPagadosTarjeta(sumaMontos(cTarjeta));
-
-        setIClienteEfectivo(cEfectivo);
-        setIClienteTransferencia(cTransferencia);
-        setIClienteTarjeta(cTarjeta);
       }
 
-      if (infoDelivery) {
-        const infoProductPromises = infoDelivery
-          .filter(
-            (d) =>
-              d.fecha === datePrincipal.fecha &&
-              d.idUser === iState?.infoUser._id &&
-              (d.idCuadre === "" || d.idCuadre === iState?._id)
-          )
-          .map(async (d) => {
-            const orderByDelivery = await GetOrderId(d.idCliente);
+      const cEfectivo = ListPagos?.filter((d) => d.metodoPago === "Efectivo");
+      const cTransferencia = ListPagos?.filter(
+        (d) => d.metodoPago === ingresoDigital
+      );
+      const cTarjeta = ListPagos?.filter((d) => d.metodoPago === "Tarjeta");
 
-            if (orderByDelivery?.estadoPrenda === "anulado") {
-              const infoAnulacion = await GetAnuladoId(orderByDelivery._id);
+      setPedidosPagadosEfectivo(sumaMontos(cEfectivo));
+      setPedidosPagadosTransferencia(sumaMontos(cTransferencia));
+      setPedidosPedidosPagadosTarjeta(sumaMontos(cTarjeta));
 
-              const commonProperties = {
-                id: d._id,
-                descripcion: `${d.descripcion} - ${d.name}`,
-                fecha: d.fecha,
-                hora: d.hora,
-                monto: d.monto,
-                _state: "anulado",
-              };
+      setIClienteEfectivo(cEfectivo);
+      setIClienteTransferencia(cTransferencia);
+      setIClienteTarjeta(cTarjeta);
 
-              return {
-                ...commonProperties,
-                cSuma:
-                  infoAnulacion.fecha === d.fecha && d.idCuadre === ""
-                    ? false
-                    : true,
-              };
-            } else {
-              return {
-                id: d._id,
-                descripcion: `${d.descripcion} - ${d.name}`,
-                fecha: d.fecha,
-                hora: d.hora,
-                monto: d.monto,
-                _state: "activo",
-                cSuma: true,
-              };
-            }
-          });
+      setFilteredGastos(ListGastos.map((g) => g._id));
+      setFilteredPagos(ListPagos.map((p) => p._id));
 
-        const infoProduct = await Promise.all(infoProductPromises);
+      setIGastosFinal(ListGastos);
 
-        const filteredIds = infoProduct
-          .filter((item) => item._state !== "anulado")
-          .map((item) => item.id);
-        setFilteredDeliverys(filteredIds);
+      const sumaMontosGastos = (lista) => {
+        return lista
+          .reduce((sum, gastos) => {
+            return sum + (gastos.monto ? parseFloat(gastos.monto) : 0);
+          }, 0)
+          .toFixed(2);
+      };
 
-        const infoGasto = infoGastos
-          .filter(
-            (g) =>
-              g.fecha === datePrincipal.fecha &&
-              g.idUser === iState?.infoUser._id &&
-              (g.idCuadre === "" || g.idCuadre === iState?._id)
-          )
-          .map((g) => {
-            return {
-              ...g,
-              id: g._id,
-              _state: "activo",
-              cSuma: true,
-            };
-          });
+      const sumaGastos = sumaMontosGastos(ListGastos);
 
-        setFilteredGastos(infoGasto.map((g) => g.id));
-
-        const sumaMontos = (lista) => {
-          return lista
-            .reduce((sum, gastos) => {
-              return sum + (gastos.cSuma ? parseFloat(gastos.monto) : 0);
-            }, 0)
-            .toFixed(2);
-        };
-
-        const infoGastosFinal = [...infoGasto, ...infoProduct].flat(1);
-        setIGastosFinal(infoGastosFinal);
-
-        const sumaDelivery = sumaMontos(infoProduct);
-        const sumaGastos = sumaMontos(infoGasto);
-
-        const sumaGastosFinal = sumaMontos(infoGastosFinal);
-
-        setDelivery(sumaDelivery);
-        setGastos(sumaGastos);
-        setGastosFinal(sumaGastosFinal);
-      }
+      setGastos(sumaGastos);
     };
 
     procesarData();
-  }, [infoRegisteredDay, infoGastos, infoDelivery, datePrincipal, iState]);
+  }, [infoRegistroNC, datePrincipal, iState]);
 
   useEffect(() => {
     if (infoCuadre?.length > 0) {
@@ -660,7 +498,7 @@ const CuadreCaja = () => {
 
   useEffect(() => {
     MontoPrevisto();
-  }, [pedidosPagadosEfectivo, gastosFinal, totalCaja, datePrincipal, iState]);
+  }, [pedidosPagadosEfectivo, gastos, totalCaja, datePrincipal, iState]);
 
   useEffect(() => {
     setCajaFinal(parseFloat(totalCaja - iState?.corte).toFixed(2));
@@ -671,10 +509,6 @@ const CuadreCaja = () => {
   }, [iState, totalCaja, montoPrevisto]);
 
   useEffect(() => {
-    socket.on("server:cGasto", (data) => {
-      dispatch(LS_updateGasto(data));
-    });
-
     socket.on("server:changeCuadre:child", (data) => {
       Notify(
         "CUADRE DE CAJA A SIDO ACTUALIZADO",
@@ -684,16 +518,7 @@ const CuadreCaja = () => {
       navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`);
     });
 
-    socket.on("server:cancel-delivery", (data) => {
-      if (datePrincipal.fecha === DateCurrent().format4) {
-        dispatch(LS_CancelarDeliveryDevolucion(data));
-      }
-    });
-
     return () => {
-      // Remove the event listener when the component unmounts
-      socket.off("server:cancel-delivery");
-      socket.off("server:cGasto");
       socket.off("server:changeCuadre:child");
       socket.off("cAnular");
     };
@@ -815,7 +640,7 @@ const CuadreCaja = () => {
                   />
                   <InfoCuadre
                     cajaInicial={iState?.cajaInicial}
-                    gastos={gastosFinal}
+                    gastos={gastos}
                     pedidosPagadosEfectivo={pedidosPagadosEfectivo}
                     pedidosPagadosTransferencia={pedidosPagadosTransferencia}
                     pedidosPagadosTarjeta={pedidosPagadosTarjeta}
@@ -836,10 +661,13 @@ const CuadreCaja = () => {
                   />
                 </div>
                 <ListPagos
+                  type={iState?.type}
                   iGastos={iGastosFinal}
                   iClienteEfectivo={iClienteEfectivo}
                   iClienteTarjeta={iClienteTarjeta}
                   iClienteTransferencia={iClienteTransferencia}
+                  savedActivated={savedActivated}
+                  handleSavedActivated={handleSavedActivated}
                 />
               </BodyCC>
             </BodyContainerCC>
@@ -893,7 +721,7 @@ const CuadreCaja = () => {
               <div className="i-final">
                 <span>
                   {cLetter(valueFinalINS?.tipo)} : &nbsp;&nbsp; {simboloMoneda}{" "}
-                  {valueFinalINS?.total}
+                  {redondearNumero(valueFinalINS?.total)}
                 </span>
               </div>
             </div>

@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { Box, MultiSelect, Tooltip } from "@mantine/core";
+import { Box, MultiSelect, Textarea, Tooltip } from "@mantine/core";
 import { MonthPickerInput } from "@mantine/dates";
 import { MantineReactTable } from "mantine-react-table";
 
@@ -40,6 +40,7 @@ import {
   simboloMoneda,
   tipoMoneda,
 } from "../../../../../services/global";
+import { useRef } from "react";
 
 const List = () => {
   //Filtros de Fecha
@@ -61,6 +62,10 @@ const List = () => {
   const [rowPick, setRowPick] = useState();
 
   const [cPedidos, setCPedidos] = useState();
+
+  const [pressedRow, setPressedRow] = useState();
+  const timeoutRowRef = useRef(null);
+  const iDelivery = useSelector((state) => state.servicios.serviceDelivery);
 
   const infoMetas = useSelector((state) => state.metas.infoMetas);
 
@@ -116,10 +121,10 @@ const List = () => {
         size: 100,
       },
       {
-        accessorKey: "Producto",
-        header: "Producto",
+        accessorKey: "items",
+        header: "Items",
         mantineFilterTextInputProps: {
-          placeholder: "Producto",
+          placeholder: "Item",
         },
         Cell: ({ cell }) => (
           <MultiSelect
@@ -152,19 +157,20 @@ const List = () => {
           data: [
             {
               value: "COMPLETO",
-              label: "COMPLETO",
+              label: "Completo",
             },
             {
               value: "INCOMPLETO",
-              label: "INCOMPLETO",
+              label: "Incompleto",
             },
             {
               value: "PENDIENTE",
-              label: "PENDIENTE",
+              label: "Pendiente",
             },
           ],
         },
         enableEditing: false,
+        Cell: ({ cell }) => <Box>{cell.getValue().toUpperCase()}</Box>,
         size: 150,
       },
       {
@@ -195,6 +201,27 @@ const List = () => {
           placeholder: "Numero",
         },
         size: 80,
+      },
+      {
+        accessorKey: "Direccion",
+        header: "Direccion",
+        enableColumnFilter: false,
+        mantineFilterTextInputProps: {
+          placeholder: "Direccion",
+        },
+        Cell: ({ cell }) =>
+          cell.getValue() ? (
+            <Textarea
+              autosize
+              minRows={1}
+              maxRows={3}
+              readOnly
+              value={cell.getValue()}
+            />
+          ) : (
+            ""
+          ),
+        size: 200,
       },
       {
         accessorKey: "Location",
@@ -305,24 +332,30 @@ const List = () => {
           d.estadoPrenda === "donado"
             ? d.donationDate.fecha
             : d.dateEntrega.fecha;
+
         const onWaiting = await handleOnWaiting(
           d.dateRecepcion.fecha,
           d.estadoPrenda,
           dateEndProcess
         );
+
+        const listItems = d.Items.filter(
+          (item) => item.identificador !== iDelivery._id
+        );
         const estadoPago = handleGetInfoPago(d.ListPago, d.totalNeto);
 
         const structureData = {
           Id: d._id,
-          Recibo: String(d.codRecibo).padStart(6, "0"),
+          Recibo: String(d.codRecibo).padStart(4, "0"),
           Nombre: d.Nombre,
           Modalidad: d.Modalidad,
-          Producto: handleItemsCantidad(d.Items),
+          items: handleItemsCantidad(listItems),
           PParcial: `${simboloMoneda} ${estadoPago.pago}`,
-          Pago: d.Pago.toUpperCase(),
+          Pago: estadoPago.estado,
           totalNeto: `${simboloMoneda} ${d.totalNeto}`,
           DNI: d.dni,
           Celular: d.celular,
+          Direccion: d.direccion,
           FechaEntrega: d.dateEntrega.fecha,
           FechaRecepcion: d.dateRecepcion.fecha,
           Descuento: d.descuento,
@@ -367,16 +400,6 @@ const List = () => {
 
     setFiltroClientes(event.target.value);
   };
-
-  // const handleFAnulados = (event) => {
-  //   if (event.target.value === "Esconder") {
-  //     setInfoRegistrado(
-  //       infoRegistrado.filter((item) => item.EstadoPrenda !== "anulado")
-  //     );
-  //   } else {
-  //     handleGetFactura(registered);
-  //   }
-  // };
 
   const handleMonthPickerChange = useCallback(
     (date) => {
@@ -435,6 +458,39 @@ const List = () => {
     const ancho = ctx.measureText(texto).width;
 
     return ancho;
+  };
+
+  const handleSelectRow = (rowInfo) => {
+    if (InfoUsuario.rol !== Roles.PERS) {
+      setRowPick(rowInfo);
+      if (
+        rowInfo.EstadoPrenda === "anulado" ||
+        rowInfo.EstadoPrenda === "donado"
+      ) {
+        setChangePago(false);
+      } else if (
+        rowInfo.EstadoPrenda === "entregado" &&
+        rowInfo.FechaEntrega !== DateCurrent().format4
+      ) {
+        setChangePago(false);
+      } else {
+        setChangePago(true);
+      }
+    }
+  };
+
+  const handleTouchEndRow = () => {
+    setPressedRow(null);
+    clearTimeout(timeoutRowRef.current);
+  };
+
+  const handleTouchStartRow = (rowInfo) => {
+    setPressedRow(rowInfo?.Id);
+
+    timeoutRowRef.current = setTimeout(() => {
+      setPressedRow(null);
+      handleSelectRow(rowInfo);
+    }, 1500);
   };
 
   useEffect(() => {
@@ -542,24 +598,11 @@ const List = () => {
             },
           })}
           mantineTableBodyRowProps={({ row }) => ({
-            onDoubleClick: () => {
-              if (InfoUsuario.rol !== Roles.PERS) {
-                setRowPick(row.original);
-                if (
-                  row.original.EstadoPrenda === "anulado" ||
-                  row.original.EstadoPrenda === "donado"
-                ) {
-                  setChangePago(false);
-                } else if (
-                  row.original.EstadoPrenda === "entregado" &&
-                  row.original.FechaEntrega !== DateCurrent().format4
-                ) {
-                  setChangePago(false);
-                } else {
-                  setChangePago(true);
-                }
-              }
-            },
+            onDoubleClick: () => handleSelectRow(row.original),
+            onTouchStart: () => handleTouchStartRow(row.original),
+            onTouchMove: () => handleTouchEndRow(),
+            onTouchEnd: () => handleTouchEndRow(),
+
             sx: {
               backgroundColor:
                 row.original.EstadoPrenda === "entregado"
@@ -569,6 +612,9 @@ const List = () => {
                   : row.original.EstadoPrenda === "donado"
                   ? "#f377f94d"
                   : "",
+              border:
+                pressedRow === row.original.Id ? "2px solid #6582ff" : "none",
+              userSelect: "none",
             },
           })}
           enableStickyHeader={true}
@@ -588,6 +634,11 @@ const List = () => {
               src={row.original.Notas?.length > 0 ? DetalleM : Detalle}
               alt="detalle"
               onDoubleClick={(e) => {
+                e.stopPropagation();
+                setRowPick(row.original);
+                setDetailEdit(true);
+              }}
+              onTouchStart={(e) => {
                 e.stopPropagation();
                 setRowPick(row.original);
                 setDetailEdit(true);

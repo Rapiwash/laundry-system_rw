@@ -12,7 +12,6 @@ import { modals } from "@mantine/modals";
 
 import { persistLocalStorage } from "../../../utils/persistence.local-storage/localStorage.util";
 import "./login.scss";
-import { ReactComponent as Logo } from "../../../utils/img/Logo/logoRapiwash.svg";
 import axios from "axios";
 
 import { GetInfoUser } from "../../../redux/actions/aUser";
@@ -21,6 +20,8 @@ import { useState } from "react";
 import { Notify } from "../../../utils/notify/Notify";
 import { socket } from "../../../utils/socket/connect";
 import { clearInfoCuadre } from "../../../redux/states/cuadre";
+
+import { ReactComponent as Logo } from "../../../utils/img/Logo/logo.svg";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -148,7 +149,6 @@ const Login = () => {
 
   return (
     <>
-      {/* <ParticlesBackgound /> */}
       <div className="container-login">
         <div className="full-height">
           <div className="card-3d-wrap">

@@ -12,6 +12,7 @@
     margin: auto;
     margin-bottom: 15px;
     position: relative;
+
     .filter-date {
       display: flex;
       place-items: center;
@@ -37,6 +38,7 @@
         background: #6363c7;
       }
     }
+
     // .filter-anulados {
     //   position: relative;
     //   .title-anulado {
@@ -152,6 +154,9 @@
     }
     .indicator {
       margin: auto 0;
+      @media (max-width: 768px) {
+        display: none; // Ocultar el elemento en dispositivos móviles
+      }
     }
   }
 }
@@ -210,6 +215,19 @@
       }
       .a4 {
         background: #c92a2a;
+      }
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .list-pedidos {
+    .header-space {
+      display: grid;
+      place-items: center;
+      gap: 20px;
+      .btn-leyenda {
+        position: relative;
       }
     }
   }

@@ -1,25 +1,25 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useState, useMemo, useEffect } from 'react';
-import { MantineReactTable } from 'mantine-react-table';
-import { Box, Button, Text } from '@mantine/core';
-import { modals } from '@mantine/modals';
-import './productos.scss';
-import { simboloMoneda } from '../../../../../../services/global';
-import Portal from '../../../../../../components/PRIVATE/Portal/Portal';
-import Add from './Accion/Add';
-import Edit from './Accion/Edit';
-import { getInfoCategoria } from '../utilsPortafolio';
-import { useDispatch, useSelector } from 'react-redux';
-import { deleteProducto } from '../../../../../../redux/actions/aProductos';
-import { Notify } from '../../../../../../utils/notify/Notify';
+import React, { useState, useMemo, useEffect } from "react";
+import { MantineReactTable } from "mantine-react-table";
+import { Box, Button, Text } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import "./productos.scss";
+import { simboloMoneda } from "../../../../../../services/global";
+import Portal from "../../../../../../components/PRIVATE/Portal/Portal";
+import Add from "./Accion/Add";
+import Edit from "./Accion/Edit";
+import { getInfoCategoria } from "../utilsPortafolio";
+import { useDispatch, useSelector } from "react-redux";
+import { deleteProducto } from "../../../../../../redux/actions/aProductos";
+import { Notify } from "../../../../../../utils/notify/Notify";
 
 const Productos = () => {
   const [infoProductos, setInfoProductos] = useState([]);
   const [rowPick, setRowPick] = useState(null);
   const [PActions, setPActions] = useState(false);
-  const [action, setAction] = useState('');
+  const [action, setAction] = useState("");
 
   const dispatch = useDispatch();
   const iProductos = useSelector((state) => state.productos.listProductos);
@@ -45,21 +45,23 @@ const Productos = () => {
   const handleCloseAction = () => {
     setRowPick(null);
     setPActions(false);
-    setAction('');
+    setAction("");
   };
 
   const handleDeleteProduct = (id) => {
     modals.openConfirmModal({
-      title: 'Eliminacion de Producto',
+      title: "Eliminacion de Producto",
       centered: true,
-      children: <Text size="sm">¿ Estas seguro de Eliminar este Producto ?</Text>,
-      labels: { confirm: 'Si', cancel: 'No' },
-      confirmProps: { color: 'red' },
+      children: (
+        <Text size="sm">¿ Estas seguro de Eliminar este Producto ?</Text>
+      ),
+      labels: { confirm: "Si", cancel: "No" },
+      confirmProps: { color: "red" },
 
       onConfirm: () => {
         dispatch(deleteProducto(id));
         handleCloseAction();
-        Notify('Eliminacion Exitosa', '', 'success');
+        Notify("Eliminacion Exitosa", "", "success");
       },
     });
   };
@@ -67,27 +69,27 @@ const Productos = () => {
   const columns = useMemo(
     () => [
       {
-        header: 'Producto',
-        accessorKey: 'nombre',
+        header: "Producto",
+        accessorKey: "nombre",
         size: 120,
         mantineFilterTextInputProps: {
-          placeholder: '',
+          placeholder: "",
         },
       },
       {
-        header: 'Categoría',
-        accessorKey: 'categoria.name',
+        header: "Categoría",
+        accessorKey: "categoria.name",
         mantineFilterTextInputProps: {
-          placeholder: '',
+          placeholder: "",
         },
         size: 120,
       },
       {
-        header: 'Precio Venta',
-        accessorKey: 'precioVenta',
+        header: "Precio Venta",
+        accessorKey: "precioVenta",
         size: 70,
         mantineFilterTextInputProps: {
-          placeholder: '',
+          placeholder: "",
         },
         Cell: ({ cell }) => (
           <Box>
@@ -96,31 +98,31 @@ const Productos = () => {
         ),
       },
       {
-        header: 'Fecha Creación',
-        accessorKey: 'dateCreation',
+        header: "Fecha Creación",
+        accessorKey: "dateCreation",
         size: 100,
         mantineFilterTextInputProps: {
-          placeholder: '',
+          placeholder: "",
         },
       },
       {
-        header: 'Stock',
-        accessorKey: 'stockPrincipal',
+        header: "Stock",
+        accessorKey: "stockPrincipal",
         size: 30,
         mantineFilterTextInputProps: {
-          placeholder: '',
+          placeholder: "",
         },
         Cell: ({ cell }) => (
           <Box
             sx={() => ({
-              backgroundColor: '#6cb199',
-              borderRadius: '4px',
-              color: '#fff',
-              fontWeight: '800',
-              textAlign: 'center',
-              padding: '5px 10px',
-              width: '60px',
-              margin: '0 5px',
+              backgroundColor: "#6cb199",
+              borderRadius: "4px",
+              color: "#fff",
+              fontWeight: "800",
+              textAlign: "center",
+              padding: "5px 10px",
+              width: "60px",
+              margin: "0 5px",
             })}
           >
             {cell.getValue()}
@@ -144,7 +146,7 @@ const Productos = () => {
           type="button"
           onClick={() => {
             setPActions(true);
-            setAction('Add');
+            setAction("Add");
           }}
         >
           Agregar Producto
@@ -155,7 +157,7 @@ const Productos = () => {
         data={infoProductos}
         initialState={{
           showColumnFilters: true,
-          density: 'xs',
+          density: "xs",
           pagination: {},
           expanded: {
             1: false,
@@ -175,8 +177,8 @@ const Productos = () => {
         enableStickyHeader
         mantineTableContainerProps={{
           sx: {
-            maxHeight: '400px',
-            maxWidth: '1000px',
+            maxHeight: "400px",
+            maxWidth: "1000px",
           },
         }}
         renderDetailPanel={({ row }) => (
@@ -190,7 +192,10 @@ const Productos = () => {
                     <tbody>
                       {index === 0 ? (
                         <tr>
-                          <th className={`${index === 0 ? 'last-stock' : null}`} colSpan="2">
+                          <th
+                            className={`${index === 0 ? "last-stock" : null}`}
+                            colSpan="2"
+                          >
                             Ultimo Ajuste de Stock
                           </th>
                         </tr>
@@ -206,7 +211,7 @@ const Productos = () => {
                         <td>Tipo Stock:</td>
                         <td>{inv.tipo}</td>
                       </tr>
-                      {inv.tipo === 'abastecimiento' ? (
+                      {inv.tipo === "abastecimiento" ? (
                         <tr>
                           <td>Precio Transaccion:</td>
                           <td>
@@ -236,9 +241,9 @@ const Productos = () => {
 
       {PActions && (
         <Portal onClose={handleCloseAction}>
-          {action === 'Add' ? (
+          {action === "Add" ? (
             <Add onClose={handleCloseAction} />
-          ) : action === 'Edit' ? (
+          ) : action === "Edit" ? (
             <Edit onClose={handleCloseAction} InfoProducto={rowPick} />
           ) : (
             <div className="portal-action-producto">
@@ -246,20 +251,20 @@ const Productos = () => {
               <div className="action">
                 <Button
                   type="submit"
-                  style={{ background: '#339af0' }}
+                  style={{ background: "#339af0" }}
                   onClick={() => {
-                    setAction('Edit');
+                    setAction("Edit");
                   }}
                 >
-                  Actualizar Producto
+                  Actualizar
                 </Button>
 
                 <Button
                   type="submit"
-                  style={{ background: '#e76565' }}
+                  style={{ background: "#e76565" }}
                   onClick={() => handleDeleteProduct(rowPick._id)}
                 >
-                  Eliminar Producto
+                  Eliminar
                 </Button>
               </div>
             </div>

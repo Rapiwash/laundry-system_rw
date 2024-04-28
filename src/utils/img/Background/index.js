@@ -4,6 +4,7 @@ import rBPendiente from "./Reportes/backPendiente.jpg";
 import rBPortafolio from "./Reportes/backPortafolio.jpg";
 import rBMensual from "./Reportes/backMensual.jpg";
 import rBAlmacen from "./Reportes/backAlmacen.jpg";
+import rBAnulado from "./Reportes/backAnulado.jpg";
 
 const Backgrounds = {
   rBCuadredCaja,
@@ -12,6 +13,7 @@ const Backgrounds = {
   rBPortafolio,
   rBMensual,
   rBAlmacen,
+  rBAnulado,
 };
 
 export default Backgrounds;

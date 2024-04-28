@@ -4,6 +4,7 @@ import iRPendiente from "./Reportes/icoPendiente.png";
 import iRPortafolio from "./Reportes/icoPortafolio.png";
 import iRMensual from "./Reportes/icoMensual.png";
 import iRAlmacen from "./Reportes/icoAlmacen.png";
+import iRAanulado from "./Reportes/icoAnulado.png";
 
 const Iconos = {
   iRCuadreCaja,
@@ -12,6 +13,7 @@ const Iconos = {
   iRPortafolio,
   iRMensual,
   iRAlmacen,
+  iRAanulado,
 };
 
 export default Iconos;

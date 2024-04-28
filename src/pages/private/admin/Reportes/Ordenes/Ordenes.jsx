@@ -14,7 +14,6 @@ import {
   handleGetInfoPago,
   handleItemsCantidad,
 } from "../../../../../utils/functions";
-import { simboloMoneda } from "../../../../../services/global";
 import { useSelector } from "react-redux";
 
 const Ordenes = ({ onClose }) => {
@@ -54,6 +53,7 @@ const Ordenes = ({ onClose }) => {
       );
 
       const infoOrdenesM = response.data;
+      console.log(infoOrdenesM);
 
       if (infoOrdenesM) {
         // Crear un nuevo libro de Excel
@@ -84,6 +84,7 @@ const Ordenes = ({ onClose }) => {
             "Pago",
             "Monto Facturado",
             "Celular",
+            "Direccion",
             "Documento",
             "Fecha de Ingreso",
             "Fecha de Salida",
@@ -112,6 +113,7 @@ const Ordenes = ({ onClose }) => {
             estadoPago.estado,
             +item.totalNeto,
             item.celular ? item.celular : "-",
+            item.direccion ? item.direccion : "-",
             item.dni,
             item.dateRecepcion.fecha,
             item.dateEntrega.fecha,

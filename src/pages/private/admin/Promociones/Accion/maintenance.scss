@@ -16,6 +16,9 @@
       height: max-content;
       display: grid;
       gap: 10px;
+      .input-item {
+        position: relative;
+      }
     }
   }
   .btn-save {

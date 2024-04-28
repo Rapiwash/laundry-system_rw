@@ -12,6 +12,7 @@
     "@mantine/modals": "6.0.21",
     "@mantine/notifications": "6.0.21",
     "@nivo/bar": "^0.84.0",
+    "@nivo/pie": "^0.85.1",
     "@reduxjs/toolkit": "1.9.5",
     "axios": "1.4.0",
     "dayjs": "1.11.9",

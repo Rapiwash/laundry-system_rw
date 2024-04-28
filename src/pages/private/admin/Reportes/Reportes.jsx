@@ -1,10 +1,8 @@
 /* eslint-disable no-unused-vars */
 import React, { useState } from "react";
 import "./reportes.scss";
-import { Link } from "react-router-dom";
 import { PrivateRoutes, Roles } from "../../../../models";
 import Ordenes from "./Ordenes/Ordenes";
-import Gasto from "./Gastos/Gasto";
 import Portal from "../../../../components/PRIVATE/Portal/Portal";
 import Target from "../../../../components/Target/Target";
 
@@ -17,11 +15,13 @@ const {
   iRPortafolio,
   iRMensual,
   iRAlmacen,
+  iRAanulado,
 } = Iconos;
 
 import Backgrounds from "../../../../utils/img/Background/index";
 import { useSelector } from "react-redux";
 import { useNavigate } from "react-router-dom";
+import Anulados from "./Anulados/Anulados";
 const {
   rBCuadredCaja,
   rBGastos,
@@ -29,11 +29,12 @@ const {
   rBPortafolio,
   rBMensual,
   rBAlmacen,
+  rBAnulado,
 } = Backgrounds;
 
 const Reportes = () => {
+  const [mAnulado, setMAnulado] = useState(false);
   const [mMensual, setMMensual] = useState(false);
-  const [mGasto, setMGasto] = useState(false);
   const InfoUsuario = useSelector((store) => store.user.infoUsuario);
   const navigate = useNavigate();
 
@@ -42,12 +43,10 @@ const Reportes = () => {
 
     if (hasPermission) {
       if (type === "modal") {
-        if (page === "Gastos") {
-          setMGasto(true);
-        } else if (page === "Ordenes") {
+        if (page === "Ordenes") {
           setMMensual(true);
-        } else {
-          alert("Error: Pagina no Econtrada");
+        } else if (page === "Anulado") {
+          setMAnulado(true);
         }
       } else {
         navigate(page);
@@ -71,21 +70,21 @@ const Reportes = () => {
     {
       imgIco: iRGastos,
       imgBack: rBGastos,
-      type_show: "modal",
+      type_show: "page",
       acceso: [Roles.ADMIN, Roles.GERENTE],
       title: "Gastos",
       descripcion:
-        "Margen de gasto Mensual, exportacion excel, flujo de gastos",
-      page: "Gastos",
+        "Lista de Gasto segun Tipo, exportacion excel, segun cantidad y monto gastado",
+      page: `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.REPORTE_GASTO}`,
     },
     {
       imgIco: iRPortafolio,
       imgBack: rBPortafolio,
       type_show: "page",
       acceso: [Roles.ADMIN],
-      title: "Productos y Servicios",
+      title: "Servicios",
       descripcion:
-        "Listado Ordenes pendiente, tiempo en custodia, reenviar Almacen",
+        "Listado Servicions, (servicios +/- rentables) por precio y cantidad, exportacion a excel",
       page: `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.REPORTE_PRODUCTOS}`,
     },
     {
@@ -108,7 +107,6 @@ const Reportes = () => {
         "Listado Ordenes mensual, exportacion en excel, montos pagados y facturados",
       page: "Ordenes",
     },
-
     {
       imgIco: iRAlmacen,
       imgBack: rBAlmacen,
@@ -118,6 +116,16 @@ const Reportes = () => {
       descripcion:
         "Listado Ordenes en Almacen, tiempo en custodia, Enviar a DONACION",
       page: `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.REPORTE_ALMACEN}`,
+    },
+    {
+      imgIco: iRAanulado,
+      imgBack: rBAnulado,
+      type_show: "modal",
+      acceso: [Roles.ADMIN, Roles.GERENTE],
+      title: "Anulados",
+      descripcion:
+        "Listado Anulacion mensuales, responsable, motivos, montos. exportado en excel",
+      page: "Anulado",
     },
   ];
 
@@ -158,13 +166,13 @@ const Reportes = () => {
             <Ordenes onClose={() => setMMensual(false)} />
           </Portal>
         )}
-        {mGasto && (
+        {mAnulado && (
           <Portal
             onClose={() => {
-              setMGasto(false);
+              setMAnulado(false);
             }}
           >
-            <Gasto onClose={() => setMGasto(false)} />
+            <Anulados onClose={() => setMAnulado(false)} />
           </Portal>
         )}
       </ul>

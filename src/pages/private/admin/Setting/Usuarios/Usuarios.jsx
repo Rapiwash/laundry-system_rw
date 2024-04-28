@@ -141,13 +141,13 @@ const Usuarios = () => {
   };
 
   const validEnabledAccion = (user) => {
-    return InfoUsuario.rol === Roles.ADMIN
+    return InfoUsuario.rol === "admin"
       ? false
-      : InfoUsuario.rol === Roles.GERENTE && user.rol === Roles.GERENTE
+      : InfoUsuario.rol === "gerente" && user.rol === "gerente"
       ? user._id === InfoUsuario._id
         ? false
         : true
-      : InfoUsuario.rol === Roles.GERENTE && user.rol !== Roles.ADMIN
+      : InfoUsuario.rol === "gerente" && user.rol !== "admin"
       ? false
       : true;
   };
@@ -291,16 +291,15 @@ const Usuarios = () => {
                   }
                   data={[
                     {
-                      value: Roles.ADMIN,
+                      value: "admin",
                       label: "Administrador",
                       disabled: true,
                     },
                     {
-                      value: Roles.GERENTE,
+                      value: "gerente",
                       label: "Gerente",
                       disabled: InfoUsuario.rol === Roles.ADMIN ? false : true,
                     },
-
                     {
                       value: "coord",
                       label: "Coordinador",

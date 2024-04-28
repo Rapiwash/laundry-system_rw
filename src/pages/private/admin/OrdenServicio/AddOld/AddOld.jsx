@@ -1,57 +1,64 @@
 ﻿/* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 /* eslint-disable react/prop-types */
-import { Autocomplete, NumberInput, TextInput } from '@mantine/core';
-import { DateInput } from '@mantine/dates';
-import React, { useEffect, useRef, useState } from 'react';
+import { Autocomplete, NumberInput, TextInput } from "@mantine/core";
+import { DateInput } from "@mantine/dates";
+import React, { useEffect, useRef, useState } from "react";
 
-import { useFormik } from 'formik';
-import * as Yup from 'yup';
+import { useFormik } from "formik";
+import * as Yup from "yup";
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from "react-router-dom";
 
-import BotonModel from '../../../../../components/PRIVATE/BotonModel/BotonModel';
-import SwitchModel from '../../../../../components/SwitchModel/SwitchModel';
-import InputSelectedPrendas from '../../../../../components/PRIVATE/InputSelectedPrenda/InputSelectedPrenda';
-import MetodoPago from '../../../../../components/PRIVATE/MetodoPago/MetodoPago';
-import Portal from '../../../../../components/PRIVATE/Portal/Portal';
-import './addOld.scss';
+import BotonModel from "../../../../../components/PRIVATE/BotonModel/BotonModel";
+import SwitchModel from "../../../../../components/SwitchModel/SwitchModel";
+import InputSelectedPrendas from "../../../../../components/PRIVATE/InputSelectedPrenda/InputSelectedPrenda";
+import MetodoPago from "../../../../../components/PRIVATE/MetodoPago/MetodoPago";
+import Portal from "../../../../../components/PRIVATE/Portal/Portal";
+import "./addOld.scss";
 
-import { ReactComponent as Eliminar } from '../../../../../utils/img/OrdenServicio/eliminar.svg';
+import { ReactComponent as Eliminar } from "../../../../../utils/img/OrdenServicio/eliminar.svg";
 
-import Tranferencia from '../../../../../utils/img/OrdenServicio/Transferencia.png';
-import Efectivo from '../../../../../utils/img/OrdenServicio/dinero.png';
-import Tarjeta from '../../../../../utils/img/OrdenServicio/card.png';
+import Tranferencia from "../../../../../utils/img/OrdenServicio/Transferencia.png";
+import Efectivo from "../../../../../utils/img/OrdenServicio/dinero.png";
+import Tarjeta from "../../../../../utils/img/OrdenServicio/card.png";
 
-import Tag from '../../../../../components/Tag/Tag';
+import Tag from "../../../../../components/Tag/Tag";
 
-import moment from 'moment';
+import moment from "moment";
 
-import { Text } from '@mantine/core';
-import { modals } from '@mantine/modals';
-import { useDispatch, useSelector } from 'react-redux';
-import { PrivateRoutes } from '../../../../../models';
-import axios from 'axios';
+import { Text } from "@mantine/core";
+import { modals } from "@mantine/modals";
+import { useDispatch, useSelector } from "react-redux";
+import { PrivateRoutes } from "../../../../../models";
+import axios from "axios";
 
-import { AddOrdenServices } from '../../../../../redux/actions/aOrdenServices';
-import { documento, ingresoDigital, nameImpuesto, simboloMoneda } from '../../../../../services/global';
-import { DateCurrent, handleGetInfoPago } from '../../../../../utils/functions';
-import ButtonSwitch from '../../../../../components/PRIVATE/MetodoPago/ButtonSwitch/ButtonSwitch';
+import { AddOrdenServices } from "../../../../../redux/actions/aOrdenServices";
+import {
+  documento,
+  ingresoDigital,
+  nameImpuesto,
+  simboloMoneda,
+} from "../../../../../services/global";
+import { DateCurrent, handleGetInfoPago } from "../../../../../utils/functions";
+import ButtonSwitch from "../../../../../components/PRIVATE/MetodoPago/ButtonSwitch/ButtonSwitch";
 
 const AddOld = () => {
   const InfoUsuario = useSelector((state) => state.user.infoUsuario);
   const infoNegocio = useSelector((state) => state.negocio.infoNegocio);
 
-  const { InfoImpuesto, InfoPuntos } = useSelector((state) => state.modificadores);
+  const { InfoImpuesto, InfoPuntos } = useSelector(
+    (state) => state.modificadores
+  );
   const codFinal = useSelector((state) => state.codigo.infoCodigo.codFinal);
 
   const [isPortal, setIsPortal] = useState(false);
 
   // Lista de clientes
   const [infoClientes, setInfoClientes] = useState([]);
-  // // Puntos del cliente Actual
+  // Puntos del cliente Actual
   const [dataScore, setDataScore] = useState(false);
-  // // valor por puntos
+  // valor por puntos
   const [vScore, setVScore] = useState(null);
   // Impuesto
   const [impuesto, setImpuesto] = useState(null);
@@ -62,28 +69,37 @@ const AddOld = () => {
   const dispatch = useDispatch();
 
   const InfoServicios = useSelector((state) => state.servicios.listServicios);
-  const InfoCategorias = useSelector((state) => state.categorias.listCategorias);
+  const InfoCategorias = useSelector(
+    (state) => state.categorias.listCategorias
+  );
   const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
 
   const getInfoDelivery = () => {
-    const ICategory = InfoCategorias.find((cat) => cat.nivel === 'primario');
+    const ICategory = InfoCategorias.find((cat) => cat.nivel === "primario");
     const IService = InfoServicios.find(
-      (service) => service.idCategoria === ICategory._id && service.nombre === 'Delivery'
+      (service) =>
+        service.idCategoria === ICategory._id && service.nombre === "Delivery"
     );
 
     return IService;
   };
 
   const validationSchema = Yup.object().shape({
-    codigo: Yup.string().required('Campo Numerico obligatorio (1 - 1000)'),
-    name: Yup.string().required('Campo obligatorio'),
-    dateRecojo: Yup.string().required('Ingrese Fecha (obligatorio)'),
-    datePrevista: Yup.string().required('Ingrese Fecha (obligatorio)'),
+    codigo: Yup.string().required("Campo Numerico obligatorio (1 - 1000)"),
+    name: Yup.string().required("Campo obligatorio"),
+    dateRecojo: Yup.string().required("Ingrese Fecha (obligatorio)"),
+    datePrevista: Yup.string().required("Ingrese Fecha (obligatorio)"),
     items: Yup.array()
-      .min(1, 'Debe haber al menos un item')
-      .test('categoria', 'Debe haber al menos un item - Delivery no cuenta', function (value) {
-        return value.some((item) => item.identificador !== getInfoDelivery()._id);
-      })
+      .min(1, "Debe haber al menos un item")
+      .test(
+        "categoria",
+        "Debe haber al menos un item - Delivery no cuenta",
+        function (value) {
+          return value.some(
+            (item) => item.identificador !== getInfoDelivery()._id
+          );
+        }
+      )
       .of(
         Yup.object().shape({
           //cantidad: Yup.string().required("Campo obligatorio"),
@@ -95,19 +111,20 @@ const AddOld = () => {
 
   const formik = useFormik({
     initialValues: {
-      codigo: '',
-      name: '',
-      phone: '',
-      dateRecojo: '',
-      datePrevista: '',
+      codigo: "",
+      name: "",
+      phone: "",
+      direccion: "",
+      dateRecojo: "",
+      datePrevista: "",
       listPago: [],
-      pago: 'Pendiente',
+      pago: "Pendiente",
       items: [],
-      descuento: '',
-      swModalidad: 'Tienda',
-      dni: '',
-      subTotal: '',
-      totalNeto: '',
+      descuento: "",
+      swModalidad: "Tienda",
+      dni: "",
+      subTotal: "",
+      totalNeto: "",
       cargosExtras: {
         beneficios: {
           puntos: 0,
@@ -133,30 +150,49 @@ const AddOld = () => {
 
   const openModal = (data) =>
     modals.openConfirmModal({
-      title: 'Registro de Orden de Servicio',
+      title: "Registro de Orden de Servicio",
       centered: true,
-      children: <Text size="sm">¿ Estas seguro de registrar esta Orden de Servicio ?</Text>,
-      labels: { confirm: 'Si', cancel: 'No' },
-      confirmProps: { color: 'green' },
+      children: (
+        <Text size="sm">
+          ¿ Estas seguro de registrar esta Orden de Servicio ?
+        </Text>
+      ),
+      labels: { confirm: "Si", cancel: "No" },
+      confirmProps: { color: "green" },
       //onCancel: () => console.log("Cancelado"),
       onConfirm: () => handleGetInfo(data),
     });
 
   const addRowGarment = (idServicio) => {
-    const IService = InfoServicios.find((service) => service._id === idServicio);
-    const ICategory = InfoCategorias.find((cat) => cat._id === IService.idCategoria);
+    const IService = InfoServicios.find(
+      (service) => service._id === idServicio
+    );
+    const ICategory = InfoCategorias.find(
+      (cat) => cat._id === IService.idCategoria
+    );
 
-    const isDelivery = ICategory.nivel === 'primario' && IService.nombre === 'Delivery' ? true : false;
-    const isOtros = ICategory.nivel === 'primario' ? (IService.nombre === 'Otros' ? true : false) : false;
+    const isDelivery =
+      ICategory.nivel === "primario" && IService.nombre === "Delivery"
+        ? true
+        : false;
+    const isOtros =
+      ICategory.nivel === "primario"
+        ? IService.nombre === "Otros"
+          ? true
+          : false
+        : false;
 
     const newRow = {
       cantidad: 1,
-      item: IService.nombre === 'Otros' && ICategory.name === 'Unico' ? '' : IService.nombre,
-      descripcion: '',
+      item:
+        IService.nombre === "Otros" && ICategory.name === "Unico"
+          ? ""
+          : IService.nombre,
+      descripcion: "",
       expanded: false,
       price: IService.precioVenta,
       total: IService.precioVenta,
-      tipo: 'servicio',
+      tipo: "servicio",
       identificador: IService._id,
       simboloMedida: IService.simboloMedida,
       disable: {
@@ -168,21 +204,26 @@ const AddOld = () => {
       },
     };
 
-    console.log(newRow);
-
     return newRow;
   };
 
   function tFecha(fecha) {
-    const fechaFormateada = moment(fecha).format('YYYY-MM-DD');
+    const fechaFormateada = moment(fecha).format("YYYY-MM-DD");
     return fechaFormateada;
   }
 
   function tHora(horaOriginal, cantidadHoras, antesDespues) {
-    const operacion = antesDespues === 'antes' ? 'subtract' : antesDespues === 'despues' ? 'add' : null;
+    const operacion =
+      antesDespues === "antes"
+        ? "subtract"
+        : antesDespues === "despues"
+        ? "add"
+        : null;
 
     if (operacion) {
-      return moment(horaOriginal, 'HH:mm')[operacion](cantidadHoras, 'hours').format('HH:mm');
+      return moment(horaOriginal, "HH:mm")
+        [operacion](cantidadHoras, "hours")
+        .format("HH:mm");
     } else {
       return 'Formato no válido. Usa "antes" o "despues".';
     }
@@ -194,20 +235,26 @@ const AddOld = () => {
     if (value) {
       newListPago.push(value);
       newStatePago = handleGetInfoPago(newListPago, formik.values.totalNeto);
-      formik.setFieldValue('listPago', [value]);
-      formik.setFieldValue('pago', newStatePago.estado);
+      formik.setFieldValue("listPago", [value]);
+      formik.setFieldValue("pago", newStatePago.estado);
     } else {
       newListPago = [value];
-      const newStatePago = handleGetInfoPago(newListPago, formik.values.totalNeto);
-      formik.setFieldValue('pago', newStatePago.estado);
+      const newStatePago = handleGetInfoPago(
+        newListPago,
+        formik.values.totalNeto
+      );
+      formik.setFieldValue("pago", newStatePago.estado);
     }
     setIPago(value);
   };
 
   const handleNoPagar = () => {
     let newListPago = [];
-    const newStatePago = handleGetInfoPago(newListPago, formik.values.totalNeto);
-    formik.setFieldValue('pago', newStatePago.estado);
+    const newStatePago = handleGetInfoPago(
+      newListPago,
+      formik.values.totalNeto
+    );
+    formik.setFieldValue("pago", newStatePago.estado);
     setIPago();
   };
 
@@ -230,41 +277,40 @@ const AddOld = () => {
           fecha: tFecha(formik.values.dateRecojo),
           hora: DateCurrent().format3,
         },
-        idCuadre: '',
+        isCounted: false,
         idUser: InfoUsuario._id,
       };
     });
-
+    2;
     const infoOrden = {
       codRecibo: info.codigo,
       dateRecepcion: {
         fecha: tFecha(info.dateRecojo),
-        hora: tHora(infoNegocio.horario.horas.inicio, 1, 'despues'),
+        hora: tHora(infoNegocio.horario.horas.inicio, 1, "despues"),
       },
       Modalidad: info.swModalidad,
       Nombre: info.name,
       Items: infoIntem,
       celular: info.phone,
-      Pago: info.pago,
-      ListPago: lPago,
+      direccion: info.direccion,
       datePrevista: {
         fecha: tFecha(info.datePrevista),
-        hora: tHora(infoNegocio.horario.horas.fin, 1, 'antes'),
+        hora: tHora(infoNegocio.horario.horas.fin, 1, "antes"),
       },
       dateEntrega: {
-        fecha: '',
-        hora: '',
+        fecha: "",
+        hora: "",
       },
       descuento: info.descuento,
-      estadoPrenda: 'pendiente',
-      estado: 'registrado',
+      estadoPrenda: "pendiente",
+      estado: "registrado",
       dni: info.dni,
       factura: info.factura,
       subTotal: info.subTotal,
       cargosExtras: info.cargosExtras,
       totalNeto: info.totalNeto,
-      modeRegistro: 'antiguo',
-      modoDescuento: 'Puntos',
+      modeRegistro: "antiguo",
+      modoDescuento: "Puntos",
       notas: [],
       gift_promo: [],
       attendedBy: {
@@ -272,28 +318,33 @@ const AddOld = () => {
         rol: InfoUsuario.rol,
       },
       lastEdit: [],
-      typeRegistro: 'normal',
+      typeRegistro: "normal",
     };
 
     dispatch(
       AddOrdenServices({
         infoOrden,
+        infoPago: lPago,
         rol: InfoUsuario.rol,
       })
     ).then((res) => {
       if (res.payload) {
-        navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`);
+        navigate(
+          `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`
+        );
       }
     });
   };
 
   const handleGetClientes = async (dni) => {
     try {
-      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-clientes/${dni}`);
+      const response = await axios.get(
+        `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-clientes/${dni}`
+      );
       const data = response.data;
       setInfoClientes(data);
     } catch (error) {
-      console.error('Error al obtener los datos:', error.message);
+      console.error("Error al obtener los datos:", error.message);
     }
   };
 
@@ -301,7 +352,7 @@ const AddOld = () => {
     return (
       <div className="ico-req">
         <i className="fa-solid fa-circle-exclamation ">
-          <div className="info-req" style={{ pointerEvents: 'none' }}>
+          <div className="info-req" style={{ pointerEvents: "none" }}>
             <span>{mensaje}</span>
           </div>
         </i>
@@ -326,14 +377,14 @@ const AddOld = () => {
   useEffect(() => {
     setVScore(InfoPuntos);
 
-    formik.setFieldValue('cargosExtras.igv.valor', InfoImpuesto.IGV);
+    formik.setFieldValue("cargosExtras.igv.valor", InfoImpuesto.IGV);
     setImpuesto(InfoImpuesto.IGV);
   }, [InfoPuntos, InfoImpuesto]);
 
   useEffect(() => {
     const subtotal = Number(calculateTotalNeto(formik.values.items).toFixed(2));
 
-    formik.setFieldValue('subTotal', subtotal);
+    formik.setFieldValue("subTotal", subtotal);
   }, [formik.values.items]);
 
   useEffect(() => {
@@ -342,12 +393,15 @@ const AddOld = () => {
     if (formik.values.factura === true) {
       montoImpuesto = +(subTotal * impuesto).toFixed(2);
     }
-    formik.setFieldValue('cargosExtras.igv.importe', montoImpuesto);
+    formik.setFieldValue("cargosExtras.igv.importe", montoImpuesto);
     const total = subTotal + montoImpuesto;
     const descuento = formik.values.cargosExtras.descuentos.puntos;
-    formik.setFieldValue('descuento', descuento);
+    formik.setFieldValue("descuento", descuento);
     const totalNeto = total - descuento;
-    formik.setFieldValue('totalNeto', (Math.floor(totalNeto * 10) / 10).toFixed(1));
+    formik.setFieldValue(
+      "totalNeto",
+      (Math.floor(totalNeto * 10) / 10).toFixed(1)
+    );
   }, [
     formik.values.cargosExtras.igv,
     formik.values.items,
@@ -370,29 +424,35 @@ const AddOld = () => {
         <div className="info-ra">
           <>
             <div className="space-paralelos">
-              <div style={{ width: '300px', margin: '10px 20px' }}>
+              <div style={{ width: "300px", margin: "10px 20px" }}>
                 <Autocomplete
                   name="dni"
                   onChange={(dni) => {
                     handleGetClientes(dni);
-                    formik.setFieldValue('dni', dni);
+                    formik.setFieldValue("dni", dni);
                     setDataScore();
                     // formik.setFieldValue('name', '');
                     // formik.setFieldValue('phone', '');
-                    formik.setFieldValue('cargosExtras.descuentos.puntos', 0);
-                    formik.setFieldValue('cargosExtras.beneficios.puntos', 0);
+                    formik.setFieldValue("cargosExtras.descuentos.puntos", 0);
+                    formik.setFieldValue("cargosExtras.beneficios.puntos", 0);
                   }}
                   label={`${documento} :`}
                   placeholder={`Ingrese ${documento}`}
                   defaultValue={formik.values.dni}
                   onItemSubmit={(selected) => {
-                    const cliente = infoClientes.find((obj) => obj.dni === selected.value);
-                    formik.setFieldValue('name', cliente.nombre);
-                    formik.setFieldValue('phone', cliente.phone);
+                    const cliente = infoClientes.find(
+                      (obj) => obj.dni === selected.value
+                    );
+                    formik.setFieldValue("name", cliente.nombre);
+                    formik.setFieldValue("phone", cliente.phone);
 
                     setDataScore(cliente);
                   }}
-                  data={infoClientes.length > 0 ? infoClientes.map((obj) => obj.dni) : []}
+                  data={
+                    infoClientes.length > 0
+                      ? infoClientes.map((obj) => obj.dni)
+                      : []
+                  }
                 />
                 <div className="space-info">
                   <NumberInput
@@ -402,7 +462,7 @@ const AddOld = () => {
                     value={formik.values.codigo}
                     precision={0}
                     onChange={(e) => {
-                      formik.setFieldValue('codigo', !Number.isNaN(e) ? e : 0);
+                      formik.setFieldValue("codigo", !Number.isNaN(e) ? e : 0);
                     }}
                     min={1}
                     step={1}
@@ -410,7 +470,9 @@ const AddOld = () => {
                     hideControls
                     autoComplete="off"
                   />
-                  {formik.errors.codigo && formik.touched.codigo && validIco(formik.errors.codigo)}
+                  {formik.errors.codigo &&
+                    formik.touched.codigo &&
+                    validIco(formik.errors.codigo)}
                 </div>
                 <div className="space-info">
                   <TextInput
@@ -421,7 +483,9 @@ const AddOld = () => {
                     onChange={formik.handleChange}
                     autoComplete="off"
                   />
-                  {formik.errors.name && formik.touched.name && validIco(formik.errors.name)}
+                  {formik.errors.name &&
+                    formik.touched.name &&
+                    validIco(formik.errors.name)}
                 </div>
                 <TextInput
                   name="phone"
@@ -431,27 +495,37 @@ const AddOld = () => {
                   onChange={formik.handleChange}
                   autoComplete="off"
                 />
+                <TextInput
+                  name="direccion"
+                  label="Direccion :"
+                  radius="md"
+                  value={formik.values.direccion}
+                  onChange={formik.handleChange}
+                  autoComplete="off"
+                />
               </div>
-              <div style={{ width: '300px', margin: '10px 20px' }}>
+              <div style={{ width: "300px", margin: "10px 20px" }}>
                 <div className="space-info">
                   <DateInput
                     label="Fecha Recojo :"
                     name="dateRecojo"
                     value={formik.values.dateRecojo}
                     onChange={(date) => {
-                      formik.setFieldValue('dateRecojo', date);
-                      formik.setFieldValue('datePrevista', date);
+                      formik.setFieldValue("dateRecojo", date);
+                      formik.setFieldValue("datePrevista", date);
                     }}
                     placeholder="Ingrese Fecha"
-                    maxDate={moment().subtract(1, 'day').toDate()}
+                    maxDate={moment().subtract(1, "day").toDate()}
                     //onNextYear
                   />
-                  {formik.errors.dateRecojo && formik.touched.dateRecojo && validIco(formik.errors.dateRecojo)}
+                  {formik.errors.dateRecojo &&
+                    formik.touched.dateRecojo &&
+                    validIco(formik.errors.dateRecojo)}
                 </div>
                 <div
                   className="content-date space-info"
                   style={{
-                    display: formik.values.dateRecojo !== '' ? 'block' : 'none',
+                    display: formik.values.dateRecojo !== "" ? "block" : "none",
                   }}
                 >
                   <label htmlFor="">Fecha Prevista :</label>
@@ -460,7 +534,7 @@ const AddOld = () => {
                       name="datePrevista"
                       value={formik.values.datePrevista}
                       onChange={(date) => {
-                        formik.setFieldValue('datePrevista', date);
+                        formik.setFieldValue("datePrevista", date);
                       }}
                       placeholder="Ingrese Fecha"
                       minDate={formik.values.dateRecojo}
@@ -472,28 +546,37 @@ const AddOld = () => {
                         onClick={() => {
                           const currentDate = formik.values.dateRecojo;
                           const newDate = new Date(
-                            Math.max(formik.values.datePrevista.getTime() - 24 * 60 * 60 * 1000, currentDate.getTime())
+                            Math.max(
+                              formik.values.datePrevista.getTime() -
+                                24 * 60 * 60 * 1000,
+                              currentDate.getTime()
+                            )
                           );
-                          formik.setFieldValue('datePrevista', newDate);
+                          formik.setFieldValue("datePrevista", newDate);
                         }}
                       >
-                        {'<'}
+                        {"<"}
                       </button>
                       <button
                         type="button"
                         className="btn-next"
                         onClick={() =>
                           formik.setFieldValue(
-                            'datePrevista',
-                            new Date(formik.values.datePrevista.getTime() + 24 * 60 * 60 * 1000)
+                            "datePrevista",
+                            new Date(
+                              formik.values.datePrevista.getTime() +
+                                24 * 60 * 60 * 1000
+                            )
                           )
                         }
                       >
-                        {'>'}
+                        {">"}
                       </button>
                     </div>
                   </div>
-                  {formik.errors.datePrevista && formik.touched.datePrevista && validIco(formik.errors.datePrevista)}
+                  {formik.errors.datePrevista &&
+                    formik.touched.datePrevista &&
+                    validIco(formik.errors.datePrevista)}
                 </div>
                 <SwitchModel
                   title="Modo :"
@@ -505,22 +588,22 @@ const AddOld = () => {
                     // value = (TRUE O FALSE)
                     //const res = value ? 'Tienda' : 'Delivery';
                     if (value === true) {
-                      formik.setFieldValue('swModalidad', 'Tienda');
+                      formik.setFieldValue("swModalidad", "Tienda");
                       const updatedItems = formik.values.items.filter(
                         (item) => item.identificador !== getInfoDelivery()._id
                       );
-                      formik.setFieldValue('items', updatedItems);
+                      formik.setFieldValue("items", updatedItems);
                     } else {
-                      formik.setFieldValue('swModalidad', 'Delivery');
-                      formik.setFieldValue('items', [
+                      formik.setFieldValue("swModalidad", "Delivery");
+                      formik.setFieldValue("items", [
                         ...formik.values.items,
                         {
                           identificador: getInfoDelivery()._id,
-                          tipo: 'servicio',
+                          tipo: "servicio",
                           cantidad: 1,
-                          item: 'Delivery',
-                          simboloMedida: 'vj',
-                          descripcion: 'Recojo y Entrega',
+                          item: "Delivery",
+                          simboloMedida: "vj",
+                          descripcion: "Recojo y Entrega",
                           price: getInfoDelivery().precioVenta,
                           total: getInfoDelivery().precioVenta,
                           disable: {
@@ -544,7 +627,7 @@ const AddOld = () => {
                   colorBackground="#F9777F" // COLOR FONDO
                   onChange={(value) => {
                     // value = (TRUE O FALSE)
-                    formik.setFieldValue('factura', value);
+                    formik.setFieldValue("factura", value);
                   }}
                 />
               </div>
@@ -554,14 +637,19 @@ const AddOld = () => {
                 <div className="button-actions">
                   {InfoNegocio.itemsAtajos.length > 0
                     ? InfoNegocio.itemsAtajos.map((items, index) => {
-                        const IService = InfoServicios.find((service) => service._id === items);
+                        const IService = InfoServicios.find(
+                          (service) => service._id === items
+                        );
 
                         return (
                           <BotonModel
                             key={index}
                             name={`Agregar ${IService?.nombre}`}
                             listenClick={() => {
-                              formik.setFieldValue('items', [...formik.values.items, addRowGarment(IService?._id)]);
+                              formik.setFieldValue("items", [
+                                ...formik.values.items,
+                                addRowGarment(IService?._id),
+                              ]);
                             }}
                           />
                         );
@@ -570,9 +658,12 @@ const AddOld = () => {
                 </div>
                 <InputSelectedPrendas
                   listenClick={(info) => {
-                    formik.setFieldValue('items', [...formik.values.items, addRowGarment(info)]);
+                    formik.setFieldValue("items", [
+                      ...formik.values.items,
+                      addRowGarment(info),
+                    ]);
                   }}
-                  tabI={'9'}
+                  tabI={"9"}
                 />
               </div>
               <table>
@@ -597,18 +688,29 @@ const AddOld = () => {
                           disabled={row.disable.cantidad}
                           onChange={(e) => {
                             const inputValue = e.target.value;
-                            const validInput = inputValue ? inputValue.replace(/[^0-9.]/g, '') : 0;
-                            const newQuantity = validInput !== '' ? validInput : 0;
+                            const validInput = inputValue
+                              ? inputValue.replace(/[^0-9.]/g, "")
+                              : 0;
+                            const newQuantity =
+                              validInput !== "" ? validInput : 0;
 
-                            const price = parseFloat(formik.values.items[index].price) || 0;
-                            const newTotal = newQuantity !== '' ? newQuantity * price : '';
+                            const price =
+                              parseFloat(formik.values.items[index].price) || 0;
+                            const newTotal =
+                              newQuantity !== "" ? newQuantity * price : "";
 
-                            formik.setFieldValue(`items.${index}.cantidad`, newQuantity);
-                            formik.setFieldValue(`items.${index}.total`, newTotal !== '' ? newTotal.toFixed(1) : '');
+                            formik.setFieldValue(
+                              `items.${index}.cantidad`,
+                              newQuantity
+                            );
+                            formik.setFieldValue(
+                              `items.${index}.total`,
+                              newTotal !== "" ? newTotal.toFixed(1) : ""
+                            );
                           }}
                           autoFocus={true}
                           onBlur={formik.handleBlur}
-                          value={formik.values.items[index].cantidad || ''}
+                          value={formik.values.items[index].cantidad || ""}
                         />
                       </td>
                       <td>
@@ -626,11 +728,15 @@ const AddOld = () => {
                       <td
                         className="tADescription"
                         style={{
-                          pointerEvents: row.type === 'Delivery' ? 'none' : 'painted',
+                          pointerEvents:
+                            row.type === "Delivery" ? "none" : "painted",
                         }}
                       >
                         <div className="contentDes">
-                          <div id={`${index}-dsp`} className="textarea-container">
+                          <div
+                            id={`${index}-dsp`}
+                            className="textarea-container"
+                          >
                             <textarea
                               className="hide"
                               rows={5}
@@ -641,23 +747,36 @@ const AddOld = () => {
                                 const inputValue = e.target.value;
 
                                 // Verifica si el valor actual contiene el check "✔"
-                                const hasCheck = inputValue.includes('✔ ');
+                                const hasCheck = inputValue.includes("✔ ");
 
                                 // Si no hay un check y hay un texto, agrega el check automáticamente
-                                const updatedValue = hasCheck ? inputValue : inputValue ? '✔ ' + inputValue : '';
+                                const updatedValue = hasCheck
+                                  ? inputValue
+                                  : inputValue
+                                  ? "✔ " + inputValue
+                                  : "";
 
-                                formik.setFieldValue(`items.${index}.descripcion`, updatedValue);
+                                formik.setFieldValue(
+                                  `items.${index}.descripcion`,
+                                  updatedValue
+                                );
                                 // formik.setFieldValue(`items.${index}.expanded`, true);
                               }}
                               onKeyDown={(event) => {
-                                if (event.key === 'Enter') {
+                                if (event.key === "Enter") {
                                   event.preventDefault();
 
                                   // Añade el check de "✔" al texto existente
                                   const updatedValue = `${formik.values.items[index].descripcion}\n✔ `;
-                                  formik.setFieldValue(`items.${index}.descripcion`, updatedValue);
+                                  formik.setFieldValue(
+                                    `items.${index}.descripcion`,
+                                    updatedValue
+                                  );
 
-                                  formik.setFieldValue(`items.${index}.expanded`, true);
+                                  formik.setFieldValue(
+                                    `items.${index}.expanded`,
+                                    true
+                                  );
                                   // const scrollHeight = event.target.scrollHeight;
                                   // event.target.style.height = `${scrollHeight + 30}px`;
                                 }
@@ -666,24 +785,44 @@ const AddOld = () => {
                             <div
                               className="expand-button"
                               onClick={() => {
-                                const element = document.getElementById(`${index}-dsp`);
+                                const element = document.getElementById(
+                                  `${index}-dsp`
+                                );
 
                                 if (element) {
-                                  const hideElement = element.querySelector('.hide');
-                                  const showElement = element.querySelector('.show');
-                                  const iconElement = element.querySelector('#ico-action');
+                                  const hideElement =
+                                    element.querySelector(".hide");
+                                  const showElement =
+                                    element.querySelector(".show");
+                                  const iconElement =
+                                    element.querySelector("#ico-action");
 
                                   if (hideElement) {
-                                    hideElement.classList.replace('hide', 'show');
-                                    iconElement.classList.replace('fa-chevron-down', 'fa-chevron-up');
+                                    hideElement.classList.replace(
+                                      "hide",
+                                      "show"
+                                    );
+                                    iconElement.classList.replace(
+                                      "fa-chevron-down",
+                                      "fa-chevron-up"
+                                    );
                                   } else if (showElement) {
-                                    showElement.classList.replace('show', 'hide');
-                                    iconElement.classList.replace('fa-chevron-up', 'fa-chevron-down');
+                                    showElement.classList.replace(
+                                      "show",
+                                      "hide"
+                                    );
+                                    iconElement.classList.replace(
+                                      "fa-chevron-up",
+                                      "fa-chevron-down"
+                                    );
                                   }
                                 }
                               }}
                             >
-                              <i id="ico-action" className="fa-solid fa-chevron-down" />
+                              <i
+                                id="ico-action"
+                                className="fa-solid fa-chevron-down"
+                              />
                             </div>
                           </div>
                         </div>
@@ -696,9 +835,14 @@ const AddOld = () => {
                           autoComplete="off"
                           onChange={(e) => {
                             const inputValue = e.target.value;
-                            const validInput = inputValue ? inputValue.replace(/[^0-9.]/g, '') : '';
+                            const validInput = inputValue
+                              ? inputValue.replace(/[^0-9.]/g, "")
+                              : "";
 
-                            formik.setFieldValue(`items.${index}.total`, validInput);
+                            formik.setFieldValue(
+                              `items.${index}.total`,
+                              validInput
+                            );
                           }}
                           onBlur={formik.handleBlur}
                           disabled={row.disable.total}
@@ -712,20 +856,25 @@ const AddOld = () => {
                         Etiqueta="td"
                         className="space-action"
                         onClick={() => {
-                          if (formik.values.items[index].identificador !== getInfoDelivery()._id) {
+                          if (
+                            formik.values.items[index].identificador !==
+                            getInfoDelivery()._id
+                          ) {
                             const updatedItems = [...formik.values.items];
                             updatedItems.splice(index, 1);
-                            formik.setFieldValue('items', updatedItems);
+                            formik.setFieldValue("items", updatedItems);
                           }
                         }}
                       >
-                        {row.disable.action ? null : <Eliminar className="delete-row" />}
+                        {row.disable.action ? null : (
+                          <Eliminar className="delete-row" />
+                        )}
                       </Tag>
                     </tr>
                   ))}
                 </tbody>
                 <tfoot>
-                  <tr style={{ marginTop: '10px' }}>
+                  <tr style={{ marginTop: "10px" }}>
                     <td></td>
                     <td>Subtotal :</td>
                     <td>
@@ -741,7 +890,8 @@ const AddOld = () => {
                           {nameImpuesto} ({(impuesto * 100).toFixed(0)} %) :
                         </td>
                         <td>
-                          {simboloMoneda} {formik.values.cargosExtras.igv.importe}
+                          {simboloMoneda}{" "}
+                          {formik.values.cargosExtras.igv.importe}
                         </td>
                       </>
                     ) : (
@@ -775,7 +925,11 @@ const AddOld = () => {
                 <div className="content-sb">
                   <div className="input-pay ">
                     <label htmlFor="">Pago :</label>
-                    <button className="btn-switch" type="button" onClick={() => setIsPortal(!isPortal)}>
+                    <button
+                      className="btn-switch"
+                      type="button"
+                      onClick={() => setIsPortal(!isPortal)}
+                    >
                       <ButtonSwitch pago={formik.values.pago} />
                     </button>
                   </div>
@@ -783,14 +937,14 @@ const AddOld = () => {
                     <img
                       tabIndex="-1"
                       className={
-                        iPago.metodoPago === 'Efectivo'
-                          ? 'ico-efect'
+                        iPago.metodoPago === "Efectivo"
+                          ? "ico-efect"
                           : iPago.metodoPago === ingresoDigital
-                          ? 'ico-tranf'
-                          : 'ico-card'
+                          ? "ico-tranf"
+                          : "ico-card"
                       }
                       src={
-                        iPago.metodoPago === 'Efectivo'
+                        iPago.metodoPago === "Efectivo"
                           ? Efectivo
                           : iPago?.metodoPago === ingresoDigital
                           ? Tranferencia
@@ -817,7 +971,7 @@ const AddOld = () => {
                   totalToPay={formik.values.totalNeto}
                   handleNoPagar={handleNoPagar}
                   onClose={setIsPortal}
-                  modeUse={'New'}
+                  modeUse={"New"}
                 />
               </Portal>
             )}
@@ -825,7 +979,11 @@ const AddOld = () => {
               <button type="submit">Registrar</button>
               <button
                 type="button"
-                onDoubleClick={() => navigate(`${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`)}
+                onDoubleClick={() =>
+                  navigate(
+                    `${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`
+                  )
+                }
               >
                 Cancelar
               </button>

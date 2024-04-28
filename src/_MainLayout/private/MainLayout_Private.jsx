@@ -11,14 +11,13 @@ import {
 import { PrivateRoutes, PublicRoutes, Roles } from "../../models/index";
 import { GetCodigos } from "../../redux/actions/aCodigo";
 import { GetOrdenServices_DateRange } from "../../redux/actions/aOrdenServices";
-import { GetPrendas } from "../../redux/actions/aPrenda";
 import { GetMetas } from "../../redux/actions/aMetas";
 import { DateCurrent, GetFirstFilter } from "../../utils/functions";
 import {
+  LS_changeListPago,
   LS_newOrder,
   LS_updateListOrder,
   LS_updateOrder,
-  LS_updateRegisteredDay,
   setOrderServiceId,
 } from "../../redux/states/service_order";
 
@@ -32,8 +31,6 @@ import Gasto from "../../pages/private/coord/Gastos/Gasto";
 import ReporteDiario from "../../pages/private/coord/Reporte/Diario/ReporteDiario";
 
 import { LS_nextCodigo } from "../../redux/states/codigo";
-
-import { LS_updatePrendas } from "../../redux/states/prenda";
 import { GetImpuesto, GetPuntos } from "../../redux/actions/aModificadores";
 import {
   LS_updateImpuestos,
@@ -57,12 +54,13 @@ import moment from "moment";
 import LoaderSpiner from "../../components/LoaderSpinner/LoaderSpiner";
 import { useRef } from "react";
 import { socket } from "../../utils/socket/connect";
-import { LS_newDelivery, LS_updateDelivery } from "../../redux/states/delivery";
 import { GetCuadre } from "../../redux/actions/aCuadre";
 import { GetListUser } from "../../redux/actions/aUser";
 import { getListCategorias } from "../../redux/actions/aCategorias";
 import { getProductos } from "../../redux/actions/aProductos";
 import { getServicios } from "../../redux/actions/aServicios";
+import { GetTipoGastos } from "../../redux/actions/aTipoGasto";
+import { updateRegistrosNCuadrados } from "../../redux/states/cuadre";
 
 const PrivateMasterLayout = (props) => {
   const [opened, { open, close }] = useDisclosure(false);
@@ -78,7 +76,6 @@ const PrivateMasterLayout = (props) => {
 
   const infoCodigo = useSelector((state) => state.codigo.infoCodigo);
   const infoMetas = useSelector((state) => state.metas.infoMetas);
-  const infoPrendas = useSelector((state) => state.prenda.infoPrendas);
   const infoImpuesto = useSelector((state) => state.modificadores.InfoImpuesto);
   const infoPuntos = useSelector((state) => state.modificadores.InfoPuntos);
   const infoPromocion = useSelector((state) => state.promocion.infoPromocion);
@@ -90,6 +87,8 @@ const PrivateMasterLayout = (props) => {
   );
   const ListServicios = useSelector((state) => state.servicios.listServicios);
   const ListProductos = useSelector((state) => state.productos.listProductos);
+
+  const ListTipoGastos = useSelector((state) => state.tipoGasto.infoTipoGasto);
 
   const [loading, setLoading] = useState(true);
 
@@ -126,12 +125,8 @@ const PrivateMasterLayout = (props) => {
             promises.push(dispatch(GetCodigos()));
           }
 
-          // if (lastCuadre === null) {
-          //   promises.push(dispatch(GetLastCuadre()));
-          // }
-
-          if (infoPrendas.length === 0) {
-            promises.push(dispatch(GetPrendas()));
+          if (ListTipoGastos.length === 0) {
+            promises.push(dispatch(GetTipoGastos()));
           }
 
           if (infoMetas.length === 0) {
@@ -255,14 +250,9 @@ const PrivateMasterLayout = (props) => {
     // ORDER
     socket.on("server:newOrder", (data) => {
       dispatch(LS_newOrder(data));
-      // if (data.datePago.fecha === DateCurrent().format4) {
-      //   dispatch(LS_updateRegisteredDay(data));
-      // }
-      dispatch(LS_updateRegisteredDay(data));
     });
     socket.on("server:orderUpdated", (data) => {
       dispatch(LS_updateOrder(data));
-      dispatch(LS_updateRegisteredDay(data));
     });
     socket.on("server:updateListOrder", (data) => {
       dispatch(LS_updateListOrder(data));
@@ -270,22 +260,20 @@ const PrivateMasterLayout = (props) => {
     socket.on("server:changeCuadre", (data) => {
       dispatch(GetCuadre({ date: DateCurrent().format4, id: InfoUsuario._id }));
     });
-    // DELIVERY
-    //-- New
-    socket.on("server:newDelivery", (data) => {
-      dispatch(LS_newDelivery(data));
+    // PAGO
+    socket.on("server:cPago", (data) => {
+      dispatch(LS_changeListPago(data));
+      if (data.info.isCounted) {
+        dispatch(updateRegistrosNCuadrados({ tipoMovimiento: "pagos", data }));
+      }
     });
-    //-- Update
-    socket.on("server:updateDelivery", (data) => {
-      dispatch(LS_updateDelivery(data));
+    // GASTO
+    socket.on("server:cGasto", (data) => {
+      dispatch(updateRegistrosNCuadrados({ tipoMovimiento: "gastos", data }));
     });
     // CODIGO
     socket.on("server:newCodigo", (data) => {
       dispatch(LS_nextCodigo(data));
-    });
-    // PRENDAS
-    socket.on("server:cPricePrendas", (data) => {
-      dispatch(LS_updatePrendas(data));
     });
     // PUNTOS
     socket.on("server:cPuntos", (data) => {
@@ -377,10 +365,10 @@ const PrivateMasterLayout = (props) => {
       // Remove the event listener when the component unmounts
       socket.off("server:newOrder");
       socket.off("server:orderUpdated");
-      socket.off("server:updateListOrder");
+      socket.off("server:cPago");
+      socket.off("server:cGasto");
 
-      socket.off("server:newDelivery");
-      socket.off("server:updateDelivery");
+      socket.off("server:updateListOrder");
 
       socket.off("server:cPricePrendas");
       socket.off("server:cPuntos");

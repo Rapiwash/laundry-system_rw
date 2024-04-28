@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
 import React, { useEffect, useMemo, useState } from "react";
-import { Modal, ScrollArea, Text } from "@mantine/core";
+import { Modal, ScrollArea, Text, Textarea } from "@mantine/core";
 import { MantineReactTable } from "mantine-react-table";
 import axios from "axios";
 
@@ -94,6 +94,7 @@ const Almacen = () => {
         "Monto Facturado",
         "Items",
         "Celular",
+        "Direccion",
         "En Espera",
         "Fecha de Ingreso",
       ])
@@ -115,6 +116,7 @@ const Almacen = () => {
         +item.totalNeto,
         itemsText,
         item.Celular ? item.Celular : "-",
+        item.Direccion ? item.Direccion : "-",
         item.onWaiting.showText,
         item.FechaIngreso.fecha,
       ]);
@@ -266,6 +268,8 @@ const Almacen = () => {
         (item) => item.identificador !== iDelivery._id
       );
 
+      const estadoPago = handleGetInfoPago(info.ListPago, info.totalNeto);
+
       return {
         _id: info._id,
         Recibo: String(info.codRecibo).padStart(4, "0"),
@@ -276,7 +280,8 @@ const Almacen = () => {
         attendedBy: info.attendedBy,
         totalNeto: info.totalNeto,
         Celular: info.celular,
-        Pago: info.Pago,
+        Direccion: info.direccion ? info.direccion : "- SIN INFORMACION -",
+        Pago: estadoPago.estado,
         ListPago: info.ListPago,
         FechaPago: info.datePago,
         FechaIngreso: info.dateRecepcion,
@@ -328,6 +333,24 @@ const Almacen = () => {
           placeholder: "Numero",
         },
         size: 100,
+      },
+      {
+        accessorKey: "Direccion",
+        header: "Direccion",
+        enableColumnFilter: false,
+        mantineFilterTextInputProps: {
+          placeholder: "Direccion",
+        },
+        Cell: ({ cell }) => (
+          <Textarea
+            autosize
+            minRows={1}
+            maxRows={3}
+            readOnly
+            value={cell.getValue()}
+          />
+        ),
+        size: 200,
       },
       {
         accessorKey: "Pago",

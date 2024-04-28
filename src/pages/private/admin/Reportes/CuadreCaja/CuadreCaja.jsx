@@ -66,21 +66,23 @@ const CuadreCaja = () => {
     let MontosNC = [];
     paysNCuadrados.map((pay) => {
       MontosNC.push({
-        user: pay.infoUser.name,
+        _id: pay._id,
+        user: pay.infoUser?.name,
         monto: pay.total,
-        decripcion: `Orden N° ${pay.codRecibo} de ${pay.Nombre}, (${pay.Modalidad})`,
+        decripcion: `Orden N° ${pay.orden} de ${pay.nombre}, (${pay.Modalidad})`,
         tipo: "ingreso",
-        hora: pay.hora,
+        hora: pay.date.hora,
       });
     });
 
     gastoGeneral.map((spend) => {
       MontosNC.push({
-        user: spend.infoUser.name,
+        _id: spend._id,
+        user: spend.infoUser?.name,
         monto: spend.monto,
-        decripcion: `Motivo : ${spend.descripcion}`,
+        decripcion: `Motivo : ${spend.motivo}`,
         tipo: "gasto",
-        hora: spend.hora,
+        hora: spend.date.hora,
       });
     });
 
@@ -135,6 +137,7 @@ const CuadreCaja = () => {
   };
 
   function sumarValores(objeto) {
+    console.log(objeto);
     let suma = 0;
     Object.keys(objeto).forEach((key) => {
       if (Object.prototype.hasOwnProperty.call(objeto, key)) {
@@ -228,7 +231,7 @@ const CuadreCaja = () => {
     <div className="report-container">
       <div className="title-h">
         <h1>Reporte de Cuadres Diarios</h1>
-        {InfoUsuario.rol === Roles.ADMIN && infoCuadres.length > 0 ? (
+        {/* {InfoUsuario.rol === Roles.ADMIN && infoCuadres.length > 0 ? (
           <button
             className={`button_wrapper ${loading ? "loading" : ""}`}
             onClick={handleExport}
@@ -249,7 +252,7 @@ const CuadreCaja = () => {
               </svg>
             </div>
           </button>
-        ) : null}
+        ) : null} */}
       </div>
 
       <div className="action-h">
@@ -436,6 +439,7 @@ const CuadreCaja = () => {
                 paysNCuadrados,
                 gastoGeneral,
               } = infoFecha;
+
               const ingresosTotales = sumarTotales(paysNCuadrados, "total");
               const egresosTotales = sumarTotales(gastoGeneral, "monto");
               const numFilas =
@@ -535,9 +539,7 @@ const CuadreCaja = () => {
                                   className="fila"
                                 >
                                   {redondearNumero(
-                                    sumarValores(
-                                      cuadresTransformados[rowIndex]?.egresos
-                                    )
+                                    cuadresTransformados[rowIndex]?.egresos
                                   )}
                                 </td>
                                 <td
@@ -718,50 +720,54 @@ const CuadreCaja = () => {
                             </td>
                           </>
                         )}
-                        <td
-                          className="space"
-                          style={{
-                            borderLeft: `solid 1px ${colorBorder}`,
-                          }}
-                          rowSpan={cuadresTransformados[rowIndex]?.length}
-                        ></td>
-                        <td
-                          style={{
-                            border: `solid 1px ${colorBorder}`,
-                          }}
-                          className="fila"
-                          rowSpan={cuadresTransformados[rowIndex]?.length}
-                        >
-                          {ingresosTotales
-                            ? redondearNumero(ingresosTotales)
-                            : ""}
-                        </td>
-                        <td
-                          style={{
-                            border: `solid 1px ${colorBorder}`,
-                          }}
-                          className="fila"
-                          rowSpan={cuadresTransformados[rowIndex]?.length}
-                        >
-                          {egresosTotales
-                            ? redondearNumero(egresosTotales)
-                            : ""}
-                        </td>
-                        <td
-                          style={{
-                            border: `solid 1px ${colorBorder}`,
-                          }}
-                          className="fila"
-                          rowSpan={cuadresTransformados[rowIndex]?.length}
-                        >
-                          {ingresosTotales || egresosTotales ? (
-                            <button
-                              onClick={() => handleShowInfoDate(infoFecha)}
+                        {rowIndex === 0 && ( // Solo mostrar la fecha y las tres últimas columnas en la primera fila
+                          <>
+                            <td
+                              className="space"
+                              style={{
+                                borderLeft: `solid 1px ${colorBorder}`,
+                              }}
+                              rowSpan={numFilas}
+                            ></td>
+                            <td
+                              style={{
+                                border: `solid 1px ${colorBorder}`,
+                              }}
+                              className="fila"
+                              rowSpan={numFilas}
                             >
-                              <i className="fa-solid fa-eye"></i>
-                            </button>
-                          ) : null}
-                        </td>
+                              {ingresosTotales
+                                ? redondearNumero(ingresosTotales)
+                                : ""}
+                            </td>
+                            <td
+                              style={{
+                                border: `solid 1px ${colorBorder}`,
+                              }}
+                              className="fila"
+                              rowSpan={numFilas}
+                            >
+                              {egresosTotales
+                                ? redondearNumero(egresosTotales)
+                                : ""}
+                            </td>
+                            <td
+                              style={{
+                                border: `solid 1px ${colorBorder}`,
+                              }}
+                              className="fila"
+                              rowSpan={numFilas}
+                            >
+                              {ingresosTotales || egresosTotales ? (
+                                <button
+                                  onClick={() => handleShowInfoDate(infoFecha)}
+                                >
+                                  <i className="fa-solid fa-eye"></i>
+                                </button>
+                              ) : null}
+                            </td>
+                          </>
+                        )}
                       </tr>
                     )
                   )}
@@ -807,7 +813,7 @@ const CuadreCaja = () => {
               <div className="i-final">
                 <span>
                   {cLetter(valueFinalINS?.tipo)} : &nbsp;&nbsp; {simboloMoneda}{" "}
-                  {valueFinalINS?.total}
+                  {redondearNumero(valueFinalINS?.total)}
                 </span>
               </div>
             </div>

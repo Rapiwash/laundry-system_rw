@@ -26,7 +26,8 @@ const index = () => {
   );
   const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
 
-  const [fCli, setFCli] = useState(false);
+  const [showDescripcion, setDescription] = useState(false);
+  const [tipoTicket, setTipoTicket] = useState(false);
   const [phoneA, setPhoneA] = useState(
     infoOrden.celular
       ? `${codigoPhonePais}${infoOrden.celular.replace(/\s/g, "")}`
@@ -98,21 +99,36 @@ const index = () => {
           </div>
         ) : null}
       </div>
-      <SwtichModel
-        title="Descripcion :"
-        onSwitch="Mostrar" // ON = TRUE
-        offSwitch="Ocultar" // OFF = FALSE
-        name="descripcion"
-        defaultValue={false}
-        colorBackground="#45c877" // COLOR FONDO
-        onChange={() => {
-          // value = (TRUE O FALSE)
-          setFCli(!fCli);
-        }}
-      />
+      <div className="actions">
+        <SwtichModel
+          title="Tipo Ticket :"
+          onSwitch="Produccion" // ON = TRUE
+          offSwitch="Cliente" // OFF = FALSE
+          name="tipo"
+          defaultValue={false}
+          colorBackground="#D5A040" // COLOR FONDO
+          onChange={() => {
+            // value = (TRUE O FALSE)
+            setTipoTicket(!tipoTicket);
+          }}
+        />
+        <SwtichModel
+          title="Descripcion :"
+          onSwitch="Mostrar" // ON = TRUE
+          offSwitch="Ocultar" // OFF = FALSE
+          name="descripcion"
+          defaultValue={false}
+          colorBackground="#45c877" // COLOR FONDO
+          onChange={() => {
+            // value = (TRUE O FALSE)
+            setDescription(!showDescripcion);
+          }}
+        />
+      </div>
       <Ticket
         ref={componentRef}
-        forW={fCli}
+        showDescripcion={showDescripcion}
+        tipoTicket={tipoTicket}
         infoOrden={infoOrden}
         InfoNegocio={InfoNegocio}
       />

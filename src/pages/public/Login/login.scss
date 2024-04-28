@@ -14,13 +14,10 @@ $input-placeholder-states: -webkit-, -moz-, -ms-;
   place-items: center;
   .logo {
     width: 370px;
-    height: 95px;
+    height: 93px;
+    margin: 10px;
     fill: #fff;
-  }
-  .fnt0 {
-    font-weight: bold !important;
-    font-size: 1173.97px !important;
-    font-family: "Arial" !important;
+    stroke: #fff;
   }
   a {
     cursor: pointer;
@@ -90,7 +87,7 @@ $input-placeholder-states: -webkit-, -moz-, -ms-;
       position: relative;
       width: 450px;
       max-width: 100%;
-      height: 400px;
+      height: 430px;
       -webkit-transform-style: preserve-3d;
       transform-style: preserve-3d;
       perspective: 800px;
@@ -135,7 +132,7 @@ $input-placeholder-states: -webkit-, -moz-, -ms-;
           transform: translate3d(0, -50%, 0) perspective(100px);
           z-index: 20;
           display: grid;
-          grid-template-rows: 120px 280px;
+          grid-template-rows: max-content 280px;
           align-items: center;
           place-items: center;
           .section {

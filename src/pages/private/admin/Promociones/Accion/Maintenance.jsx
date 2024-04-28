@@ -54,7 +54,7 @@ const Maintenance = ({ info, onClose }) => {
       tipoPromocion: "Unico",
       prenda: [],
       alcance: "",
-      cantidadMin: 0,
+      cantidadMin: "",
       tipoDescuento: "Porcentaje",
       descripcion: "",
       descuento: "",
@@ -184,10 +184,7 @@ const Maintenance = ({ info, onClose }) => {
             }
             onChange={(value) => {
               formik.setFieldValue("tipoDescuento", "Porcentaje");
-              formik.setFieldValue(
-                "cantidadMin",
-                formik.values.tipoDescuento === "Monto" ? "" : 0
-              );
+              formik.setFieldValue("cantidadMin", value ? "" : 0);
               formik.setFieldValue("prenda", []);
               if (value === true) {
                 formik.setFieldValue("tipoPromocion", "Unico");
@@ -199,7 +196,7 @@ const Maintenance = ({ info, onClose }) => {
           />
           {formik.errors.tipoPromocion &&
             formik.touched.tipoPromocion &&
-            ValidIco(formik.errors.tipoPromocion)}
+            ValidIco({ mensaje: formik.errors.tipoPromocion })}
         </div>
         {formik.values.tipoPromocion === "Unico" ? (
           <div className="input-item">
@@ -220,14 +217,14 @@ const Maintenance = ({ info, onClose }) => {
                   formik.setFieldValue("tipoDescuento", "Gratis");
                 } else {
                   formik.setFieldValue("tipoDescuento", "Porcentaje");
-                  formik.setFieldValue("cantidadMin", 0);
+                  formik.setFieldValue("cantidadMin", "");
                 }
                 formik.setFieldValue("prenda", []);
               }}
             />
             {formik.errors.tipoDescuento &&
               formik.touched.tipoDescuento &&
-              ValidIco(formik.errors.tipoDescuento)}
+              ValidIco({ mensaje: formik.errors.tipoDescuento })}
           </div>
         ) : (
           <div className="input-item">
@@ -249,7 +246,9 @@ const Maintenance = ({ info, onClose }) => {
                   formik.setFieldValue("tipoDescuento", "Monto");
                 } else {
                   formik.setFieldValue("tipoDescuento", "Porcentaje");
-                  // formik.setFieldValue('cantidadMin', 0);
+                  if (formik.values.tipoPromocion === "Varios") {
+                    formik.setFieldValue("cantidadMin", 0);
+                  }
                   // if (formik.values.prenda.includes('Todos')) {
 
                   // } else {
@@ -263,7 +262,7 @@ const Maintenance = ({ info, onClose }) => {
             />
             {formik.errors.tipoDescuento &&
               formik.touched.tipoDescuento &&
-              ValidIco(formik.errors.tipoDescuento)}
+              ValidIco({ mensaje: formik.errors.tipoDescuento })}
           </div>
         )}
       </div>
@@ -307,7 +306,7 @@ const Maintenance = ({ info, onClose }) => {
                 )}
                 {formik.errors.descuento &&
                   formik.touched.descuento &&
-                  ValidIco(formik.errors.descuento)}
+                  ValidIco({ mensaje: formik.errors.descuento })}
               </div>
               <div className="input-item">
                 <Select
@@ -332,7 +331,7 @@ const Maintenance = ({ info, onClose }) => {
                 />
                 {formik.errors.prenda &&
                   formik.touched.prenda &&
-                  ValidIco(formik.errors.prenda)}
+                  ValidIco({ mensaje: formik.errors.prenda })}
               </div>
               <div className="input-item">
                 <NumberInput
@@ -352,7 +351,7 @@ const Maintenance = ({ info, onClose }) => {
                 />
                 {formik.errors.cantidadMin &&
                   formik.touched.cantidadMin &&
-                  ValidIco(formik.errors.cantidadMin)}
+                  ValidIco({ mensaje: formik.errors.cantidadMin })}
               </div>
             </>
           ) : (
@@ -394,7 +393,7 @@ const Maintenance = ({ info, onClose }) => {
                 )}
                 {formik.errors.descuento &&
                   formik.touched.descuento &&
-                  ValidIco(formik.errors.descuento)}
+                  ValidIco({ mensaje: formik.errors.descuento })}
               </div>
               <div className="input-item">
                 <MultiSelect
@@ -420,7 +419,7 @@ const Maintenance = ({ info, onClose }) => {
                 />
                 {formik.errors.prenda &&
                   formik.touched.prenda &&
-                  ValidIco(formik.errors.prenda)}
+                  ValidIco({ mensaje: formik.errors.prenda })}
               </div>
 
               <div className="input-item">
@@ -451,7 +450,7 @@ const Maintenance = ({ info, onClose }) => {
                 />
                 {formik.errors.cantidadMin &&
                   formik.touched.cantidadMin &&
-                  ValidIco(formik.errors.cantidadMin)}
+                  ValidIco({ mensaje: formik.errors.cantidadMin })}
               </div>
             </>
           )}
@@ -468,7 +467,7 @@ const Maintenance = ({ info, onClose }) => {
             />
             {formik.errors.descripcion &&
               formik.touched.descripcion &&
-              ValidIco(formik.errors.descripcion)}
+              ValidIco({ mensaje: formik.errors.descripcion })}
           </div>
           <div className="input-item">
             <NumberInput
@@ -488,7 +487,7 @@ const Maintenance = ({ info, onClose }) => {
             />
             {formik.errors.vigencia &&
               formik.touched.vigencia &&
-              ValidIco(formik.errors.vigencia)}
+              ValidIco({ mensaje: formik.errors.vigencia })}
           </div>
           <div
             className="input-item"

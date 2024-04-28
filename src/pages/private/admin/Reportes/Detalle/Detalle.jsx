@@ -2,9 +2,6 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React, { useEffect } from "react";
-
-import Prendas from "../../../../../utils/img/Prendas/index";
-import { GetDeliverysID } from "../../../../../redux/actions/aDelivery";
 import "./detalle.scss";
 import { useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
@@ -20,8 +17,6 @@ import {
 const Detalle = ({ infoD }) => {
   const [ordern, setOrder] = useState();
   const [statePago, setStatePago] = useState();
-  const dispatch = useDispatch();
-  const iDelivery = useSelector((state) => state.delivery.infoDeliveryID);
   const ListUsuarios = useSelector((state) => state.user.listUsuario);
 
   const calculateHeight = (
@@ -80,12 +75,6 @@ const Detalle = ({ infoD }) => {
   };
 
   useEffect(() => {
-    if (ordern?.Modalidad === "Delivery") {
-      dispatch(GetDeliverysID(ordern._id));
-    }
-  }, [ordern]);
-
-  useEffect(() => {
     setOrder(infoD);
     if (infoD) {
       const sPago = handleGetInfoPago(infoD.ListPago, infoD.totalNeto);
@@ -99,22 +88,6 @@ const Detalle = ({ infoD }) => {
         <h1>{ordern?.onWaiting.showText} en Espera</h1>
       </div>
       <h1 className="mod-ord">{ordern?.Modalidad}</h1>
-      {ordern?.Modalidad === "Delivery" && iDelivery ? (
-        <div className="list-delivery">
-          {iDelivery.map((e) => (
-            <div className="gasto-d" key={e._id}>
-              <div className="dsc_d">
-                <span>{handleDescDelivery(e.descripcion)}</span>
-              </div>
-              <div className="cant_d">
-                <span>
-                  {simboloMoneda} {e.monto}
-                </span>
-              </div>
-            </div>
-          ))}
-        </div>
-      ) : null}
       <table className="product-t">
         <thead>
           <tr>

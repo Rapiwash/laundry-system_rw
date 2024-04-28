@@ -51,7 +51,11 @@ const InputSelectedPrenda = ({ listenClick, tabI, disabled }) => {
       };
     });
 
-    setData(serviciosDB);
+    const infoOrdenada = serviciosDB.sort((a, b) =>
+      a.label.localeCompare(b.label)
+    );
+
+    setData(infoOrdenada);
   }, [iServicios]);
 
   return (

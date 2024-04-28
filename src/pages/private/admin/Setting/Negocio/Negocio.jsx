@@ -35,8 +35,6 @@ const Negocio = () => {
     },
     //validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
-      // Verificar si "gerente" está presente en el array rolQAnulan
-
       openModal(values);
       setSubmitting(false);
     },

@@ -161,7 +161,9 @@ const Categorias = () => {
       {PActions && (
         <Portal onClose={handleCloseAction}>
           <div className="portal-action-categoria">
-            <span>Categoria : {rowPick.name.toUpperCase()}</span>
+            <span className="title">
+              Categoria : {rowPick.name.toUpperCase()}
+            </span>
             <div className="action">
               <Button
                 type="submit"
@@ -171,7 +173,7 @@ const Categorias = () => {
                   setPActions(false);
                 }}
               >
-                Actualizar Categoria
+                Actualizar
               </Button>
 
               <Button
@@ -179,7 +181,7 @@ const Categorias = () => {
                 style={{ background: "#e76565" }}
                 onClick={() => handleDeleteCategoria(rowPick._id)}
               >
-                Eliminar Categoria
+                Eliminar
               </Button>
             </div>
           </div>

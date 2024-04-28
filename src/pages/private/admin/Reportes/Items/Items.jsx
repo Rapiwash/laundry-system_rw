@@ -274,7 +274,8 @@ const Items = () => {
             maw={400}
           />
         </div>
-        <SwitchModel
+        <div style={{ width: "200px" }}></div>
+        {/* <SwitchModel
           title="Tipo :"
           onSwitch="Producto" // TRUE
           offSwitch="Servicio" // FALSE
@@ -289,7 +290,7 @@ const Items = () => {
               setTipoFiltro("servicios");
             }
           }}
-        />
+        /> */}
       </div>
       <div className="body-p">
         <div className="graf-prod">
