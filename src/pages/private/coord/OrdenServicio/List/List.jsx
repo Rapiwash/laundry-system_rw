@@ -614,7 +614,7 @@ const List = () => {
                   : "",
               border:
                 pressedRow === row.original.Id ? "2px solid #6582ff" : "none",
-              userSelect: "none",
+              // userSelect: "none",
             },
           })}
           enableStickyHeader={true}
