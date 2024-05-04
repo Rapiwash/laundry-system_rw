@@ -137,11 +137,6 @@ const HeaderUser = () => {
             <div className="right" />
           </div>
           <li>
-            <Link to={`./${PrivateRoutes.PERSONAL}`} className="active">
-              ASISTENCIA
-            </Link>
-          </li>
-          <li>
             <Link
               to={`./${PrivateRoutes.LIST_ORDER_SERVICE}`}
               className="active"
@@ -175,6 +170,11 @@ const HeaderUser = () => {
           {(userState.rol === Roles.ADMIN || userState.rol === Roles.GERENTE) &&
           isSmallScreen ? (
             <>
+              <li>
+                <Link to={`./${PrivateRoutes.PERSONAL}`} className="active">
+                  ASISTENCIA
+                </Link>
+              </li>
               <li>
                 <Link to={`./${PrivateRoutes.PROMOCIONES}`}>Promociones</Link>
               </li>
