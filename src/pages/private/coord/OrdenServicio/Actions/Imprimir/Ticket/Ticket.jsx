@@ -32,7 +32,7 @@ const Ticket = React.forwardRef((props, ref) => {
   const InfoCategorias = useSelector(
     (state) => state.categorias.listCategorias
   );
-  const { InfoPuntos } = useSelector((state) => state.modificadores);
+  // const { InfoPuntos } = useSelector((state) => state.modificadores);
 
   const getInfoDelivery = () => {
     const ICategory = InfoCategorias.find((cat) => cat.nivel === "primario");
@@ -499,7 +499,7 @@ const Ticket = React.forwardRef((props, ref) => {
                                 </strong>
                               </div>
                             </div>
-                            <div className="info-extra-dt">
+                            {/* <div className="info-extra-dt">
                               <span>
                                 Por cada{" "}
                                 {formatThousandsSeparator(InfoPuntos?.score)}{" "}
@@ -510,7 +510,7 @@ const Ticket = React.forwardRef((props, ref) => {
                                 )}{" "}
                                 de descuento
                               </span>
-                            </div>
+                            </div> */}
                           </div>
                           {sizePaper80 ? (
                             <div className="img-pet">

@@ -1,14 +1,14 @@
 import { simboloMoneda } from "../../../services/global";
 
 export function formatThousandsSeparator(value, money) {
-  return !Number.isNaN(parseFloat(value))
-    ? `${money ? simboloMoneda : ""} ${value}`.replace(
-        /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g,
-        ","
-      )
-    : money
-    ? simboloMoneda
-    : "";
+  if (Number.isNaN(parseFloat(value))) {
+    return money ? simboloMoneda : "";
+  }
+
+  const fixedValue = parseFloat(value).toFixed(2);
+  const formattedValue = fixedValue.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+
+  return money ? `${simboloMoneda} ${formattedValue}` : formattedValue;
 }
 
 export function formatRoundedNumber(value) {

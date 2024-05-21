@@ -184,7 +184,10 @@ const InfoServicios = ({
                         const price = values.items[index].price || 0;
                         const newTotal = value * price;
                         changeValue(`items.${index}.cantidad`, value);
-                        changeValue(`items.${index}.total`, newTotal);
+                        changeValue(
+                          `items.${index}.total`,
+                          +newTotal.toFixed(2)
+                        );
                       }}
                       precision={2}
                       min={0.01}
