@@ -145,7 +145,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
         motivo: `[${String(infoCliente.codRecibo).padStart(
           4,
           "0"
-        )}] Delivery recojo en ${values.tipoTrasporte} - ${infoCliente.Nombre}`,
+        )}] Delivery envio en ${values.tipoTrasporte} - ${infoCliente.Nombre}`,
         date: {
           fecha: DateCurrent().format4,
           hora: DateCurrent().format3,
