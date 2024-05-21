@@ -1,44 +1,59 @@
 import { simboloMoneda } from "../../../services/global";
 
-export function formatValue(value) {
-  const isNumericValue = !Number.isNaN(parseFloat(value));
-
-  if (isNumericValue) {
-    const formattedValue = `${simboloMoneda} ${value}`.replace(
-      /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g,
-      ","
-    );
-    return formattedValue;
-  }
-
-  return "";
+export function formatThousandsSeparator(value, money) {
+  return !Number.isNaN(parseFloat(value))
+    ? `${money ? simboloMoneda : ""} ${value}`.replace(
+        /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g,
+        ","
+      )
+    : money
+    ? simboloMoneda
+    : "";
 }
 
-export function redondearNumero(input) {
+export function formatRoundedNumber(value) {
   // Convertir el input a número
-  let numero = Number(input);
+  let numero = Number(value);
 
   // Verificar si el número es un entero o tiene decimales
   if (Number.isInteger(numero)) {
     // Si es un entero, simplemente devolver el número
     return numero;
   } else {
-    // Si tiene decimales, ajustar a dos decimales sin redondear hacia arriba
-    let base = Math.floor(numero * 100) / 100; // Redondeo hacia abajo para dos decimales
-    let decimales = (numero - base).toFixed(3).slice(2, 5); // Extraer los decimales como string
+    let base = Math.floor(numero); // Obtener la parte entera
+    let decimales = Math.round((numero % 1) * 100); // Obtener la parte decimal
 
-    // Verificar condiciones específicas para ajustar el formato
-    if (decimales.length >= 2) {
-      if (decimales[1] === "0") {
-        // Si el segundo decimal es 0, ajustar para mostrar un solo decimal
-        return Math.floor(numero * 10) / 10;
+    const segundoDigito = parseInt(decimales.toString().charAt(1));
+
+    // Ajustar las decimales si es necesario
+    if (decimales >= 10) {
+      if (segundoDigito < 5) {
+        // Redondear hacia abajo al múltiplo de 10 más cercano
+        decimales = Math.floor(decimales / 10) * 10;
+      } else if (segundoDigito === 5 && decimales % 10 === 5) {
+        // Mantener el segundo dígito igual a 5 si el primer decimal es 5
+        decimales = Math.floor(decimales / 10) * 10 + 5;
       } else {
-        // En caso contrario, devolver el número ajustado a dos decimales sin redondear arriba
-        return base.toFixed(1);
+        // Redondear hacia arriba al múltiplo de 10 más cercano
+        decimales = Math.ceil(decimales / 10) * 10;
       }
     } else {
-      // Si solo hay un decimal o ninguno, devolver el número como está
-      return base;
+      if (decimales < 5) {
+        // Redondear hacia abajo al múltiplo de 10 más cercano
+        decimales = Math.floor(decimales / 10) * 10;
+      } else if (decimales === 5) {
+        // Mantener el segundo dígito igual a 5 si el primer decimal es 5
+        decimales = Math.floor(decimales / 10) * 10 + 5;
+      } else {
+        // Redondear hacia arriba al múltiplo de 10 más cercano
+        decimales = Math.ceil(decimales / 10) * 10;
+      }
     }
+
+    // Obtener el número con las decimales ajustadas
+    const numberFinal = base + decimales / 100;
+
+    // Devolver el número
+    return numberFinal;
   }
 }

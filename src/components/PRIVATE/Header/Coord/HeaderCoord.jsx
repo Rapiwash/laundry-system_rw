@@ -6,7 +6,6 @@ import { Link, useLocation } from "react-router-dom";
 import { PrivateRoutes, Roles } from "../../../../models/index";
 import Logout from "../../Logout/Logout";
 import "./headerCoord.scss";
-import { oldOrder } from "../../../../services/global";
 
 import { ReactComponent as Logo } from "../../../../utils/img/Logo/logo.svg";
 
@@ -171,11 +170,6 @@ const HeaderUser = () => {
           isSmallScreen ? (
             <>
               <li>
-                <Link to={`./${PrivateRoutes.PERSONAL}`} className="active">
-                  ASISTENCIA
-                </Link>
-              </li>
-              <li>
                 <Link to={`./${PrivateRoutes.PROMOCIONES}`}>Promociones</Link>
               </li>
               <li>
@@ -187,7 +181,7 @@ const HeaderUser = () => {
               <li className="pages-admin">
                 <Link to={`./${PrivateRoutes.SETTING}`}>Ajustes</Link>
               </li>
-              {oldOrder ? (
+              {InfoNegocio?.oldOrder ? (
                 <li>
                   <Link to={`./${PrivateRoutes.REGISTER_OLDS}`}>
                     Registro Antiguos

@@ -3,10 +3,8 @@
 /* eslint-disable react/display-name */
 import React, { useEffect, useState } from "react";
 import {
-  DiasAttencion,
-  HoraAttencion,
+  formatThousandsSeparator,
   handleGetInfoPago,
-  roundDecimal,
 } from "../../../../../../../utils/functions";
 // import "./ticket50.scss";
 import "./ticket80.scss";
@@ -20,7 +18,6 @@ import axios from "axios";
 import {
   nameImpuesto,
   politicaAbandono,
-  simboloMoneda,
 } from "../../../../../../../services/global";
 import { useSelector } from "react-redux";
 
@@ -29,11 +26,13 @@ const Ticket = React.forwardRef((props, ref) => {
   const { showDescripcion, tipoTicket, infoOrden, InfoNegocio } = props;
   const [listPromos, setListPromos] = useState([]);
   const [sPago, setSPago] = useState();
+  const [infoPuntosCli, setInfoPuntosCli] = useState(null);
 
   const InfoServicios = useSelector((state) => state.servicios.listServicios);
   const InfoCategorias = useSelector(
     (state) => state.categorias.listCategorias
   );
+  const { InfoPuntos } = useSelector((state) => state.modificadores);
 
   const getInfoDelivery = () => {
     const ICategory = InfoCategorias.find((cat) => cat.nivel === "primario");
@@ -45,12 +44,8 @@ const Ticket = React.forwardRef((props, ref) => {
     return IService;
   };
 
-  const montoDelivery = (dataC) => {
-    if (dataC.Modalidad === "Delivery") {
-      return infoOrden.Items.find((p) => p.item === "Delivery").total;
-    } else {
-      return 0;
-    }
+  const montoDelivery = () => {
+    return infoOrden.Items.find((p) => p.item === "Delivery").total;
   };
 
   const calcularFechaFutura = (numeroDeDias) => {
@@ -72,6 +67,21 @@ const Ticket = React.forwardRef((props, ref) => {
       console.error(
         `No se pudo obtener información de la promoción - ${error}`
       );
+      throw error; // Lanza el error para que pueda ser capturado por Promise.all
+    }
+  };
+
+  const handleGetInfoPuntosCliente = async (dni) => {
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/lava-ya/get-specific-cliente/${dni}`
+      );
+      return response.data;
+    } catch (error) {
+      // Maneja los errores aquí
+      console.error(`No se pudo obtener información de la puntos - ${error}`);
       throw error; // Lanza el error para que pueda ser capturado por Promise.all
     }
   };
@@ -132,7 +142,6 @@ const Ticket = React.forwardRef((props, ref) => {
         const promos = infoOrden.gift_promo;
 
         try {
-          // Utiliza Promise.all para esperar a que todas las llamadas asincrónicas se completen
           const results = await Promise.all(
             promos.map(async (promo) => {
               return await handleGetInfoPromo(promo.codigoCupon);
@@ -141,18 +150,28 @@ const Ticket = React.forwardRef((props, ref) => {
 
           setListPromos(results);
         } catch (error) {
-          // Maneja los errores aquí
           console.error(
             "Error al obtener información de las promociones:",
             error
           );
         }
       }
+      if (
+        infoOrden?.descuento > 0 &&
+        infoOrden?.dni &&
+        infoOrden?.modoDescuento === "Puntos"
+      ) {
+        try {
+          const res = await handleGetInfoPuntosCliente(infoOrden?.dni);
+          setInfoPuntosCli(res);
+        } catch (error) {
+          console.error("Error al obtener información de las Puntos :", error);
+        }
+      }
     };
 
     fetchData();
   }, [infoOrden]);
-
   useEffect(() => {
     if (infoOrden) {
       setSPago(handleGetInfoPago(infoOrden.ListPago, infoOrden.totalNeto));
@@ -168,37 +187,58 @@ const Ticket = React.forwardRef((props, ref) => {
               <div className="name-bussiness">
                 <Logo className="img-logo" />
               </div>
-              <table className="info-table">
-                <tbody>
-                  <tr>
-                    <td>Direccion:</td>
-                    <td>{InfoNegocio?.direccion}</td>
-                  </tr>
-                  {InfoNegocio.numero.state ? (
+              {sizePaper80 === false ? (
+                <>
+                  <div className="i-negocio">
+                    <span>Horario de Atencion</span>
+                    {InfoNegocio.horario.map((hor, index) => (
+                      <span key={index}>{hor.horario}</span>
+                    ))}
+                  </div>
+                  <div className="i-negocio">
+                    <span>Direccion</span>
+                    <span>{InfoNegocio?.direccion}</span>
+                  </div>
+                  <div className="i-negocio " style={{ paddingBottom: "0" }}>
+                    <span>Telefono de contacto</span>
+                    <div className="flexd">
+                      {InfoNegocio.contacto.map((num, index) => (
+                        <span key={index}> {num.numero}</span>
+                      ))}
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <table className="info-table">
+                  <tbody>
+                    <tr>
+                      <td>Direccion:</td>
+                      <td>{InfoNegocio?.direccion}</td>
+                    </tr>
                     <tr>
                       <td>Telefono:</td>
-                      <td>{InfoNegocio?.numero?.info}</td>
+                      <td className="u-line">
+                        {InfoNegocio.contacto.map((num, index) => (
+                          <span key={index}>
+                            {num.numero}{" "}
+                            {index !== InfoNegocio.contacto.length - 1 && (
+                              <>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</>
+                            )}
+                          </span>
+                        ))}
+                      </td>
                     </tr>
-                  ) : null}
-                  <tr>
-                    <td>Horario:</td>
-                    <td>
-                      {Object.keys(InfoNegocio).length > 0 ? (
-                        <>
-                          {DiasAttencion(InfoNegocio?.horario.dias)}
-
-                          {!sizePaper80 ? (
-                            <hr style={{ visibility: "hidden" }} />
-                          ) : (
-                            " - "
-                          )}
-                          {HoraAttencion(InfoNegocio?.horario.horas)}
-                        </>
-                      ) : null}
-                    </td>
-                  </tr>
-                </tbody>
-              </table>
+                    <tr>
+                      <td>Horario:</td>
+                      <td className="m-line">
+                        {InfoNegocio.horario.map((hor, index) => (
+                          <span key={index}>{hor.horario}</span>
+                        ))}
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              )}
             </div>
             <div className="info-client">
               <div className="cod-rec">
@@ -213,7 +253,7 @@ const Ticket = React.forwardRef((props, ref) => {
                 <table className="tb-date">
                   <tbody>
                     <tr>
-                      <td>Recojo:</td>
+                      <td>Ingreso:</td>
                       <td>
                         <div className="date-time">
                           {sizePaper80 ? (
@@ -333,10 +373,10 @@ const Ticket = React.forwardRef((props, ref) => {
                         <tr>
                           <td>•</td>
                           <td>{p.item}</td>
-                          <td>{roundDecimal(p.cantidad)}</td>
+                          <td>{formatThousandsSeparator(p.cantidad)}</td>
                           {!tipoTicket ? (
                             <>
-                              <td>{roundDecimal(p.total)}</td>
+                              <td>{formatThousandsSeparator(p.total)}</td>
                             </>
                           ) : null}
                         </tr>
@@ -355,18 +395,25 @@ const Ticket = React.forwardRef((props, ref) => {
                       <tr>
                         <td colSpan="3">Subtotal :</td>
                         <td>
-                          {roundDecimal(
+                          {formatThousandsSeparator(
                             infoOrden.Items.reduce(
                               (total, p) => total + parseFloat(p.total),
                               0
-                            ) - montoDelivery(infoOrden)
+                            ) -
+                              infoOrden?.Modalidad ===
+                              "Delivery"
+                              ? montoDelivery()
+                              : 0
                           )}
                         </td>
                       </tr>
-                      <tr>
-                        <td colSpan="3">Delivery :</td>
-                        <td>{montoDelivery(infoOrden)}</td>
-                      </tr>
+                      {infoOrden?.Modalidad === "Delivery" ? (
+                        <tr>
+                          <td colSpan="3">Delivery :</td>
+                          <td>{montoDelivery()}</td>
+                        </tr>
+                      ) : null}
+
                       {infoOrden.factura ? (
                         <tr>
                           <td colSpan="3">
@@ -378,52 +425,99 @@ const Ticket = React.forwardRef((props, ref) => {
                       ) : null}
                       <tr>
                         <td colSpan="3">Descuento :</td>
-                        <td>{infoOrden.descuento ? infoOrden.descuento : 0}</td>
+                        <td>
+                          {infoOrden.descuento
+                            ? formatThousandsSeparator(infoOrden.descuento)
+                            : 0}
+                        </td>
                       </tr>
                       <tr>
                         <td colSpan="3">Total a Pagar :</td>
-                        <td>{roundDecimal(infoOrden.totalNeto)}</td>
+                        <td>{formatThousandsSeparator(infoOrden.totalNeto)}</td>
                       </tr>
                       {sPago?.estado === "Incompleto" ? (
                         <>
                           <tr>
                             <td colSpan="3">A Cuenta :</td>
-                            <td>{sPago?.pago}</td>
+                            <td>{formatThousandsSeparator(sPago?.pago)}</td>
                           </tr>
                           <tr>
                             <td colSpan="3">Deuda Pendiente :</td>
-                            <td>{sPago?.falta}</td>
+                            <td>{formatThousandsSeparator(sPago?.falta)}</td>
                           </tr>
                         </>
                       ) : null}
                     </tfoot>
                   ) : null}
                 </table>
-                {infoOrden.modoDescuento === "Promocion" &&
-                infoOrden.descuento > 0 &&
-                !tipoTicket ? (
+                {infoOrden?.descuento > 0 && !tipoTicket ? (
                   <div className="space-ahorro">
                     <h2 className="title">
-                      ! Felicidades Ahorraste {simboloMoneda}
-                      {infoOrden?.descuento} ¡
+                      ! Felicidades Ahorraste
+                      {formatThousandsSeparator(infoOrden?.descuento, true)} ¡
                     </h2>
-                    <div className="info-promo">
-                      <span>Usando nuestras promociones :</span>
-                      <div className="body-ahorro">
-                        <div className="list-promo">
-                          <ul>
-                            {infoOrden.cargosExtras.beneficios.promociones.map(
-                              (p) => (
-                                <li key={p.codigoCupon}>{p.descripcion}</li>
-                              )
-                            )}
-                          </ul>
-                        </div>
-                        <div className="img-pet">
-                          <img src={AhorroPet} alt="" />
+                    {infoOrden?.modoDescuento === "Promocion" ? (
+                      <div className="info-promo">
+                        <span>Usando nuestras promociones :</span>
+                        <div className="body-ahorro">
+                          <div className="list-promo">
+                            <ul>
+                              {infoOrden?.cargosExtras.beneficios.promociones.map(
+                                (p) => (
+                                  <li key={p.codigoCupon}>{p.descripcion}</li>
+                                )
+                              )}
+                            </ul>
+                          </div>
+                          <div className="img-pet">
+                            <img src={AhorroPet} alt="" />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    ) : (
+                      <div className="info-point">
+                        <span>Usando nuestras sistema de puntos :</span>
+                        <div className="body-ahorro">
+                          <div className="detalle-puntos">
+                            <div className="content-items">
+                              <div className="item-dt">
+                                <span>PUNTOS USADOS</span>
+                                <strong>
+                                  {formatThousandsSeparator(
+                                    infoOrden?.cargosExtras.beneficios.puntos
+                                  )}
+                                </strong>
+                              </div>
+                              <div className="item-dt">
+                                <span>PUNTOS RESTANTES</span>
+                                <strong>
+                                  {formatThousandsSeparator(
+                                    infoPuntosCli?.scoreTotal
+                                  )}
+                                </strong>
+                              </div>
+                            </div>
+                            <div className="info-extra-dt">
+                              <span>
+                                Por cada{" "}
+                                {formatThousandsSeparator(InfoPuntos?.score)}{" "}
+                                puntos recibes{" "}
+                                {formatThousandsSeparator(
+                                  InfoPuntos?.valor,
+                                  true
+                                )}{" "}
+                                de descuento
+                              </span>
+                            </div>
+                          </div>
+                          {sizePaper80 ? (
+                            <div className="img-pet">
+                              <img src={AhorroPet} alt="" />
+                            </div>
+                          ) : null}
+                        </div>
+                      </div>
+                    )}
                   </div>
                 ) : null}
               </div>
@@ -431,18 +525,9 @@ const Ticket = React.forwardRef((props, ref) => {
             {!tipoTicket ? (
               <>
                 <div className="monto-final">
-                  <h2>
-                    Pago : {simboloMoneda}
-                    {
-                      handleGetInfoPago(infoOrden.ListPago, infoOrden.totalNeto)
-                        .pago
-                    }
-                  </h2>
+                  <h2>Pago : {formatThousandsSeparator(sPago?.pago, true)}</h2>
                   <h3 className={`${infoOrden.factura ? null : "sf"} estado`}>
-                    {handleGetInfoPago(
-                      infoOrden.ListPago,
-                      infoOrden.totalNeto
-                    ).estado.toUpperCase()}
+                    {sPago?.estado.toUpperCase()}
                   </h3>
                   {infoOrden.factura ? (
                     <h2 className="cangeo-factura">

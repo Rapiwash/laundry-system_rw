@@ -1,13 +1,12 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-import { NumberInput } from '@mantine/core';
-import { formatValue } from '../../../../../../../utils/functions';
-import { ReactComponent as Moto } from '../../../../../../../utils/img/Delivery/moto.svg';
-import { ReactComponent as Taxi } from '../../../../../../../utils/img/Delivery/taxi-lateral.svg';
-import { ReactComponent as Tienda } from '../../../../../../../utils/img/Delivery/tienda.svg';
-import { simboloMoneda } from '../../../../../../../services/global';
+import { NumberInput } from "@mantine/core";
+import { ReactComponent as Moto } from "../../../../../../../utils/img/Delivery/moto.svg";
+import { ReactComponent as Taxi } from "../../../../../../../utils/img/Delivery/taxi-lateral.svg";
+import { ReactComponent as Tienda } from "../../../../../../../utils/img/Delivery/tienda.svg";
+import { simboloMoneda } from "../../../../../../../services/global";
 
 const Entregar = ({ setFieldValue, errors, touched, values }) => {
   const inputRef = useRef(null);
@@ -32,7 +31,7 @@ const Entregar = ({ setFieldValue, errors, touched, values }) => {
               name="tipoTrasporte"
               value="Taxi"
               onChange={(e) => {
-                setFieldValue('tipoTrasporte', e.target.value);
+                setFieldValue("tipoTrasporte", e.target.value);
                 // setFieldValue('mDevolucion', 6);
                 setShouldFocusInput(true);
               }}
@@ -53,8 +52,8 @@ const Entregar = ({ setFieldValue, errors, touched, values }) => {
               name="tipoTrasporte"
               value="Moto"
               onChange={(e) => {
-                setFieldValue('tipoTrasporte', e.target.value);
-                setFieldValue('mDevolucion', '');
+                setFieldValue("tipoTrasporte", e.target.value);
+                setFieldValue("mDevolucion", "");
                 setShouldFocusInput(true);
               }}
             />
@@ -74,8 +73,8 @@ const Entregar = ({ setFieldValue, errors, touched, values }) => {
               name="tipoTrasporte"
               value="Tienda"
               onClick={(e) => {
-                setFieldValue('tipoTrasporte', e.target.value);
-                setFieldValue('mDevolucion', 0);
+                setFieldValue("tipoTrasporte", e.target.value);
+                setFieldValue("mDevolucion", 0);
                 setShouldFocusInput(true);
               }}
             />
@@ -90,7 +89,7 @@ const Entregar = ({ setFieldValue, errors, touched, values }) => {
         {errors.tipoTrasporte && touched.tipoTrasporte && (
           <div className="ico-req">
             <i className="fa-solid fa-circle-exclamation ">
-              <div className="info-req" style={{ pointerEvents: 'none' }}>
+              <div className="info-req" style={{ pointerEvents: "none" }}>
                 <span>{errors.tipoTrasporte}</span>
               </div>
             </i>
@@ -102,21 +101,25 @@ const Entregar = ({ setFieldValue, errors, touched, values }) => {
           name="mDevolucion"
           value={values.mDevolucion}
           ref={inputRef}
-          disabled={values.tipoTrasporte === 'Tienda' ? true : false}
-          // parser={(value) => value.replace(/S\/\s?|(,*)/g, '')}
-          parser={(value) => value.replace(new RegExp(`${simboloMoneda}\\s?|(,*)`, 'g'), '')}
-          formatter={formatValue}
+          disabled={values.tipoTrasporte === "Tienda" ? true : false}
+          formatter={(value) =>
+            `${simboloMoneda} ${value}`.replace(
+              /\B(?<!\.\d*)(?=(\d{3})+(?!\d))/g,
+              ","
+            )
+          }
           placeholder="Ingrese Monto"
           precision={2}
           step={0.05}
+          min={0}
           hideControls={true}
           autoComplete="off"
-          onChange={(value) => setFieldValue('mDevolucion', value)}
+          onChange={(value) => setFieldValue("mDevolucion", value)}
         />
         {errors.mDevolucion && touched.mDevolucion && (
           <div className="ico-req">
             <i className="fa-solid fa-circle-exclamation ">
-              <div className="info-req" style={{ pointerEvents: 'none' }}>
+              <div className="info-req" style={{ pointerEvents: "none" }}>
                 <span>{errors.mDevolucion}</span>
               </div>
             </i>

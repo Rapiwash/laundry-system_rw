@@ -198,7 +198,9 @@ const Delivery = () => {
 
   const inputRef = useRef(null);
 
-  const openModal = (values) =>
+  const openModal = (values) => {
+    let confirmationEnabled = true;
+
     modals.openConfirmModal({
       title: "Reserva de Pedido",
       centered: true,
@@ -208,8 +210,14 @@ const Delivery = () => {
       labels: { confirm: "Si", cancel: "No" },
       confirmProps: { color: "green" },
       //onCancel: () => console.log("Cancelado"),
-      onConfirm: () => handleReservar(values),
+      onConfirm: () => {
+        if (confirmationEnabled) {
+          confirmationEnabled = false;
+          handleReservar(values);
+        }
+      },
     });
+  };
 
   const validationSchema = Yup.object().shape({
     name: Yup.string().required("Campo obligatorio"),
@@ -426,11 +434,8 @@ const Delivery = () => {
             </Formik>
           ) : (
             <div className="OS-content">
-              <div className="title-action">
-                <h1 className="elegantshadow">Agregando Factura</h1>
-                <h1 className="elegantshadow">- DELIVERY -</h1>
-              </div>
               <OrdenServicio
+                titleMode="REGISTRAR"
                 mode={"Delivery"}
                 action={"Guardar"}
                 onAction={handleRegistrar}

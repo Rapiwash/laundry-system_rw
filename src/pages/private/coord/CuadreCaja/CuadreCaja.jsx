@@ -10,7 +10,7 @@ import styled from "styled-components";
 import {
   DateCurrent,
   cLetter,
-  redondearNumero,
+  formatRoundedNumber,
 } from "../../../../utils/functions/index";
 import { DatePickerInput } from "@mantine/dates";
 
@@ -245,6 +245,7 @@ const CuadreCaja = () => {
   };
 
   const openModal = (value) => {
+    let confirmationEnabled = true;
     const clonedElement = certificateTemplateRef.current.cloneNode(true);
 
     modals.openConfirmModal({
@@ -267,12 +268,15 @@ const CuadreCaja = () => {
       withCloseButton: false,
       closeOnClickOutside: false,
       onConfirm: () => {
-        setOnLoading(true);
-        setTimeout(() => {
-          value === true
-            ? handleSaved(clonedElement)
-            : handleGeneratePdf(clonedElement);
-        }, 500);
+        if (confirmationEnabled) {
+          confirmationEnabled = false;
+          setOnLoading(true);
+          setTimeout(() => {
+            value === true
+              ? handleSaved(clonedElement)
+              : handleGeneratePdf(clonedElement);
+          }, 500);
+        }
       },
     });
   };
@@ -721,7 +725,7 @@ const CuadreCaja = () => {
               <div className="i-final">
                 <span>
                   {cLetter(valueFinalINS?.tipo)} : &nbsp;&nbsp; {simboloMoneda}{" "}
-                  {redondearNumero(valueFinalINS?.total)}
+                  {formatRoundedNumber(valueFinalINS?.total)}
                 </span>
               </div>
             </div>

@@ -79,6 +79,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
   };
 
   const openModalPagar = (values) => {
+    let confirmationEnabled = true;
     modals.openConfirmModal({
       title: "Confirmar Pago",
       centered: true,
@@ -88,11 +89,17 @@ const EndProcess = ({ IdCliente, onClose }) => {
       labels: { confirm: "Si", cancel: "No" },
       confirmProps: { color: "green" },
       //onCancel: () => console.log("Cancelado"),
-      onConfirm: () => handleEditPago(values),
+      onConfirm: () => {
+        if (confirmationEnabled) {
+          confirmationEnabled = false;
+          handleEditPago(values);
+        }
+      },
     });
   };
 
   const openModalEntregar = (value) => {
+    let confirmationEnabled = true;
     modals.openConfirmModal({
       title: "Confirmar Entrega",
       centered: true,
@@ -102,7 +109,12 @@ const EndProcess = ({ IdCliente, onClose }) => {
       labels: { confirm: "Si", cancel: "No" },
       confirmProps: { color: "green" },
       //onCancel: () => console.log("Cancelado"),
-      onConfirm: () => handleEditEntrega(value),
+      onConfirm: () => {
+        if (confirmationEnabled) {
+          confirmationEnabled = false;
+          handleEditEntrega(value);
+        }
+      },
     });
   };
 
@@ -286,8 +298,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
                 Anular
               </button>
             ) : null}
-            {infoCliente.estadoPrenda !== "entregado" &&
-            infoCliente.modeRegistro !== "antiguo" ? (
+            {infoCliente.estadoPrenda !== "entregado" ? (
               <button
                 type="button"
                 className="btn-exm"
@@ -317,14 +328,12 @@ const EndProcess = ({ IdCliente, onClose }) => {
               estadoPago.estado !== "Completo" ? vInitialPago : vInitialEntrega
             }
             validationSchema={validationSchema}
-            onSubmit={(values, { setSubmitting }) => {
+            onSubmit={(values) => {
               if (estadoPago.estado !== "Completo") {
                 openModalPagar(values);
               } else {
                 openModalEntregar(values);
               }
-              // openModalPagarEntregar(values);
-              setSubmitting(false);
             }}
           >
             {({
@@ -409,11 +418,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
                   >
                     Retroceder
                   </button>
-                  <button
-                    className="btn-exm"
-                    type="submit"
-                    disabled={isSubmitting}
-                  >
+                  <button className="btn-exm" type="submit">
                     Guardar
                   </button>
                 </div>

@@ -4,11 +4,13 @@ import React, { useEffect, useState, useCallback } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { PrivateRoutes } from "../../../../models/index";
 import "./headerAdmin.scss";
-import { oldOrder } from "../../../../services/global";
+import { useSelector } from "react-redux";
 
 const HeaderAdmin = () => {
   const [stateHam2, setStateHam2] = useState(true);
   const location = useLocation();
+
+  const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
 
   const handleResize = () => {
     setTimeout(() => {
@@ -120,7 +122,7 @@ const HeaderAdmin = () => {
           <li>
             <Link to={`./${PrivateRoutes.SETTING}`}>Ajustes</Link>
           </li>
-          {oldOrder ? (
+          {InfoNegocio?.oldOrder ? (
             <li>
               <Link to={`./${PrivateRoutes.REGISTER_OLDS}`}>
                 Registro Antiguos
