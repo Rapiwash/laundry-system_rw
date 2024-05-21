@@ -398,7 +398,7 @@ const OrdenServicio = ({
         fecha: tFecha(info.dateRecojo),
         hora: tHora(info.dateRecojo),
       },
-      Modalidad: mode === "Delivery" ? "Delivery" : "Tienda",
+      Modalidad: mode,
       Nombre: info.name,
       Items: infoIntem,
       celular: info.phone,
@@ -445,15 +445,14 @@ const OrdenServicio = ({
       typeRegistro: "normal",
     };
 
-    console.log(infoOrden);
-    // onAction({
-    //   infoOrden,
-    //   infoPago: info.listPago,
-    //   rol: iUsuario.rol,
-    // });
+    onAction({
+      infoOrden,
+      infoPago: info.listPago,
+      rol: iUsuario.rol,
+    });
 
-    // formik.handleReset();
-    // handleNoPagar();
+    formik.handleReset();
+    handleNoPagar();
   };
 
   const handleNoPagar = (id) => {
