@@ -54,7 +54,6 @@ const OrdenServicio = ({
   const iDelivery = useSelector((state) => state.servicios.serviceDelivery);
   const iServicios = useSelector((state) => state.servicios.listServicios);
 
-  const [delivery, setDelivery] = useState(false);
   const [sidePanelVisible, setSidePanelVisible] = useState(false);
 
   const [listCupones, setListCupones] = useState([]);
@@ -399,7 +398,7 @@ const OrdenServicio = ({
         fecha: tFecha(info.dateRecojo),
         hora: tHora(info.dateRecojo),
       },
-      Modalidad: delivery ? "Delivery" : "Tienda",
+      Modalidad: mode === "Delivery" ? "Delivery" : "Tienda",
       Nombre: info.name,
       Items: infoIntem,
       celular: info.phone,
@@ -446,14 +445,15 @@ const OrdenServicio = ({
       typeRegistro: "normal",
     };
 
-    onAction({
-      infoOrden,
-      infoPago: info.listPago,
-      rol: iUsuario.rol,
-    });
+    console.log(infoOrden);
+    // onAction({
+    //   infoOrden,
+    //   infoPago: info.listPago,
+    //   rol: iUsuario.rol,
+    // });
 
-    formik.handleReset();
-    handleNoPagar();
+    // formik.handleReset();
+    // handleNoPagar();
   };
 
   const handleNoPagar = (id) => {
