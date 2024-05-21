@@ -215,19 +215,21 @@ const Ticket = React.forwardRef((props, ref) => {
                       <td>Direccion:</td>
                       <td>{InfoNegocio?.direccion}</td>
                     </tr>
-                    <tr>
-                      <td>Telefono:</td>
-                      <td className="u-line">
-                        {InfoNegocio.contacto.map((num, index) => (
-                          <span key={index}>
-                            {num.numero}{" "}
-                            {index !== InfoNegocio.contacto.length - 1 && (
-                              <>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</>
-                            )}
-                          </span>
-                        ))}
-                      </td>
-                    </tr>
+                    {InfoNegocio.contacto.length > 0 ? (
+                      <tr>
+                        <td>Telefono:</td>
+                        <td className="u-line">
+                          {InfoNegocio.contacto.map((num, index) => (
+                            <span key={index}>
+                              {num.numero}{" "}
+                              {index !== InfoNegocio.contacto.length - 1 && (
+                                <>&nbsp;&nbsp;&nbsp;-&nbsp;&nbsp;&nbsp;</>
+                              )}
+                            </span>
+                          ))}
+                        </td>
+                      </tr>
+                    ) : null}
                     <tr>
                       <td>Horario:</td>
                       <td className="m-line">
