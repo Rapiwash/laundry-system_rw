@@ -10,20 +10,15 @@ import styled from "styled-components";
 import {
   DateCurrent,
   cLetter,
-  formatRoundedNumber,
+  formatThousandsSeparator,
 } from "../../../../utils/functions/index";
 import { DatePickerInput } from "@mantine/dates";
 
-import { GetGastosByDate } from "../../../../redux/actions/aGasto";
 import {
   GetCuadre,
   SaveCuadre,
   UpdateCuadre,
 } from "../../../../redux/actions/aCuadre";
-import {
-  GetAnuladoId,
-  GetOrderId,
-} from "../../../../services/default.services";
 
 import { modals } from "@mantine/modals";
 import { Button, Text } from "@mantine/core";
@@ -41,7 +36,6 @@ import InfoCuadre from "./InfoCuadre/InfoCuadre";
 import FinalBalance from "./FinalBalance/FinalBalance";
 import ListPagos from "./ListPagos/ListPagos";
 import Portal from "../../../../components/PRIVATE/Portal/Portal";
-import { GetPagosByDate } from "../../../../redux/actions/aPago";
 
 const CuadreCaja = () => {
   const navigate = useNavigate();
@@ -725,7 +719,7 @@ const CuadreCaja = () => {
               <div className="i-final">
                 <span>
                   {cLetter(valueFinalINS?.tipo)} : &nbsp;&nbsp; {simboloMoneda}{" "}
-                  {formatRoundedNumber(valueFinalINS?.total)}
+                  {formatThousandsSeparator(valueFinalINS?.total)}
                 </span>
               </div>
             </div>

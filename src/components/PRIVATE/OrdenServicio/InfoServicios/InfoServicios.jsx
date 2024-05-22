@@ -11,10 +11,7 @@ import BotonModel from "../../BotonModel/BotonModel";
 import InputSelectedPrenda from "../../InputSelectedPrenda/InputSelectedPrenda";
 import { useEffect } from "react";
 import ValidIco from "../../../ValidIco/ValidIco";
-import {
-  formatRoundedNumber,
-  formatThousandsSeparator,
-} from "../../../../utils/functions";
+import { formatThousandsSeparator } from "../../../../utils/functions";
 
 const InfoServicios = ({
   paso,

@@ -1,10 +1,9 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import { NumberInput, TextInput } from "@mantine/core";
-import React, { useEffect } from "react";
+import React from "react";
 import styled from "styled-components";
 import Nota from "../Nota/Nota";
-import { simboloMoneda } from "../../../../../services/global";
 import {
   formatRoundedNumber,
   formatThousandsSeparator,

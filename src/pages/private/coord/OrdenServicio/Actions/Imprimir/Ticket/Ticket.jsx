@@ -32,7 +32,6 @@ const Ticket = React.forwardRef((props, ref) => {
   const InfoCategorias = useSelector(
     (state) => state.categorias.listCategorias
   );
-  // const { InfoPuntos } = useSelector((state) => state.modificadores);
 
   const getInfoDelivery = () => {
     const ICategory = InfoCategorias.find((cat) => cat.nivel === "primario");
@@ -402,10 +401,9 @@ const Ticket = React.forwardRef((props, ref) => {
                               (total, p) => total + parseFloat(p.total),
                               0
                             ) -
-                              infoOrden?.Modalidad ===
-                              "Delivery"
-                              ? montoDelivery()
-                              : 0
+                              (infoOrden?.Modalidad === "Delivery"
+                                ? montoDelivery()
+                                : 0)
                           )}
                         </td>
                       </tr>
@@ -499,18 +497,6 @@ const Ticket = React.forwardRef((props, ref) => {
                                 </strong>
                               </div>
                             </div>
-                            {/* <div className="info-extra-dt">
-                              <span>
-                                Por cada{" "}
-                                {formatThousandsSeparator(InfoPuntos?.score)}{" "}
-                                puntos recibes{" "}
-                                {formatThousandsSeparator(
-                                  InfoPuntos?.valor,
-                                  true
-                                )}{" "}
-                                de descuento
-                              </span>
-                            </div> */}
                           </div>
                           {sizePaper80 ? (
                             <div className="img-pet">

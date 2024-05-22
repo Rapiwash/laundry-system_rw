@@ -1,14 +1,9 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React from "react";
-import { ReactComponent as Eliminar } from "../../../../utils/img/OrdenServicio/eliminar.svg";
-import { simboloMoneda } from "../../../../services/global";
 import "./infoPromociones.scss";
 import { TextInput } from "@mantine/core";
-import {
-  formatRoundedNumber,
-  formatThousandsSeparator,
-} from "../../../../utils/functions";
+import { formatThousandsSeparator } from "../../../../utils/functions";
 
 const InfoPromociones = ({ listCupones, changeValue, setListCupones }) => {
   return (
