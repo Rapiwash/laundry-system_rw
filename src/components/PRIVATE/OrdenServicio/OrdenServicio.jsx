@@ -19,7 +19,7 @@ import { useEffect } from "react";
 import InfoPromociones from "./InfoPromociones/InfoPromociones";
 import InfoPuntos from "./InfoPuntos/InfoPuntos";
 import InfoPago from "./InfoPago/InfoPago";
-import { simboloMoneda } from "../../../services/global";
+import { showFactura, simboloMoneda } from "../../../services/global";
 import { modals } from "@mantine/modals";
 import axios from "axios";
 import {
@@ -35,6 +35,7 @@ import { useDisclosure } from "@mantine/hooks";
 import InfoPagos from "./InfoPagos/InfoPagos";
 import MetodoPago from "../MetodoPago/MetodoPago";
 import Portal from "../Portal/Portal";
+import InfoFactura from "./InfoFactura/InfoFactura";
 
 const OrdenServicio = ({
   mode,
@@ -743,6 +744,7 @@ const OrdenServicio = ({
             descripcion="¿Qué trajo el cliente?"
             iEdit={iEdit}
             iDelivery={iDelivery}
+            iPuntos={iPuntos}
             error={formik.errors}
             touched={formik.touched}
             iServicios={iServicios}
@@ -756,6 +758,16 @@ const OrdenServicio = ({
             descripcion="¿Para cuando estara Listo?"
             iEdit={iEdit}
           />
+          {showFactura ? (
+            <InfoFactura
+              paso={showFactura ? "4" : "5"}
+              descripcion="Agregar Factura"
+              changeValue={handleChageValue}
+              values={formik.values}
+              iPuntos={iPuntos}
+              iEdit={iEdit}
+            />
+          ) : null}
           {(iEdit && iEdit.modeEditAll) || !iEdit ? (
             <>
               <InfoDescuento
@@ -768,13 +780,13 @@ const OrdenServicio = ({
                 setResValidCupon={setResValidCupon}
                 resValidCupon={resValidCupon}
                 values={formik.values}
-                paso="4"
+                paso={showFactura ? "5" : "4"}
                 descripcion="¿Deseas Agregar Descuento?"
               />
               <InfoPago
                 changeValue={handleChageValue}
                 values={formik.values}
-                paso="5"
+                paso={showFactura ? "6" : "5"}
                 descripcion="Agregar Pago"
                 handleNoPagar={handleNoPagar}
                 handlePago={handlePago}

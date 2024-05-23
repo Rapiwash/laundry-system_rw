@@ -4,7 +4,7 @@
 import React from "react";
 import "./infoServicios.scss";
 import { ReactComponent as Eliminar } from "../../../../utils/img/OrdenServicio/eliminar.svg";
-import { simboloMoneda } from "../../../../services/global";
+import { nameImpuesto, simboloMoneda } from "../../../../services/global";
 import { NumberInput } from "@mantine/core";
 import { useSelector } from "react-redux";
 import BotonModel from "../../BotonModel/BotonModel";
@@ -22,14 +22,12 @@ const InfoServicios = ({
   iEdit,
   iDelivery,
   iServicios,
+  iPuntos,
   error,
   touched,
 }) => {
   const iNegocio = useSelector((state) => state.negocio.infoNegocio);
   const iCategorias = useSelector((state) => state.categorias.listCategorias);
-  const { InfoImpuesto, InfoPuntos } = useSelector(
-    (state) => state.modificadores
-  );
 
   const addRowGarment = (idServicio) => {
     const IService = iServicios.find((service) => service._id === idServicio);
@@ -103,8 +101,8 @@ const InfoServicios = ({
   };
 
   const MontoxPoints = (xpoints) => {
-    const puntos = parseFloat(InfoPuntos.score);
-    const valor = parseFloat(InfoPuntos.valor);
+    const puntos = parseFloat(iPuntos.score);
+    const valor = parseFloat(iPuntos.valor);
     const equivalenteEnSoles = (xpoints / puntos) * valor;
 
     return equivalenteEnSoles;
@@ -334,7 +332,7 @@ const InfoServicios = ({
                       <NumberInput
                         value={+values.cargosExtras.beneficios.puntos}
                         label={`Descuento x Puntos -  Max(${iCliente.scoreTotal})`}
-                        description={`Por cada ${InfoPuntos.score} puntos -  ${simboloMoneda} ${InfoPuntos.valor} de descuento`}
+                        description={`Por cada ${iPuntos.score} puntos -  ${simboloMoneda} ${iPuntos.valor} de descuento`}
                         max={parseInt(iCliente?.scoreTotal)}
                         formatter={(value) => formatThousandsSeparator(value)}
                         min={0}
@@ -359,8 +357,8 @@ const InfoServicios = ({
                           </label>
                           <br />
                           <span>
-                            Por cada {InfoPuntos.score} puntos - {simboloMoneda}{" "}
-                            {InfoPuntos.valor} de descuento
+                            Por cada {iPuntos.score} puntos - {simboloMoneda}{" "}
+                            {iPuntos.valor} de descuento
                           </span>
                         </>
                       ) : null}
@@ -372,9 +370,46 @@ const InfoServicios = ({
                 <td></td>
               </tr>
               <tr>
-                <td></td>
-                <td></td>
-                <td></td>
+                <td>
+                  {iPuntos &&
+                  Object.keys(iPuntos).length > 0 &&
+                  values.modoDescuento === "Puntos" ? (
+                    <div className="input-number dsc">
+                      <label>Dsc x Puntos</label>
+                      <NumberInput
+                        value={values.cargosExtras.beneficios.puntos}
+                        min={0}
+                        max={parseInt(iPuntos?.scoreTotal) || 0}
+                        step={1}
+                        hideControls={true}
+                        onChange={(e) => {
+                          const data = iPuntos.scoreTotal < e ? false : true;
+                          changeValue(
+                            "cargosExtras.descuentos.puntos",
+                            data ? Number(MontoxPoints(e).toFixed(2)) : 0
+                          );
+                          changeValue("cargosExtras.beneficios.puntos", e);
+                        }}
+                      />
+                    </div>
+                  ) : null}
+                </td>
+                {values.factura ? (
+                  <>
+                    <td>
+                      {nameImpuesto} ({values.cargosExtras.igv.valor * 100} %) :
+                    </td>
+                    <td>
+                      {simboloMoneda} {values.cargosExtras.igv.importe}
+                    </td>
+                  </>
+                ) : (
+                  <>
+                    <td></td>
+                    <td></td>
+                  </>
+                )}
+
                 <td></td>
               </tr>
               <tr>

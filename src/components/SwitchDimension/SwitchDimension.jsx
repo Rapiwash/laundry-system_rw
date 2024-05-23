@@ -109,6 +109,7 @@ const SwtichDimension = ({
             id={`${name}-on`}
             checked={isChecked === true}
             onChange={(e) => handleChange(e.target.value)}
+            disabled={disabled}
           />
           <label htmlFor={`${name}-on`}>{onSwitch}</label>
           <input
@@ -118,6 +119,7 @@ const SwtichDimension = ({
             id={`${name}-off`}
             checked={isChecked === false}
             onChange={(e) => handleChange(e.target.value)}
+            disabled={disabled}
           />
           <label htmlFor={`${name}-off`}>{offSwitch}</label>
         </div>
