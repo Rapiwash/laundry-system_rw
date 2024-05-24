@@ -476,7 +476,7 @@ const Ticket = React.forwardRef((props, ref) => {
                       </div>
                     ) : (
                       <div className="info-point">
-                        <span>Usando nuestras sistema de puntos :</span>
+                        <span>Usando nuestro sistema de puntos :</span>
                         <div className="body-ahorro">
                           <div className="detalle-puntos">
                             <div className="content-items">
