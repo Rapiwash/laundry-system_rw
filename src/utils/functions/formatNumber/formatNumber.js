@@ -35,12 +35,9 @@ export function formatRoundedNumber(value) {
         decimales = Math.ceil(decimales / 10) * 10;
       }
     } else {
-      if (decimales < 5) {
+      if (decimales <= 5) {
         // Redondear hacia abajo al múltiplo de 10 más cercano
         decimales = Math.floor(decimales / 10) * 10;
-      } else if (decimales === 5) {
-        // Mantener el segundo dígito igual a 5 si el primer decimal es 5
-        decimales = Math.floor(decimales / 10) * 10 + 5;
       } else {
         // Redondear hacia arriba al múltiplo de 10 más cercano
         decimales = Math.ceil(decimales / 10) * 10;
