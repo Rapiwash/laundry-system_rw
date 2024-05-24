@@ -16,7 +16,7 @@ const InfoFactura = ({ paso, descripcion, changeValue, values, iEdit }) => {
           <SwtichDimension
             onSwitch="SI"
             offSwitch="NO"
-            name="sw-tipo-descuento"
+            name="sw-tipo-factura"
             defaultValue={values.factura}
             handleChange={(value) => {
               changeValue("factura", value === "SI" ? true : false);

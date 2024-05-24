@@ -370,30 +370,7 @@ const InfoServicios = ({
                 <td></td>
               </tr>
               <tr>
-                <td>
-                  {iPuntos &&
-                  Object.keys(iPuntos).length > 0 &&
-                  values.modoDescuento === "Puntos" ? (
-                    <div className="input-number dsc">
-                      <label>Dsc x Puntos</label>
-                      <NumberInput
-                        value={values.cargosExtras.beneficios.puntos}
-                        min={0}
-                        max={parseInt(iPuntos?.scoreTotal) || 0}
-                        step={1}
-                        hideControls={true}
-                        onChange={(e) => {
-                          const data = iPuntos.scoreTotal < e ? false : true;
-                          changeValue(
-                            "cargosExtras.descuentos.puntos",
-                            data ? Number(MontoxPoints(e).toFixed(2)) : 0
-                          );
-                          changeValue("cargosExtras.beneficios.puntos", e);
-                        }}
-                      />
-                    </div>
-                  ) : null}
-                </td>
+                <td></td>
                 {values.factura ? (
                   <>
                     <td>
