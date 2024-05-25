@@ -355,6 +355,7 @@ const List = () => {
           FechaEntrega: d.dateEntrega.fecha,
           FechaRecepcion: d.dateRecepcion.fecha,
           Descuento: d.descuento,
+          listPago: d.listPago,
           Location: d.location,
           EstadoPrenda: d.estadoPrenda,
           Estado: d.estado,
