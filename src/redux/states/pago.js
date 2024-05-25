@@ -52,7 +52,7 @@ const pago = createSlice({
       })
       .addCase(AddPago.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.listPagoByDate.push(action.payload.info);
+        state.listPagoByDate.push(action.payload);
       })
       .addCase(AddPago.rejected, (state, action) => {
         state.isLoading = false;
@@ -91,9 +91,10 @@ const pago = createSlice({
       // DeletePago
       .addCase(DeletePago.fulfilled, (state, action) => {
         state.isLoading = false;
-        const deletedPagoId = action.payload._id;
+        const deletedPago = action.payload;
+
         state.listPagoByDate = state.listPagoByDate.filter(
-          (pago) => pago._id !== deletedPagoId
+          (pago) => pago?._id !== deletedPago?._id
         );
       })
       .addCase(DeletePago.rejected, (state, action) => {
