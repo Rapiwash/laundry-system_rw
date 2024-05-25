@@ -15,6 +15,7 @@ import { GetMetas } from "../../redux/actions/aMetas";
 import { DateCurrent, GetFirstFilter } from "../../utils/functions";
 import {
   LS_changeListPago,
+  LS_changePagoOnOrden,
   LS_newOrder,
   LS_updateListOrder,
   LS_updateOrder,
@@ -262,6 +263,7 @@ const PrivateMasterLayout = (props) => {
     });
     // PAGO
     socket.on("server:cPago", (data) => {
+      dispatch(LS_changePagoOnOrden(data));
       dispatch(LS_changeListPago(data));
       if (data.info.isCounted) {
         dispatch(updateRegistrosNCuadrados({ tipoMovimiento: "pagos", data }));

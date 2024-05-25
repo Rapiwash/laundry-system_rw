@@ -25,7 +25,6 @@ export const AddPago = createAsyncThunk("pago/AddPago", async (newPago) => {
     );
 
     const infoRes = response.data;
-    console.log(infoRes);
     const { info } = infoRes;
     socket.emit("client:cPago", infoRes);
     Notify("Registro Exitoso", "", "success");
