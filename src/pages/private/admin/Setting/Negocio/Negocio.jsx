@@ -12,6 +12,7 @@ import { TimeInput } from "@mantine/dates";
 import { PrivateRoutes, Roles } from "../../../../../models";
 import { useNavigate } from "react-router-dom";
 import { UpdateInfoNegocio } from "../../../../../redux/actions/aNegocio";
+import SwtichDimension from "../../../../../components/SwitchDimension/SwitchDimension";
 const Negocio = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -32,6 +33,7 @@ const Negocio = () => {
       funcionamiento: InfoNegocio.funcionamiento,
       horario: InfoNegocio.horario,
       oldOrder: InfoNegocio.oldOrder,
+      hasMobility: InfoNegocio.hasMobility,
     },
     //validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
@@ -117,9 +119,13 @@ const Negocio = () => {
   useEffect(() => {
     formik.setFieldValue("name", InfoNegocio.name);
     formik.setFieldValue("direccion", InfoNegocio.direccion);
-    formik.setFieldValue("numero", InfoNegocio.numero);
+    formik.setFieldValue("contacto", InfoNegocio.contacto);
+    formik.setFieldValue("itemsAtajos", InfoNegocio.itemsAtajos);
+    formik.setFieldValue("rolQAnulan", InfoNegocio.rolQAnulan);
+    formik.setFieldValue("funcionamiento", InfoNegocio.funcionamiento);
     formik.setFieldValue("horario", InfoNegocio.horario);
-    formik.setFieldValue("estado", InfoNegocio.estado);
+    formik.setFieldValue("oldOrder", InfoNegocio.oldOrder);
+    formik.setFieldValue("hasMobility", InfoNegocio.hasMobility);
   }, [InfoNegocio]);
 
   useEffect(() => {
@@ -168,18 +174,37 @@ const Negocio = () => {
                     />
                   </div>
                   <div className="input-item-switch">
-                    <label className="l-description" htmlFor="">
-                      Registros Antiguos :
-                    </label>
-                    <Switch
+                    <SwtichDimension
+                      title="Registros Antiguos :"
+                      onSwitch="Activado"
+                      offSwitch="Desactivado"
                       name="oldOrder"
-                      size="lg"
-                      onLabel="Activado"
-                      offLabel="Desactivado"
-                      checked={formik.values.oldOrder}
-                      onChange={(e) => {
-                        formik.setFieldValue("oldOrder", e.target.checked);
+                      defaultValue={formik.values.oldOrder}
+                      handleChange={(value) => {
+                        formik.setFieldValue(
+                          "oldOrder",
+                          value === "Activado" ? true : false
+                        );
                       }}
+                      // colorOn=""
+                      // colorOff=""
+                      // disabled=""
+                    />
+                    <SwtichDimension
+                      title="Mobilidad Propia :"
+                      onSwitch="SI"
+                      offSwitch="NO"
+                      name="hasMobility"
+                      defaultValue={formik.values.hasMobility}
+                      handleChange={(value) => {
+                        formik.setFieldValue(
+                          "hasMobility",
+                          value === "SI" ? true : false
+                        );
+                      }}
+                      colorOn="#5bc97d"
+                      // colorOff=""
+                      // disabled=""
                     />
                   </div>
                 </div>
@@ -194,8 +219,8 @@ const Negocio = () => {
                           placeholder={`Ingrese Teléfono ${index + 1}`}
                           autoComplete="off"
                           maxLength={13}
-                          required
                           autoFocus
+                          required
                           onChange={(e) => {
                             formik.setFieldValue(
                               `contacto.${index}.numero`,
@@ -234,7 +259,6 @@ const Negocio = () => {
                           maxLength={35}
                           placeholder="Ingrese Teléfono 1"
                           autoComplete="off"
-                          required
                           onChange={(e) => {
                             formik.setFieldValue(`contacto`, [
                               {

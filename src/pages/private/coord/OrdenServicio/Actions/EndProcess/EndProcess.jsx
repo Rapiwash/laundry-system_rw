@@ -29,7 +29,6 @@ import "./endProcess.scss";
 import { socket } from "../../../../../../utils/socket/connect";
 import { Notify } from "../../../../../../utils/notify/Notify";
 import { simboloMoneda } from "../../../../../../services/global";
-import { GetDeliveryById } from "../../../../../../services/default.services";
 import { AddPago } from "../../../../../../redux/actions/aPago";
 
 const EndProcess = ({ IdCliente, onClose }) => {
@@ -138,14 +137,16 @@ const EndProcess = ({ IdCliente, onClose }) => {
   // Entregado
   const handleEditEntrega = (values) => {
     let infoGastoByDelivery;
-    if (infoCliente.Modalidad === "Delivery") {
+    if (infoCliente.Modalidad === "Delivery" && !InfoNegocio?.hasMobility) {
       infoGastoByDelivery = {
         idTipoGasto: infoTipoGastoDeliveryEnvio._id,
         tipo: infoTipoGastoDeliveryEnvio.name,
         motivo: `[${String(infoCliente.codRecibo).padStart(
           4,
           "0"
-        )}] Delivery envio en ${values.tipoTrasporte} - ${infoCliente.Nombre}`,
+        )}] Delivery ENVIO en Transporte ${values.tipoTrasporte} - ${
+          infoCliente.Nombre
+        }`,
         date: {
           fecha: DateCurrent().format4,
           hora: DateCurrent().format3,
@@ -178,14 +179,15 @@ const EndProcess = ({ IdCliente, onClose }) => {
   };
 
   const handleEntregar = () => {
-    if (infoCliente.Modalidad === "Tienda") {
-      console.log("tienda");
+    if (infoCliente.Modalidad === "Tienda" || InfoNegocio?.hasMobility) {
+      console.log("tienda o delivery (propio)");
       openModalEntregar();
     } else {
-      console.log("delivery");
+      console.log("delivery particular");
       setOnAction("concluir");
     }
   };
+
   const validationSchema = Yup.object().shape({
     tipoTrasporte:
       infoCliente.Modalidad === "Delivery" && estadoPago.estado === "Completo"
@@ -336,14 +338,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
               }
             }}
           >
-            {({
-              handleSubmit,
-              setFieldValue,
-              isSubmitting,
-              values,
-              errors,
-              touched,
-            }) => (
+            {({ handleSubmit, setFieldValue, values, errors, touched }) => (
               <Form onSubmit={handleSubmit} className="content-pE">
                 <div className="trasporte-pago">
                   {estadoPago.estado !== "Completo" ? (
@@ -400,7 +395,8 @@ const EndProcess = ({ IdCliente, onClose }) => {
                       />
                     </>
                   ) : null}
-                  {infoCliente.Modalidad === "Delivery" &&
+                  {!InfoNegocio?.hasMobility &&
+                  infoCliente.Modalidad === "Delivery" &&
                   estadoPago.estado === "Completo" ? (
                     <Entregar
                       setFieldValue={setFieldValue}
