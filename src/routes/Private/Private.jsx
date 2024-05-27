@@ -46,7 +46,7 @@ import STipoGastos from "../../pages/private/admin/Setting/TipoGastos/TipoGastos
 import SCategorias from "../../pages/private/admin/Setting/Categorias/Categorias";
 import Personal from "../../pages/private/coord/Personal/Personal";
 import Asistencia from "../../pages/private/coord/Personal/Asistencia/Asistencia";
-// import NewDesignList from "../../pages/private/coord/OrdenServicio/List/NewDesignList";
+import NewDesignList from "../../pages/private/coord/OrdenServicio/List/NewDesignList";
 
 const Private = () => {
   return (

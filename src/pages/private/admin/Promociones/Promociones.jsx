@@ -1,38 +1,16 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import {
-  Box,
-  Button,
-  Modal,
-  MultiSelect,
-  NumberInput,
-  Select,
-  Switch,
-  Table,
-  Textarea,
-} from "@mantine/core";
-import * as Yup from "yup";
+import { Box, Button, Modal, MultiSelect, Textarea } from "@mantine/core";
 import { Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 import React, { useEffect, useState, useRef } from "react";
-import { Formik, useFormik } from "formik";
 import { useDisclosure } from "@mantine/hooks";
 import { ScrollArea } from "@mantine/core";
 import "./promocion.scss";
-import SwitchModel from "../../../../components/SwitchModel/SwitchModel";
 import { useDispatch, useSelector } from "react-redux";
-import { ReactComponent as Eliminar } from "../../../../utils/img/OrdenServicio/eliminar.svg";
-import {
-  DeletePromocion,
-  addPromocion,
-} from "../../../../redux/actions/aPromociones";
-import {
-  codigoPhonePais,
-  nameMoneda,
-  simboloMoneda,
-} from "../../../../services/global";
-import giftcupon from "./gift.png";
+import { DeletePromocion } from "../../../../redux/actions/aPromociones";
+import { codigoPhonePais, simboloMoneda } from "../../../../services/global";
 import {
   WSendMessage,
   handleRegisterCupon,
@@ -41,21 +19,18 @@ import { Notify } from "../../../../utils/notify/Notify";
 import whatsappApp from "./whatsappApp.png";
 import Cupon from "../../../../components/PRIVATE/Cupon/Cupon";
 import axios from "axios";
-import moment from "moment";
-import { DateDetail, calcularFechaFutura } from "../../../../utils/functions";
 import { useMemo } from "react";
 import { MantineReactTable } from "mantine-react-table";
 import Portal from "../../../../components/PRIVATE/Portal/Portal";
 import Maintenance from "./Accion/Maintenance";
+import { calcularFechaFutura } from "../../../../utils/functions";
 
 const Promociones = () => {
   const [opened, { open, close }] = useDisclosure(false);
   const dispatch = useDispatch();
-  const [listPrendas, setListPrendas] = useState([]);
   const [promoSelected, setPromoSelected] = useState();
   const [phoneA, setPhoneA] = useState("");
   const [sCuponSaved, setSCuponSaved] = useState(false);
-  const [lPrendasInicial, setLPrendasInicial] = useState([]);
 
   const inputRef = useRef();
 
@@ -66,9 +41,6 @@ const Promociones = () => {
   const [action, setAction] = useState("");
 
   const InfoServicios = useSelector((state) => state.servicios.listServicios);
-  const InfoCategorias = useSelector(
-    (state) => state.categorias.listCategorias
-  );
 
   const infoPromocion = useSelector((state) => state.promocion.infoPromocion);
   const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
@@ -277,7 +249,7 @@ const Promociones = () => {
                 ? `${promo.cantidadMin} ${
                     InfoServicios.find(
                       (service) => service._id === promo.prenda[0]
-                    ).simboloMedida
+                    )?.simboloMedida
                   }`
                 : promo.cantidadMin;
           } else {
@@ -314,7 +286,7 @@ const Promociones = () => {
 
     const transformedPromociones = transformData(infoPromocion);
     setListPromociones(transformedPromociones);
-  }, [infoPromocion]);
+  }, [infoPromocion, InfoServicios]);
 
   return (
     <div className="content-promos">

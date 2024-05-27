@@ -7,7 +7,6 @@ import { useFormik } from "formik";
 import { useDispatch, useSelector } from "react-redux";
 
 import { AddGasto } from "../../../../redux/actions/aGasto";
-import { DateCurrent } from "../../../../utils/functions";
 
 import { NumberInput, Select, TextInput, Textarea } from "@mantine/core";
 import { modals } from "@mantine/modals";
@@ -86,7 +85,7 @@ const Gasto = ({ onClose }) => {
 
   const handleSaveGasto = (infoGasto) => {
     dispatch(AddGasto({ infoGasto, rol: InfoUsuario.rol }));
-    onClose(false);
+    onClose();
   };
 
   useEffect(() => {
@@ -101,8 +100,8 @@ const Gasto = ({ onClose }) => {
   return (
     <div>
       <form onSubmit={formik.handleSubmit} className="container-gasto">
+        <h1>Gastos</h1>
         <div className="info-gasto">
-          <h1>Gastos</h1>
           <div className="input-g">
             <Select
               name="idTipoGasto"

@@ -455,7 +455,7 @@ const Ticket = React.forwardRef((props, ref) => {
                 {infoOrden?.descuento > 0 && !tipoTicket ? (
                   <div className="space-ahorro">
                     <h2 className="title">
-                      ! Felicidades Ahorraste
+                      ! Felicidades Ahorraste&nbsp;
                       {formatThousandsSeparator(infoOrden?.descuento, true)} ¡
                     </h2>
                     {infoOrden?.modoDescuento === "Promocion" ? (

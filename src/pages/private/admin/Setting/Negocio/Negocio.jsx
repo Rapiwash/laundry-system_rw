@@ -219,8 +219,8 @@ const Negocio = () => {
                           placeholder={`Ingrese Teléfono ${index + 1}`}
                           autoComplete="off"
                           maxLength={13}
-                          autoFocus
                           required
+                          autoFocus
                           onChange={(e) => {
                             formik.setFieldValue(
                               `contacto.${index}.numero`,
@@ -259,6 +259,7 @@ const Negocio = () => {
                           maxLength={35}
                           placeholder="Ingrese Teléfono 1"
                           autoComplete="off"
+                          required
                           onChange={(e) => {
                             formik.setFieldValue(`contacto`, [
                               {
