@@ -399,10 +399,7 @@ const Ticket = React.forwardRef((props, ref) => {
                         <td colSpan="3">Subtotal :</td>
                         <td>
                           {formatThousandsSeparator(
-                            infoOrden.Items.reduce(
-                              (total, p) => total + parseFloat(p.total),
-                              0
-                            ) -
+                            infoOrden.subTotal -
                               (infoOrden?.Modalidad === "Delivery"
                                 ? montoDelivery()
                                 : 0)
