@@ -60,7 +60,7 @@ const InfoCliente = ({
           readOnly
         />
         <hr />
-        {!iEdit ? (
+        {!iEdit || (iEdit && iEdit.modeEditAll) ? (
           <div className="tipo-registro-cli">
             <Select
               style={{ width: "135px" }}
