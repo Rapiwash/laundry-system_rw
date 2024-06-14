@@ -101,11 +101,11 @@ const HeaderAdmin = () => {
             <div className="left" />
             <div className="right" />
           </div>
-          {/* <li>
+          <li>
             <Link to={`./${PrivateRoutes.PERSONAL}`} className="active">
               ASISTENCIA
             </Link>
-          </li> */}
+          </li>
           <li>
             <Link to={`./${PrivateRoutes.CLIENTES}`}>Clientes</Link>
           </li>
