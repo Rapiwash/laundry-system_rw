@@ -60,7 +60,7 @@ const InfoCliente = ({
         changeICliente(infoChange);
         changeValue("dni", infoChange.dni);
         changeValue("name", infoChange.nombre);
-        changeValue("celular", infoChange.celular);
+        changeValue("celular", infoChange.phone);
         changeValue("direccion", infoChange.direccion);
       } else {
         setSearchedValue();
@@ -130,8 +130,9 @@ const InfoCliente = ({
                   changeICliente(cliente);
                   changeValue("dni", cliente?.dni || "");
                   changeValue("name", cliente?.nombre || "");
-                  changeValue("celular", cliente?.celular || "");
+                  changeValue("celular", cliente?.phone || "");
                   changeValue("direccion", cliente?.direccion || "");
+                  setSearchedValue("");
                 }}
                 data={
                   searchedValue
