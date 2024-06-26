@@ -728,6 +728,7 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
           />
           {showFactura ? (
             <InfoFactura
+              mode={mode}
               changeValue={handleChageValue}
               values={formik.values}
               paso={showFactura ? "4" : "5"}

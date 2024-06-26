@@ -3,7 +3,7 @@
 import React from "react";
 import "./infoFactura.scss";
 import SwtichDimension from "../../../SwitchDimension/SwitchDimension";
-const InfoFactura = ({ paso, descripcion, changeValue, values }) => {
+const InfoFactura = ({ mode, paso, descripcion, changeValue, values }) => {
   return (
     <div className="info-descuento">
       <div className="title">
@@ -22,6 +22,7 @@ const InfoFactura = ({ paso, descripcion, changeValue, values }) => {
             }}
             colorOn="#72c999"
             // colorOff=""
+            disabled={mode === "UPDATE"}
           />
         </div>
       </div>
