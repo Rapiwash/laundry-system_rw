@@ -94,7 +94,9 @@ const cuadre = createSlice({
           state.cuadreActual = cuadreActual;
         }
 
-        const IdsPagos = lastCuadre.Pagos.map((order) => order._id);
+        const IdsPagos = lastCuadre
+          ? lastCuadre.Pagos.map((order) => order._id)
+          : [];
 
         state.paysToDay = [...new Set([...state.paysToDay, ...IdsPagos])];
       })

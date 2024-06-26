@@ -24,9 +24,6 @@ const service_order = createSlice({
     error: null,
   },
   reducers: {
-    setOrderServiceId: (state, action) => {
-      state.orderServiceId = action.payload;
-    },
     updateLastRegister: (state, action) => {
       state.lastRegister = {
         ...state.lastRegister,
@@ -424,7 +421,6 @@ const service_order = createSlice({
 });
 
 export const {
-  setOrderServiceId,
   setLastRegister,
   updateNotaOrden,
   updateDetalleOrden,

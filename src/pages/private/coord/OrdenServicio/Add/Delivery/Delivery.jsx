@@ -161,10 +161,11 @@ const Delivery = () => {
   };
 
   // Registrar
-  const handleRegistrar = (info) => {
+  const handleRegistrar = async (info) => {
     const { infoOrden, infoPago, rol } = info;
     if (infoGastoByDelivery) {
-      dispatch(
+      setRedirect(true);
+      await dispatch(
         AddOrdenServices({
           infoOrden: {
             ...infoOrden,
@@ -176,10 +177,14 @@ const Delivery = () => {
           infoGastoByDelivery,
         })
       ).then((res) => {
-        if ("error" in res) {
-          setRedirect(false);
-        } else {
-          setRedirect(true);
+        if (res.error) {
+          console.error(
+            "Error en el servicio al agregar la orden:",
+            res.error.message
+          );
+          navigate(
+            `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`
+          );
         }
       });
     }

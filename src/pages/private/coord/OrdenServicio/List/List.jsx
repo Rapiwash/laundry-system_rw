@@ -26,10 +26,7 @@ import { useDispatch, useSelector } from "react-redux";
 
 import { GetOrdenServices_DateRange } from "../../../../../redux/actions/aOrdenServices";
 import { GetMetas } from "../../../../../redux/actions/aMetas";
-import {
-  setLastRegister,
-  setOrderServiceId,
-} from "../../../../../redux/states/service_order";
+import { setLastRegister } from "../../../../../redux/states/service_order";
 
 import EndProcess from "../Actions/EndProcess/EndProcess";
 import Details from "../Details/Details";
@@ -485,7 +482,6 @@ const List = () => {
   };
 
   useEffect(() => {
-    dispatch(setOrderServiceId(false));
     dispatch(setLastRegister());
   }, []);
 

@@ -22,34 +22,31 @@ const Tienda = () => {
   const { lastRegister } = useSelector((state) => state.orden);
 
   const handleRegistrar = async (data) => {
-    try {
-      const { infoOrden, infoPago, rol } = data;
+    const { infoOrden, infoPago, rol } = data;
 
-      // Crear la nueva orden con los datos necesarios
-      const nuevaOrden = {
-        infoOrden: {
-          ...infoOrden,
-          estado: "registrado",
-          tipoRegistro: "normal",
-        },
-        infoPago,
-        rol,
-      };
+    // Crear la nueva orden con los datos necesarios
+    const nuevaOrden = {
+      infoOrden: {
+        ...infoOrden,
+        estado: "registrado",
+        tipoRegistro: "normal",
+      },
+      infoPago,
+      rol,
+    };
+    setRedirect(true);
 
-      // Despachar la acción y esperar la respuesta
-      const res = await dispatch(AddOrdenServices(nuevaOrden));
-
-      // Verificar la respuesta y ajustar la redirección
-      if (res?.error) {
-        console.error("Error en el servicio al agregar la orden:", res.error);
-        setRedirect(false);
-      } else {
-        setRedirect(true);
+    await dispatch(AddOrdenServices(nuevaOrden)).then((res) => {
+      if (res.error) {
+        console.error(
+          "Error en el servicio al agregar la orden:",
+          res.error.message
+        );
+        navigate(
+          `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`
+        );
       }
-    } catch (error) {
-      console.error("Error al registrar la orden:", error);
-      setRedirect(false);
-    }
+    });
   };
 
   useEffect(() => {

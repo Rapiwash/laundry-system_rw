@@ -4,21 +4,24 @@ import OrdenServicio from "../../../../../components/PRIVATE/OrdenServicio/Orden
 import { useDispatch, useSelector } from "react-redux";
 
 import { FinalzarReservaOrdenService } from "../../../../../redux/actions/aOrdenServices";
-import { setOrderServiceId } from "../../../../../redux/states/service_order";
 
 import { PrivateRoutes } from "../../../../../models";
 import "./finishReserva.scss";
+import { useState } from "react";
 
 const FinishReserva = () => {
   const navigate = useNavigate();
   const dispatch = useDispatch();
   const { id } = useParams();
 
+  const [redirect, setRedirect] = useState(false);
+
   const ordenReservada = useSelector((state) =>
     state.orden.reserved.find((item) => item._id === id)
   );
 
   const handleFinishReserva = async (updateData) => {
+    setRedirect(true);
     const { infoOrden, infoPago, rol } = updateData;
 
     const {
@@ -41,50 +44,49 @@ const FinishReserva = () => {
       attendedBy,
     } = infoOrden;
 
-    try {
-      const res = await dispatch(
-        FinalzarReservaOrdenService({
-          id,
-          infoOrden: {
-            codRecibo: ordenReservada.codRecibo,
-            dateRecepcion,
-            Modalidad,
-            Nombre,
-            idCliente,
-            Items,
-            celular,
-            direccion,
-            datePrevista,
-            descuento,
-            dni,
-            subTotal,
-            totalNeto,
-            cargosExtras,
-            factura,
-            modoDescuento,
-            gift_promo,
-            attendedBy,
-          },
-          infoPago,
-          rol,
-        })
-      );
-
+    await dispatch(
+      FinalzarReservaOrdenService({
+        id,
+        infoOrden: {
+          codRecibo: ordenReservada.codRecibo,
+          dateRecepcion,
+          Modalidad,
+          Nombre,
+          idCliente,
+          Items,
+          celular,
+          direccion,
+          datePrevista,
+          descuento,
+          dni,
+          subTotal,
+          totalNeto,
+          cargosExtras,
+          factura,
+          modoDescuento,
+          gift_promo,
+          attendedBy,
+        },
+        infoPago,
+        rol,
+      })
+    ).then((res) => {
+      if (res.error) {
+        navigate(
+          `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`
+        );
+      }
       if (res.payload) {
-        dispatch(setOrderServiceId(false));
         navigate(
           `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.IMPRIMIR_ORDER_SERVICE}/${id}`
         );
       }
-    } catch (error) {
-      console.error("Error al finalizar reserva:", error);
-      // Manejar el error según tu lógica de aplicación
-    }
+    });
   };
 
   return (
     <>
-      {ordenReservada ? (
+      {ordenReservada && redirect === false ? (
         <div className="edit-orden-service">
           <OrdenServicio
             titleMode="REGISTRAR"

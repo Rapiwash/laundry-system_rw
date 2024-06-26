@@ -18,7 +18,6 @@ import {
   LS_changePagoOnOrden,
   LS_newOrder,
   LS_updateListOrder,
-  setOrderServiceId,
   updateAnulacionOrden,
   updateCancelarEntregaOrden,
   updateDetalleOrden,
@@ -172,7 +171,6 @@ const PrivateMasterLayout = (props) => {
             const currentPath = new URL(window.location.href).pathname;
             const dir = `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.FINISH_ORDEN_SERVICE_PENDING}/${r._id}`;
             if (dir !== currentPath) {
-              dispatch(setOrderServiceId(false));
               navigate(dir);
             }
           },

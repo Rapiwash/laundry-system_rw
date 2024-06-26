@@ -77,13 +77,19 @@ const Replace = () => {
       infoGastoByDelivery,
     };
 
-    try {
-      await dispatch(
-        AnularRemplazar_OrdensService({ dataToAnular, dataToNewOrden })
-      );
-    } catch (error) {
-      console.error("Error al editar detalle de la orden:", error);
-    }
+    await dispatch(
+      AnularRemplazar_OrdensService({ dataToAnular, dataToNewOrden })
+    ).then((res) => {
+      if (res.error) {
+        console.error(
+          "Error al anular y remplazar la orden de servicio:",
+          res.error.message
+        );
+        navigate(
+          `/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`
+        );
+      }
+    });
   };
 
   const handleGetInfoGastoByDelivery = (values) => {
