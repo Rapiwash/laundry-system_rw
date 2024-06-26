@@ -1,7 +1,7 @@
 // Zona Horaria
 export const timeZone = "America/Lima";
 // Default Hora Prevista
-export const defaultHoraPrevista = "18:00";
+export const defaultHoraPrevista = "17:00";
 // Factura
 export const showFactura = true;
 // Tipo de Moneda
