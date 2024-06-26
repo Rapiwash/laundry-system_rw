@@ -35,12 +35,7 @@ import EndProcess from "../Actions/EndProcess/EndProcess";
 import Details from "../Details/Details";
 import BarProgress from "../../../../../components/PRIVATE/BarProgress/BarProgress";
 import { Roles } from "../../../../../models";
-import {
-  confMoneda,
-  documento,
-  simboloMoneda,
-  tipoMoneda,
-} from "../../../../../services/global";
+import { documento } from "../../../../../services/global";
 import { useRef } from "react";
 
 const List = () => {
