@@ -184,7 +184,7 @@ const InfoCliente = ({
               const valor = e.target.value;
               changeValue("name", valor);
             }}
-            defaultValue={values.name}
+            value={values.name}
             readOnly={iCliente}
             disabled={mode === "UPDATE"}
           />
@@ -199,7 +199,7 @@ const InfoCliente = ({
             const valor = e.target.value;
             changeValue("direccion", valor);
           }}
-          defaultValue={values.direccion}
+          value={values.direccion}
           readOnly={iCliente}
           disabled={mode === "UPDATE"}
         />
@@ -212,7 +212,7 @@ const InfoCliente = ({
             const valor = e.target.value;
             changeValue("celular", valor);
           }}
-          defaultValue={values.celular}
+          value={values.celular}
           readOnly={iCliente}
           disabled={mode === "UPDATE"}
         />
@@ -225,7 +225,7 @@ const InfoCliente = ({
             const valor = e.target.value;
             changeValue("dni", valor);
           }}
-          defaultValue={values.dni}
+          value={values.dni}
           readOnly={iCliente}
           disabled={mode === "UPDATE"}
         />
