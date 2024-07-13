@@ -1058,7 +1058,7 @@ const Asistencia = () => {
                   <div className="input-item">
                     <NumberInput
                       name="pagoByHour"
-                      label="Pago por Hora :"
+                      label="Pago x Hora :  ( Extra / Descuento )"
                       value={formik.values.pagoByHour}
                       precision={2}
                       onChange={(e) => {
