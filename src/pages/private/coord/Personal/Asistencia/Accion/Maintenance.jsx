@@ -3,7 +3,6 @@
 /* eslint-disable no-unused-vars */
 import { useFormik } from "formik";
 import React, { useState, useEffect } from "react";
-import { useSelector } from "react-redux";
 import ValidIco from "../../../../../../components/ValidIco/ValidIco";
 import { Radio, Group } from "@mantine/core";
 import TimePicker from "react-time-picker";
@@ -17,7 +16,6 @@ import moment from "moment";
 
 // eslint-disable-next-line react/prop-types
 const Maintenance = ({ info, onClose, onAddAsistencia }) => {
-  const InfoUsuario = useSelector((state) => state.user.infoUsuario);
   const { infoDay, infoPersonal } = info;
   const [day, setDay] = useState();
 
@@ -39,7 +37,6 @@ const Maintenance = ({ info, onClose, onAddAsistencia }) => {
       ingreso: infoDay?.ingreso,
       observacion: infoDay?.observacion,
       salida: infoDay?.salida,
-      time: infoDay?.time,
       tipoRegistro: infoDay?.tipoRegistro || "normal",
       estado: infoDay?.estado,
     },
@@ -56,30 +53,11 @@ const Maintenance = ({ info, onClose, onAddAsistencia }) => {
           hora: values.salida.hora,
           saved: !!values.salida.hora,
         },
-        time:
-          values.salida.hora && values.ingreso.hora
-            ? handleCalculateTime(values.ingreso.hora, values.salida.hora)
-            : { hora: 0, minutos: 0 },
       };
 
       handleValidateAdd(dataFinal);
     },
   });
-
-  const handleCalculateTime = (timeIngreso, timeSalida) => {
-    // Convertir las cadenas de tiempo en objetos moment
-    const ingresoMoment = moment(timeIngreso, "HH:mm");
-    const salidaMoment = moment(timeSalida, "HH:mm");
-
-    // Calcular la diferencia en minutos
-    const diffMinutes = salidaMoment.diff(ingresoMoment, "minutes");
-
-    // Calcular las horas y minutos
-    const hours = Math.floor(diffMinutes / 60);
-    const minutes = diffMinutes % 60;
-
-    return { hora: hours, minutos: minutes };
-  };
 
   const handleValidateAdd = (data) => {
     let confirmationEnabled = true;
