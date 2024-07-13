@@ -45,6 +45,7 @@ const Asistencia = () => {
     horaIngreso: Yup.string().required("Campo obligatorio"),
     horaSalida: Yup.string().required("Campo obligatorio"),
     pagoByHour: Yup.string().required("Campo obligatorio"),
+    pagoMensual: Yup.string().required("Campo obligatorio"),
   });
 
   const formik = useFormik({
@@ -55,6 +56,7 @@ const Asistencia = () => {
       horaSalida: "",
       pagoByHour: "",
       dateNacimiento: "",
+      pagoMensual: "",
       estado: "",
     },
     validationSchema: validationSchema,
@@ -344,6 +346,7 @@ const Asistencia = () => {
 
     // Establecer el valor de pago por hora por defecto
     const defaultPaymentPerHour = formik.values.pagoByHour;
+    const defaultMonthlyPayment = formik.values.pagoMensual;
 
     // Estilos para el encabezado
     const headerStyle = {
@@ -607,7 +610,6 @@ const Asistencia = () => {
 
     montoByHoraExtraRow.eachCell((cell, colNumber) => {
       if (colNumber === 9) {
-        cell.fill = styleBlue.fill;
         cell.border = {
           top: { style: "thin" },
           left: { style: "thin" },
@@ -641,7 +643,6 @@ const Asistencia = () => {
 
     montoByHoraPenalidadRow.eachCell((cell, colNumber) => {
       if (colNumber === 9) {
-        cell.fill = styleBlue.fill;
         cell.border = {
           left: { style: "thin" },
           right: { style: "thin" },
@@ -665,7 +666,7 @@ const Asistencia = () => {
       "",
       "",
       "Pago Mensual",
-      1000,
+      defaultMonthlyPayment,
     ]);
     pagoMensual.height = 35;
 
@@ -887,6 +888,7 @@ const Asistencia = () => {
       formik.setFieldValue("horaSalida", infoPersonal.horaSalida);
       formik.setFieldValue("pagoByHour", infoPersonal.pagoByHour);
       formik.setFieldValue("dateNacimiento", infoPersonal.dateNacimiento);
+      formik.setFieldValue("pagoMensual", infoPersonal.pagoMensual);
     }
   }, [infoPersonal, datePrincipal]);
 
@@ -1074,6 +1076,28 @@ const Asistencia = () => {
                       formik.touched.horaSalida &&
                       ValidIco({
                         mensaje: formik.errors.horaSalida,
+                      })}
+                  </div>
+                  <div className="input-item">
+                    <NumberInput
+                      name="pagoMensual"
+                      label="Pago Mensual :"
+                      value={formik.values.pagoMensual}
+                      onChange={(e) => {
+                        formik.setFieldValue(
+                          "pagoMensual",
+                          !Number.isNaN(e) ? e : 0
+                        );
+                      }}
+                      min={0}
+                      step={1}
+                      hideControls
+                      autoComplete="off"
+                    />
+                    {formik.errors.pagoMensual &&
+                      formik.touched.pagoMensual &&
+                      ValidIco({
+                        mensaje: formik.errors.pagoMensual,
                       })}
                   </div>
 
