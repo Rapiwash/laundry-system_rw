@@ -111,7 +111,7 @@ const InfoCliente = ({
                 data={[
                   { value: "nombre", label: "Nombre" },
                   { value: "dni", label: documento },
-                  { value: "celular", label: "Teléfono" },
+                  { value: "phone", label: "Teléfono" },
                 ]}
               />
               <Autocomplete

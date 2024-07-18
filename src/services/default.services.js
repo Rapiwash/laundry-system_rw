@@ -1,5 +1,4 @@
 import axios from "axios";
-import { Notify } from "../utils/notify/Notify";
 const baseURL = `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya`;
 
 export const handleAddCliente = async (info) => {
@@ -125,29 +124,6 @@ export const handleRegisterCupon = async (Promotions) => {
     throw new Error(`No se pudo actualizar el cliente - ${error}`);
   }
 };
-
-export const handleRemoveFStorage = async (id) => {
-  try {
-    await axios.delete(`${baseURL}/remove-from-warehouse/${id}`);
-  } catch (error) {
-    // Puedes manejar los errores aquí
-    console.log(error.response.data.mensaje);
-    Notify("Error", "No remover orden de almacen", "fail");
-  }
-};
-
-// export const LogoutUser = async (token) => {
-//   try {
-//     const response = await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/logout`, {
-//       data: { token }, // Envía el token en el cuerpo de la solicitud
-//     });
-
-//     return response;
-//   } catch (error) {
-//     // Puedes manejar los errores aquí
-//     throw new Error('No se pudieron obtener los datos del usuario');
-//   }
-// };
 
 export const WSendMessage = (mensaje, phone) => {
   let webUrl;

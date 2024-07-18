@@ -124,7 +124,21 @@ const EndProcess = ({ IdCliente, onClose }) => {
       idUser: InfoUsuario._id,
     };
 
-    dispatch(AddPago(newPago));
+    const extraInfo = {
+      orden: {
+        codRecibo: infoCliente.codRecibo,
+        Nombre: infoCliente.Nombre,
+        Modalidad: infoCliente.Modalidad,
+      },
+      infoUser: {
+        _id: InfoUsuario._id,
+        name: InfoUsuario.name,
+        usuario: InfoUsuario.usuario,
+        rol: InfoUsuario.rol,
+      },
+    };
+
+    dispatch(AddPago({ newPago, extraInfo }));
   };
 
   // Entregado
@@ -153,6 +167,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
       Entregar_OrdenService({
         id: IdCliente,
         rol: InfoUsuario.rol,
+        location: infoCliente.location,
         infoGastoByDelivery,
       })
     ).then((res) => {
@@ -213,11 +228,6 @@ const EndProcess = ({ IdCliente, onClose }) => {
       <div className="body-ac">
         {onAction === "principal" ? ( // Principal
           <div className="actions-init">
-            {/* {infoCliente.estadoPrenda === 'pendiente' ? (
-              <button type="button" className="btn-exm" onClick={handleButtonClick}>
-                {btnText}
-              </button>
-            ) : null} */}
             {infoCliente.estadoPrenda === "pendiente" &&
             estadoPago.estado === "Completo" ? (
               <button

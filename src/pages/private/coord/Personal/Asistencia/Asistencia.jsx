@@ -54,9 +54,9 @@ const Asistencia = () => {
       name: "",
       horaIngreso: "",
       horaSalida: "",
-      pagoByHour: "",
+      pagoByHour: 0,
       dateNacimiento: "",
-      pagoMensual: "",
+      pagoMensual: 0,
       estado: "",
     },
     validationSchema: validationSchema,
@@ -1058,7 +1058,7 @@ const Asistencia = () => {
                   <div className="input-item">
                     <NumberInput
                       name="pagoByHour"
-                      label="Pago x Hora :  ( Extra / Descuento )"
+                      label="Pago x Hora : ( Extra / Descuento )"
                       value={formik.values.pagoByHour}
                       precision={2}
                       onChange={(e) => {

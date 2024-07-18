@@ -21,6 +21,7 @@ const cuadre = createSlice({
     cuadreActual: null,
     registroNoCuadrados: { gastos: [], pagos: [] },
     paysToDay: [],
+    spendToDay: [],
     isLoading: false,
     error: null,
   },
@@ -98,7 +99,12 @@ const cuadre = createSlice({
           ? lastCuadre.Pagos.map((order) => order._id)
           : [];
 
+        const IdsGastos = lastCuadre
+          ? lastCuadre.Gastos.map((order) => order._id)
+          : [];
+
         state.paysToDay = [...new Set([...state.paysToDay, ...IdsPagos])];
+        state.spendToDay = [...new Set([...state.spendToDay, ...IdsGastos])];
       })
       .addCase(GetCuadre.rejected, (state, action) => {
         state.isLoading = false;
@@ -111,7 +117,9 @@ const cuadre = createSlice({
       })
       .addCase(GetPagos_OnCuadreToday.fulfilled, (state, action) => {
         state.isLoading = false;
-        state.paysToDay = action.payload;
+        const { Pagos, Gastos } = action.payload;
+        state.paysToDay = Pagos;
+        state.spendToDay = Gastos;
       })
       .addCase(GetPagos_OnCuadreToday.rejected, (state, action) => {
         state.isLoading = false;

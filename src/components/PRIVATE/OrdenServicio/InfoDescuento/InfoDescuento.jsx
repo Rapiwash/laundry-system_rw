@@ -141,7 +141,7 @@ const InfoDescuento = ({
                       : { borderColor: "#f5532f" }
                   }
                   className="description-info"
-                  defaultValue={
+                  value={
                     infoCupon?.validacion === true
                       ? infoCupon?.promocion.descripcion
                       : infoCupon?.respuesta

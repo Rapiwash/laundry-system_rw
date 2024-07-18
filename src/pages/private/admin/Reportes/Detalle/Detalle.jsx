@@ -4,10 +4,8 @@
 import React, { useEffect } from "react";
 import "./detalle.scss";
 import { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 
 import moment from "moment";
-import { simboloMoneda } from "../../../../../services/global";
 import {
   DateDetail_Hora,
   cLetter,
@@ -18,15 +16,8 @@ import {
 const Detalle = ({ infoD }) => {
   const [ordern, setOrder] = useState();
   const [statePago, setStatePago] = useState();
-  const ListUsuarios = useSelector((state) => state.user.listUsuario);
 
-  const calculateHeight = (
-    description,
-    fontSize,
-    width,
-    padding,
-    lineHeightValue
-  ) => {
+  const calculateHeight = (description, fontSize, width, padding) => {
     // Crear un elemento de textarea oculto para medir su contenido.
     const hiddenTextarea = document.createElement("textarea");
     hiddenTextarea.style.visibility = "hidden";
@@ -67,12 +58,6 @@ const Detalle = ({ infoD }) => {
   const handleHour = (hora) => {
     const hora12 = moment(hora, "HH:mm").format("h:mm A");
     return hora12;
-  };
-
-  const handleInfoUser = (idUser) => {
-    // console.log(idUser);
-    const usuario = ListUsuarios.find((usuario) => usuario._id === idUser);
-    return usuario ? usuario.name.split(" ")[0] : "No Encontrado";
   };
 
   useEffect(() => {
@@ -226,7 +211,7 @@ const Detalle = ({ infoD }) => {
                 {formatThousandsSeparator(p.total, true)}
               </span>
               <span className="_metodopago">{cLetter(p.metodoPago)}</span>
-              <span>{handleInfoUser(p.idUser)}</span>
+              <span>{p.infoUser.name}</span>
               <span className="_ico">
                 {p.metodoPago === "Tarjeta" ? (
                   <i className="fa-solid fa-credit-card" />

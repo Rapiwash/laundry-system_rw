@@ -14,7 +14,7 @@ import { DeletePago, UpdatePago } from "../../../../redux/actions/aPago";
 import MetodoPago from "../../MetodoPago/MetodoPago";
 import { useState } from "react";
 
-const InfoPagos = ({ values, infoPagos, iUsuario, descripcion }) => {
+const InfoPagos = ({ values, infoPagos, iUsuario, descripcion, codRecibo }) => {
   const [
     mMetodoPago,
     { open: openModalMetodoPago, close: closeModalMetodoPago },
@@ -71,10 +71,26 @@ const InfoPagos = ({ values, infoPagos, iUsuario, descripcion }) => {
       onConfirm: () => {
         if (confirmationEnabled) {
           confirmationEnabled = false;
+
+          const extraInfo = {
+            orden: {
+              codRecibo: codRecibo,
+              Nombre: values.name,
+              Modalidad: values.Modalidad,
+            },
+            infoUser: {
+              _id: iUsuario._id,
+              name: iUsuario.name,
+              usuario: iUsuario.usuario,
+              rol: iUsuario.rol,
+            },
+          };
+
           dispatch(
             UpdatePago({
               idPago: id,
               pagoUpdated: iPago,
+              extraInfo,
             })
           );
           navigate(

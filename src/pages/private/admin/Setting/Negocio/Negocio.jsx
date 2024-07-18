@@ -34,6 +34,7 @@ const Negocio = () => {
       horario: InfoNegocio.horario,
       oldOrder: InfoNegocio.oldOrder,
       hasMobility: InfoNegocio.hasMobility,
+      filterListDefault: InfoNegocio.filterListDefault,
     },
     //validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
@@ -126,6 +127,7 @@ const Negocio = () => {
     formik.setFieldValue("horario", InfoNegocio.horario);
     formik.setFieldValue("oldOrder", InfoNegocio.oldOrder);
     formik.setFieldValue("hasMobility", InfoNegocio.hasMobility);
+    formik.setFieldValue("filterListDefault", InfoNegocio.filterListDefault);
   }, [InfoNegocio]);
 
   useEffect(() => {
@@ -469,6 +471,24 @@ const Negocio = () => {
                       </tbody>
                     </table>
                   </div>
+                  <SwtichDimension
+                    title="Filtrar Lista Principal Por :"
+                    onSwitch="Fecha"
+                    offSwitch="Pendientes"
+                    name="filterListDefault"
+                    defaultValue={
+                      formik.values.filterListDefault === "date" ? true : false
+                    }
+                    handleChange={(value) => {
+                      formik.setFieldValue(
+                        "filterListDefault",
+                        value === "Fecha" ? "date" : "pendiente"
+                      );
+                    }}
+                    colorOn="goldenrod"
+                    // colorOff=""
+                    // disabled=""
+                  />
                 </div>
               </div>
             </div>

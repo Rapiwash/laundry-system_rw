@@ -155,6 +155,12 @@ const Delivery = () => {
         rol: InfoUsuario.rol,
         infoPago: null,
         infoGastoByDelivery,
+        infoUser: {
+          _id: InfoUsuario._id,
+          name: InfoUsuario.name,
+          usuario: InfoUsuario.usuario,
+          rol: InfoUsuario.rol,
+        },
       })
     );
     navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`);
@@ -175,6 +181,12 @@ const Delivery = () => {
           infoPago,
           rol,
           infoGastoByDelivery,
+          infoUser: {
+            _id: InfoUsuario._id,
+            name: InfoUsuario.name,
+            usuario: InfoUsuario.usuario,
+            rol: InfoUsuario.rol,
+          },
         })
       ).then((res) => {
         if (res.error) {

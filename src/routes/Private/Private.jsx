@@ -48,7 +48,6 @@ import STipoGastos from "../../pages/private/admin/Setting/TipoGastos/TipoGastos
 import SCategorias from "../../pages/private/admin/Setting/Categorias/Categorias";
 import Personal from "../../pages/private/coord/Personal/Personal";
 import Asistencia from "../../pages/private/coord/Personal/Asistencia/Asistencia";
-import NewDesignList from "../../pages/private/coord/OrdenServicio/List/NewDesignList";
 import Clientes from "../../pages/private/admin/Clientes/Clientes";
 
 const Private = () => {
@@ -63,7 +62,6 @@ const Private = () => {
         <Route
           path={PrivateRoutes.LIST_ORDER_SERVICE}
           element={<ListOrdenService />}
-          // element={<NewDesignList />}
         />
         {/* PAGES ADMINISTRADOR O PAGES GERENTE */}
         <Route element={<RoleGuard rol={Roles.GERENTE} />}>

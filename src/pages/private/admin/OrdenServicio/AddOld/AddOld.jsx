@@ -307,6 +307,12 @@ const AddOld = () => {
         infoOrden,
         infoPago,
         rol: InfoUsuario.rol,
+        infoUser: {
+          _id: InfoUsuario._id,
+          name: InfoUsuario.name,
+          usuario: InfoUsuario.usuario,
+          rol: InfoUsuario.rol,
+        },
       })
     );
 
@@ -915,14 +921,14 @@ const AddOld = () => {
                       className={
                         currentPago.metodoPago === "Efectivo"
                           ? "ico-efect"
-                          : currentPago.metodoPago === ingresoDigital
+                          : ingresoDigital.includes(currentPago?.metodoPago)
                           ? "ico-tranf"
                           : "ico-card"
                       }
                       src={
                         currentPago.metodoPago === "Efectivo"
                           ? Efectivo
-                          : currentPago?.metodoPago === ingresoDigital
+                          : ingresoDigital.includes(currentPago?.metodoPago)
                           ? Tranferencia
                           : Tarjeta
                       }

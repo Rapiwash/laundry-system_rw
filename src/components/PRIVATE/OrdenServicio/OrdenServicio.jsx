@@ -769,6 +769,7 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
               infoPagos={infoPagos}
               iUsuario={iUsuario}
               descripcion="Lista de Pagos"
+              codRecibo={infoDefault.codReciboo}
             />
           )}
         </div>

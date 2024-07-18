@@ -36,7 +36,6 @@ const Details = ({ IdCliente }) => {
     state.orden.registered.find((item) => item._id === IdCliente)
   );
   const InfoUsuario = useSelector((state) => state.user.infoUsuario);
-  const ListUsuarios = useSelector((state) => state.user.listUsuario);
 
   const handleDateLarge = (fecha) => {
     const fechaObjeto = moment(fecha);
@@ -47,11 +46,6 @@ const Details = ({ IdCliente }) => {
   const handleHour = (hora) => {
     const hora12 = moment(hora, "HH:mm").format("h:mm A");
     return hora12;
-  };
-
-  const handleInfoUser = (idUser) => {
-    const usuario = ListUsuarios.find((usuario) => usuario._id === idUser);
-    return usuario ? usuario.name.split(" ")[0] : "No Encontrado";
   };
 
   useEffect(() => {
@@ -246,7 +240,7 @@ const Details = ({ IdCliente }) => {
                     {formatThousandsSeparator(p.total, true)}
                   </span>
                   <span className="_metodopago">{cLetter(p.metodoPago)}</span>
-                  <span>{handleInfoUser(p.idUser)}</span>
+                  <span>{p.infoUser.name}</span>
                   <span className="_ico">
                     {p.metodoPago === "Tarjeta" ? (
                       <i className="fa-solid fa-credit-card" />

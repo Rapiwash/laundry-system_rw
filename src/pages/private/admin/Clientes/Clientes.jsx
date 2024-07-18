@@ -107,22 +107,22 @@ const Clientes = () => {
 
   return (
     <div className="content-clientes">
-      <div className="header-cli">
-        <h1>Clientes</h1>
-        <Button
-          type="button"
-          onClick={() => {
-            setRowPick();
-            openModalActionCliente();
-          }}
-          className="btn-save"
-          color="blue"
-        >
-          Nuevo Cliente
-        </Button>
-      </div>
       <div className="body-clientes">
         <div className="list-clientes">
+          <div className="header-cli">
+            <h1>Clientes</h1>
+            <Button
+              type="button"
+              onClick={() => {
+                setRowPick();
+                openModalActionCliente();
+              }}
+              className="btn-save"
+              color="blue"
+            >
+              Nuevo Cliente
+            </Button>
+          </div>
           <MantineReactTable
             columns={columns}
             data={listClientes}
@@ -151,6 +151,7 @@ const Clientes = () => {
             mantineTableContainerProps={{
               sx: {
                 maxHeight: "400px",
+                width: "100%",
               },
             }}
             enableRowVirtualization={true} // no scroll lateral
@@ -177,7 +178,6 @@ const Clientes = () => {
         </div>
         <div className="detail-cliente">
           <span className="title-detail">Historial de Órdenes</span>
-
           <div className="table-wrapper">
             <table className="sticky-table">
               <thead>

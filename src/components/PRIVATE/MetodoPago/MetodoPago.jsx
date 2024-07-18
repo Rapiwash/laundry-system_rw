@@ -78,25 +78,26 @@ const MetodoPago = ({
             </span>
           </label>
         </div>
-        <div className="checkbox">
-          <label className="checkbox-wrapper">
-            <input
-              type="radio"
-              className="checkbox-input"
-              name="metodoPago"
-              value={ingresoDigital}
-              checked={formMetodoPago.values.metodoPago === ingresoDigital}
-              onChange={(e) => handleOptionChange(e)}
-            />
-            <span className="checkbox-tile">
-              <span className="checkbox-icon"></span>
-              <span className="checkbox-label">
-                {ingresoDigital.charAt(0) +
-                  ingresoDigital.slice(1).toLowerCase()}
+        {ingresoDigital.map((metodo) => (
+          <div key={metodo} className="checkbox">
+            <label className="checkbox-wrapper">
+              <input
+                type="radio"
+                className="checkbox-input"
+                name="metodoPago"
+                value={metodo}
+                checked={formMetodoPago.values.metodoPago === metodo}
+                onChange={(e) => handleOptionChange(e)}
+              />
+              <span className="checkbox-tile">
+                <span className="checkbox-icon">
+                  {/* <Moto className="custom-icon" /> */}
+                </span>
+                <span className="checkbox-label">{metodo}</span>
               </span>
-            </span>
-          </label>
-        </div>
+            </label>
+          </div>
+        ))}
         <div className="checkbox">
           <label className="checkbox-wrapper">
             <input

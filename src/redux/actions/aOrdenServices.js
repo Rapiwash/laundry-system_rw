@@ -11,7 +11,27 @@ export const GetOrdenServices_DateRange = createAsyncThunk(
       const response = await axios.get(
         `${
           import.meta.env.VITE_BACKEND_URL
-        }/api/lava-ya/get-factura/date/${dateInicio}/${dateFin}`
+        }/api/lava-ya/get-factura/date-range/${dateInicio}/${dateFin}`
+      );
+
+      return response.data;
+    } catch (error) {
+      // Puedes manejar los errores aquí
+      //Notify('Error', 'No se ontemer la lista de Ordenes de Servicio', 'fail');
+      console.log(error.response.data.mensaje);
+      throw new Error(`No se pudo actualizar el cliente - ${error}`);
+    }
+  }
+);
+
+export const GetOrdenServices_Date = createAsyncThunk(
+  "service_order/GetOrdenServices_Date",
+  async (date) => {
+    try {
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/lava-ya/get-factura/date/${date}`
       );
 
       return response.data;
@@ -26,7 +46,7 @@ export const GetOrdenServices_DateRange = createAsyncThunk(
 
 export const AddOrdenServices = createAsyncThunk(
   "service_order/AddOrdenServices",
-  async ({ infoOrden, infoPago, infoGastoByDelivery, rol }) => {
+  async ({ infoOrden, infoPago, infoGastoByDelivery, rol, infoUser }) => {
     try {
       const dataSend = {
         infoOrden,
@@ -44,15 +64,16 @@ export const AddOrdenServices = createAsyncThunk(
       const res = response.data;
       const { newOrder } = res;
 
-      if ("listNewsPagos" in res) {
-        const { listNewsPagos } = res;
-        listNewsPagos.map((p) => {
-          const pago = {
-            tipo: "added",
-            info: p,
-          };
-          socket.emit("client:cPago", pago);
-        });
+      if ("newPago" in res) {
+        const { newPago } = res;
+        const pago = {
+          tipo: "added",
+          info: {
+            ...newPago,
+            infoUser,
+          },
+        };
+        socket.emit("client:cPago", pago);
       }
 
       if ("newGasto" in res) {
@@ -72,7 +93,10 @@ export const AddOrdenServices = createAsyncThunk(
 
       socket.emit("client:newOrder", newOrder);
 
-      return newOrder;
+      return {
+        ...newOrder,
+        ListPago: newOrder.ListPago.map((pago) => ({ ...pago, infoUser })),
+      };
     } catch (error) {
       console.log(error.response.data.mensaje);
       Notify("Error", "No se registro la Orden de Servicio", "fail");
@@ -114,7 +138,7 @@ export const UpdateDetalleOrdenServices = createAsyncThunk(
 
 export const FinalzarReservaOrdenService = createAsyncThunk(
   "service_order/FinalzarReservaOrdenService",
-  async ({ id, infoOrden, infoPago, rol }) => {
+  async ({ id, infoOrden, infoPago, rol, infoUser }) => {
     try {
       const dataSend = {
         infoOrden,
@@ -135,15 +159,16 @@ export const FinalzarReservaOrdenService = createAsyncThunk(
 
       socket.emit("client:updateOrder(FINISH_RESERVA)", orderUpdated);
 
-      if ("listNewsPagos" in res) {
-        const { listNewsPagos } = res;
-        listNewsPagos.map((p) => {
-          const pago = {
-            tipo: "added",
-            info: p,
-          };
-          socket.emit("client:cPago", pago);
-        });
+      if ("newPago" in res) {
+        const { newPago } = res;
+        const pago = {
+          tipo: "added",
+          info: {
+            ...newPago,
+            infoUser,
+          },
+        };
+        socket.emit("client:cPago", pago);
       }
 
       if ("changeCliente" in res) {
@@ -151,7 +176,10 @@ export const FinalzarReservaOrdenService = createAsyncThunk(
         socket.emit("client:cClientes", changeCliente);
       }
 
-      return orderUpdated;
+      return {
+        ...orderUpdated,
+        ListPago: orderUpdated.ListPago.map((pago) => ({ ...pago, infoUser })),
+      };
     } catch (error) {
       // Puedes manejar los errores aquí
       console.log(error.response.data.mensaje);
@@ -163,10 +191,11 @@ export const FinalzarReservaOrdenService = createAsyncThunk(
 
 export const Entregar_OrdenService = createAsyncThunk(
   "service_order/Entregar_OrdenService",
-  async ({ id, rol, infoGastoByDelivery }) => {
+  async ({ id, rol, infoGastoByDelivery, location }) => {
     try {
       const dataSend = {
         rol,
+        location,
         ...(infoGastoByDelivery && { infoGastoByDelivery }),
       };
       // Lógica para cancelar entrega en el backend
@@ -191,6 +220,8 @@ export const Entregar_OrdenService = createAsyncThunk(
         const { changeCliente } = res;
         socket.emit("client:cClientes", changeCliente);
       }
+
+      socket.emit("client:onRemoveOrderReporteAE", id);
 
       return orderUpdated;
     } catch (error) {
@@ -262,6 +293,8 @@ export const Anular_OrdenService = createAsyncThunk(
         const { changeCliente } = orderUpdated;
         socket.emit("client:cClientes", changeCliente);
       }
+
+      socket.emit("client:onRemoveOrderReporteAE", id);
 
       return orderAnulado;
     } catch (error) {

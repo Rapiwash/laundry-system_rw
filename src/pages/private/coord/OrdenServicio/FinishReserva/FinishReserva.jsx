@@ -19,6 +19,7 @@ const FinishReserva = () => {
   const ordenReservada = useSelector((state) =>
     state.orden.reserved.find((item) => item._id === id)
   );
+  const InfoUsuario = useSelector((state) => state.user.infoUsuario);
 
   const handleFinishReserva = async (updateData) => {
     setRedirect(true);
@@ -69,6 +70,12 @@ const FinishReserva = () => {
         },
         infoPago,
         rol,
+        infoUser: {
+          _id: InfoUsuario._id,
+          name: InfoUsuario.name,
+          usuario: InfoUsuario.usuario,
+          rol: InfoUsuario.rol,
+        },
       })
     ).then((res) => {
       if (res.error) {

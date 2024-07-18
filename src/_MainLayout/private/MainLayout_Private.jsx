@@ -14,15 +14,15 @@ import { GetOrdenServices_DateRange } from "../../redux/actions/aOrdenServices";
 import { GetMetas } from "../../redux/actions/aMetas";
 import { DateCurrent, GetFirstFilter } from "../../utils/functions";
 import {
-  LS_changeListPago,
   LS_changePagoOnOrden,
   LS_newOrder,
-  LS_updateListOrder,
+  setFilterBy,
   updateAnulacionOrden,
   updateCancelarEntregaOrden,
   updateDetalleOrden,
   updateEntregaOrden,
   updateFinishReserva,
+  updateLocationOrden,
   updateNotaOrden,
 } from "../../redux/states/service_order";
 
@@ -43,7 +43,6 @@ import { GetPromocion } from "../../redux/actions/aPromociones";
 import { LS_updatePromociones } from "../../redux/states/promociones";
 import { GetInfoNegocio } from "../../redux/actions/aNegocio";
 import { LS_updateNegocio } from "../../redux/states/negocio";
-import { LS_FirtsLogin } from "../../redux/states/user";
 import { useDisclosure } from "@mantine/hooks";
 import { ScrollArea } from "@mantine/core";
 import { Modal } from "@mantine/core";
@@ -57,7 +56,6 @@ import moment from "moment";
 import LoaderSpiner from "../../components/LoaderSpinner/LoaderSpiner";
 import { socket } from "../../utils/socket/connect";
 import { GetCuadre, GetPagos_OnCuadreToday } from "../../redux/actions/aCuadre";
-import { GetListUser } from "../../redux/actions/aUser";
 import { getListCategorias } from "../../redux/actions/aCategorias";
 import { getServicios } from "../../redux/actions/aServicios";
 import { GetTipoGastos } from "../../redux/actions/aTipoGasto";
@@ -77,6 +75,10 @@ const PrivateMasterLayout = (props) => {
   ] = useDisclosure(false);
 
   const InfoUsuario = useSelector((store) => store.user.infoUsuario);
+  const { filterListDefault } = useSelector(
+    (state) => state.negocio.infoNegocio
+  );
+
   const [data, setData] = useState();
   const dispatch = useDispatch();
   const navigate = useNavigate();
@@ -113,7 +115,6 @@ const PrivateMasterLayout = (props) => {
           dispatch(GetImpuesto()),
           dispatch(GetPuntos()),
           dispatch(GetInfoNegocio()),
-          dispatch(GetListUser()),
           dispatch(getListCategorias()),
           dispatch(getServicios()),
           dispatch(getListClientes()),
@@ -189,6 +190,10 @@ const PrivateMasterLayout = (props) => {
   }, [reserved]);
 
   useEffect(() => {
+    dispatch(setFilterBy(filterListDefault));
+  }, [filterListDefault]);
+
+  useEffect(() => {
     // ORDEN ADD
     socket.on("server:newOrder", (data) => {
       dispatch(LS_newOrder(data));
@@ -212,9 +217,8 @@ const PrivateMasterLayout = (props) => {
     socket.on("server:updateOrder(NOTA)", (data) => {
       dispatch(updateNotaOrden(data));
     });
-    // ORDEN LIST
-    socket.on("server:updateListOrder", (data) => {
-      dispatch(LS_updateListOrder(data));
+    socket.on("server:updateOrder(LOCATION)", (data) => {
+      dispatch(updateLocationOrden(data));
     });
     // CUADRE
     socket.on("server:changeCuadre", () => {
@@ -222,8 +226,8 @@ const PrivateMasterLayout = (props) => {
     });
     // PAGO
     socket.on("server:cPago", (data) => {
+      console.log(data);
       dispatch(LS_changePagoOnOrden(data));
-      dispatch(LS_changeListPago(data));
       if (data.info.isCounted) {
         dispatch(updateRegistrosNCuadrados({ tipoMovimiento: "pagos", data }));
       }
@@ -295,9 +299,9 @@ const PrivateMasterLayout = (props) => {
       }
     });
     // 1er LOGIN
-    socket.on("server:onFirtLogin", (data) => {
-      dispatch(LS_FirtsLogin(data));
-    });
+    // socket.on("server:onFirtLogin", (data) => {
+    //   dispatch(LS_FirtsLogin(data));
+    // });
     // Cambio en los datos de usuario
     socket.on("server:onChangeUser", (data) => {
       if (InfoUsuario._id === data) {
@@ -322,31 +326,26 @@ const PrivateMasterLayout = (props) => {
     return () => {
       // Remove the event listener when the component unmounts
       socket.off("server:newOrder");
-      socket.off("server:updateCodigo");
-
       socket.off("server:updateOrder(ITEMS)");
       socket.off("server:updateOrder(FINISH_RESERVA)");
       socket.off("server:updateOrder(ENTREGA)");
       socket.off("server:updateOrder(CANCELAR_ENTREGA)");
       socket.off("server:updateOrder(ANULACION)");
       socket.off("server:updateOrder(NOTA)");
-
+      socket.off("server:updateOrder(LOCATION)");
+      socket.off("server:changeCuadre");
       socket.off("server:cPago");
       socket.off("server:cGasto");
-      socket.off("server:cClientes");
-
-      socket.off("server:updateListOrder");
-      socket.off("server:changeCuadre");
-
-      socket.off("server:cPricePrendas");
+      socket.off("server:updateCodigo");
       socket.off("server:cPuntos");
+      socket.off("server:cClientes");
       socket.off("server:cImpuesto");
       socket.off("server:cPromotions");
       socket.off("server:cNegocio");
       socket.off("server:onLogin");
       socket.off("server:onFirtLogin");
-      socket.off("server:onDeleteAccount");
       socket.off("server:onChangeUser");
+      socket.off("server:onDeleteAccount");
     };
   }, []);
 
