@@ -16,9 +16,12 @@ const InfoFactura = ({ mode, paso, descripcion, changeValue, values }) => {
             onSwitch="SI"
             offSwitch="NO"
             name="sw-tipo-factura"
-            defaultValue={values.factura}
+            defaultValue={values.cargosExtras.impuesto.estado}
             handleChange={(value) => {
-              changeValue("factura", value === "SI" ? true : false);
+              changeValue(
+                "cargosExtras.impuesto.estado",
+                value === "SI" ? true : false
+              );
             }}
             colorOn="#72c999"
             // colorOff=""

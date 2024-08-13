@@ -98,6 +98,10 @@ li {
 /* .mantine-Select-dropdown {
 } */
 
+.mantine-Paper-root::-webkit-scrollbar {
+  width: 0 !important;
+}
+
 .mantine-MultiSelect-values {
   margin: 0 !important;
 }
@@ -129,7 +133,15 @@ li {
 }
 .mantine-Modal-header {
   position: relative;
+  /* justify-content: center; */
+  width: 100%;
+  min-width: 275px;
 }
+
+.mantine-Modal-header h2 {
+  font-size: 20px !important;
+}
+
 .mantine-Modal-header button {
   position: absolute;
   right: 10px;

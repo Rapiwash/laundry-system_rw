@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable no-unused-vars */
-import { Button, Modal, ScrollArea, ActionIcon, Box } from "@mantine/core";
+import { Button, Modal, ScrollArea } from "@mantine/core";
 import { useDisclosure } from "@mantine/hooks";
 import { useMemo } from "react";
 
@@ -127,25 +127,27 @@ const Usuarios = () => {
 
   const validEnabledAccion = (user, action) => {
     let estado;
-    if (action === "update") {
-      if (InfoUsuario.rol === "admin" && user._id === InfoUsuario._id) {
-        estado = true;
-      } else if (user._id !== InfoUsuario._id && user.rol === "admin") {
-        estado = false;
-      } else {
-        estado = true;
-      }
+    if (InfoUsuario.nivel === "master") {
+      estado = true;
     } else {
-      if (InfoUsuario.rol === "admin") {
-        if (InfoUsuario.rol === "admin" && user._id === InfoUsuario._id) {
-          estado = false;
-        } else if (user._id !== InfoUsuario._id && user.rol === "admin") {
+      if (action === "update") {
+        if (user.rol === "admin" && user._id === InfoUsuario._id) {
+          estado = true;
+        } else if (user.rol === "admin" && user._id !== InfoUsuario._id) {
           estado = false;
         } else {
           estado = true;
         }
       } else {
-        estado = false;
+        if (user.rol === "admin") {
+          estado = false;
+        } else {
+          if (InfoUsuario.rol === "admin") {
+            estado = true;
+          } else {
+            estado = false;
+          }
+        }
       }
     }
 
@@ -158,7 +160,6 @@ const Usuarios = () => {
         `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-list-users`
       );
 
-      console.log(response.data);
       setListUsuarios(response.data);
     } catch (error) {
       console.log(error.response.data.mensaje);
@@ -257,7 +258,7 @@ const Usuarios = () => {
         enableRowActions={true}
         renderRowActions={({ row }) => (
           <div className="actions-ajuste-usuario">
-            {validEnabledAccion(row.original) === false ? (
+            {validEnabledAccion(row.original, "update") ? (
               <button
                 type="button"
                 className="btn-edit"
@@ -271,18 +272,16 @@ const Usuarios = () => {
               </button>
             ) : null}
 
-            {validEnabledAccion(row.original) === false ? (
-              row.original._id === InfoUsuario._id ? null : (
-                <button
-                  className="btn-delete"
-                  type="button"
-                  onClick={() => {
-                    validDeleteUsuario(row.original._id);
-                  }}
-                >
-                  <i className="fas fa-user-times" />
-                </button>
-              )
+            {validEnabledAccion(row.original, "delete") ? (
+              <button
+                className="btn-delete"
+                type="button"
+                onClick={() => {
+                  validDeleteUsuario(row.original._id);
+                }}
+              >
+                <i className="fas fa-user-times" />
+              </button>
             ) : null}
           </div>
         )}
@@ -304,16 +303,6 @@ const Usuarios = () => {
             maxHeight: "400px",
           },
         }}
-        mantineTableBodyRowProps={({ row }) => ({
-          onDoubleClick: () => {
-            const iUsuario = ListUsuarios.find(
-              (pr) => pr._id === row.original._id
-            );
-
-            setRowPick(iUsuario);
-            openAccionUsuario();
-          },
-        })}
       />
       <Modal
         opened={mAccionUsuario}

@@ -30,7 +30,7 @@ const Tienda = () => {
       infoOrden: {
         ...infoOrden,
         estado: "registrado",
-        tipoRegistro: "normal",
+        typeRegistro: "normal",
       },
       infoPago,
       rol,

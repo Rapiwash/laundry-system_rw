@@ -52,8 +52,8 @@ const EndProcess = ({ IdCliente, onClose }) => {
     infoCliente?.totalNeto
   );
 
-  const handleCancelarEntregar = async () => {
-    await dispatch(CancelEntrega_OrdenService(infoCliente._id));
+  const handleCancelarEntregar = () => {
+    dispatch(CancelEntrega_OrdenService(infoCliente._id));
     onClose(false);
   };
 
@@ -170,11 +170,9 @@ const EndProcess = ({ IdCliente, onClose }) => {
         location: infoCliente.location,
         infoGastoByDelivery,
       })
-    ).then((res) => {
-      if (res.payload) {
-        onClose(false);
-      }
-    });
+    );
+
+    onClose(false);
   };
 
   const handleEntregar = () => {

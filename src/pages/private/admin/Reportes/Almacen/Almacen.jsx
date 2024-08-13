@@ -310,10 +310,8 @@ const Almacen = () => {
         FechaIngreso: info.dateRecepcion,
         FechaPrevista: info.datePrevista,
         FechaAlmacenamiento: info.dateStorage,
-        Factura: info.factura,
         CargosExtras: info.cargosExtras,
         Descuento: info.descuento,
-        Index: info.index,
         onWaiting: handleOnWaiting(
           info.dateRecepcion.fecha,
           info.estadoPrenda,

@@ -8,7 +8,6 @@ import { NumberInput, TextInput } from "@mantine/core";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 
-// import Factura from "../../../../../Data/ReusableComponent/Factura/Factura";
 import OrdenServicio from "../../../../../../components/PRIVATE/OrdenServicio/OrdenServicio";
 import LoaderSpiner from "../../../../../../components/LoaderSpinner/LoaderSpiner";
 import { DateCurrent } from "../../../../../../utils/functions";
@@ -53,10 +52,6 @@ const Delivery = () => {
   const [infoGastoByDelivery, setInfoGastoByDelivery] = useState();
   const [infoDefault, setInfoDefault] = useState();
 
-  const infoServiceDelivery = useSelector(
-    (state) => state.servicios.serviceDelivery
-  );
-
   const infoTipoGastoDeliveryRecojo = useSelector(
     (state) => state.tipoGasto.iDeliveryRecojo
   );
@@ -86,24 +81,32 @@ const Delivery = () => {
         fecha: DateCurrent().format4,
         hora: DateCurrent().format3,
       },
+      dateRecojo: {
+        fecha: "",
+        hora: "",
+      },
       Modalidad: "Delivery",
       Nombre: values.name,
       idCliente: "",
       Items: [
         {
-          identificador: infoServiceDelivery._id,
+          identificador: iDelivery._id,
           tipo: "servicio",
           cantidad: 1,
-          item: infoServiceDelivery.nombre,
-          simboloMedida: infoServiceDelivery.simboloMedida,
+          item: iDelivery.nombre,
+          simboloMedida: iDelivery.simboloMedida,
           descripcion: "Transporte",
-          price: infoServiceDelivery.precioVenta,
-          total: infoServiceDelivery.precioVenta,
+          price: iDelivery.precioVenta,
+          monto: iDelivery.precioVenta,
+          descuentoManual: 0,
+          total: iDelivery.precioVenta,
           disable: {
             cantidad: true,
             item: true,
             descripcion: true,
+            monto: false,
             total: false,
+            descuentoManual: false,
             action: true,
           },
         },
@@ -118,29 +121,25 @@ const Delivery = () => {
         fecha: "",
         hora: "",
       },
-      descuento: 0,
+      descuento: {
+        estado: false,
+        modoDescuento: "Ninguno",
+        info: null,
+        monto: 0,
+      },
       estadoPrenda: "pendiente",
       estado: "reservado",
       dni: "",
-      factura: false,
       subTotal: 0,
       cargosExtras: {
-        beneficios: {
-          puntos: 0,
-          promociones: [],
-        },
-        descuentos: {
-          puntos: 0,
-          promocion: 0,
-        },
-        igv: {
-          valor: InfoImpuesto.IGV,
+        impuesto: {
+          estado: false,
+          valor: iImpuesto.IGV,
           importe: 0,
         },
       },
       totalNeto: 0,
       modeRegistro: "nuevo",
-      modoDescuento: "Promocion",
       gift_promo: [],
       attendedBy: {
         name: InfoUsuario.name,
@@ -244,30 +243,30 @@ const Delivery = () => {
           simboloMedida: iDelivery?.simboloMedida,
           descripcion: "Transporte",
           price: iDelivery?.precioVenta,
+          monto: iDelivery?.precioVenta,
+          descuentoManual: 0,
           total: iDelivery?.precioVenta,
           disable: {
             cantidad: true,
             item: true,
             descripcion: true,
+            monto: false,
             total: false,
+            descuentoManual: false,
             action: true,
           },
         },
       ],
-      descuento: 0,
-      modoDescuento: "Promocion",
-      factura: false,
+      descuento: {
+        estado: false,
+        modoDescuento: "Ninguno",
+        info: null,
+        monto: 0,
+      },
       subTotal: 0,
       cargosExtras: {
-        beneficios: {
-          puntos: 0,
-          promociones: [],
-        },
-        descuentos: {
-          puntos: 0,
-          promocion: 0,
-        },
-        igv: {
+        impuesto: {
+          estado: false,
           valor: iImpuesto.IGV,
           importe: 0,
         },

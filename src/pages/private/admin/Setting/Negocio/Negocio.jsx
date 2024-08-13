@@ -38,7 +38,11 @@ const Negocio = () => {
     },
     //validationSchema: validationSchema,
     onSubmit: (values, { setSubmitting }) => {
-      openModal(values);
+      openModal({
+        ...values,
+        contacto: values.contacto.filter((item) => item.numero !== ""),
+        horario: values.horario.filter((item) => item.horario !== ""),
+      });
       setSubmitting(false);
     },
   });
@@ -221,7 +225,6 @@ const Negocio = () => {
                           placeholder={`Ingrese Teléfono ${index + 1}`}
                           autoComplete="off"
                           maxLength={13}
-                          required
                           autoFocus
                           onChange={(e) => {
                             formik.setFieldValue(
@@ -230,25 +233,29 @@ const Negocio = () => {
                             );
                           }}
                         />
-                        {index === 0 ? (
-                          <button
-                            className={`state-ii add`}
-                            type="button"
-                            onClick={() => {
-                              handleAddItem("contacto");
-                            }}
-                          >
-                            <i className="fa-solid fa-plus" />
-                          </button>
-                        ) : (
-                          <button
-                            className={`state-ii delete`}
-                            type="button"
-                            onClick={() => handleDeleteItem("contacto", index)}
-                          >
-                            <i className="fa-solid fa-x" />
-                          </button>
-                        )}
+                        {contacto.numero.length > 0 ? (
+                          index === 0 ? (
+                            <button
+                              className={`state-ii add`}
+                              type="button"
+                              onClick={() => {
+                                handleAddItem("contacto");
+                              }}
+                            >
+                              <i className="fa-solid fa-plus" />
+                            </button>
+                          ) : (
+                            <button
+                              className={`state-ii delete`}
+                              type="button"
+                              onClick={() =>
+                                handleDeleteItem("contacto", index)
+                              }
+                            >
+                              <i className="fa-solid fa-x" />
+                            </button>
+                          )
+                        ) : null}
                       </div>
                     ))}
                     {/* Este bloque solo se muestra si no hay datos agregados previamente */}
@@ -261,7 +268,6 @@ const Negocio = () => {
                           maxLength={35}
                           placeholder="Ingrese Teléfono 1"
                           autoComplete="off"
-                          required
                           onChange={(e) => {
                             formik.setFieldValue(`contacto`, [
                               {
@@ -296,7 +302,6 @@ const Negocio = () => {
                           autoComplete="off"
                           autoFocus
                           maxLength={35}
-                          required
                           onChange={(e) => {
                             formik.setFieldValue(
                               `horario.${index}.horario`,
@@ -304,25 +309,27 @@ const Negocio = () => {
                             );
                           }}
                         />
-                        {index === 0 ? (
-                          <button
-                            className={`state-ii add`}
-                            type="button"
-                            onClick={() => {
-                              handleAddItem("horario");
-                            }}
-                          >
-                            <i className="fa-solid fa-plus" />
-                          </button>
-                        ) : (
-                          <button
-                            className={`state-ii delete`}
-                            type="button"
-                            onClick={() => handleDeleteItem("horario", index)}
-                          >
-                            <i className="fa-solid fa-x" />
-                          </button>
-                        )}
+                        {horario.horario.length > 0 ? (
+                          index === 0 ? (
+                            <button
+                              className={`state-ii add`}
+                              type="button"
+                              onClick={() => {
+                                handleAddItem("horario");
+                              }}
+                            >
+                              <i className="fa-solid fa-plus" />
+                            </button>
+                          ) : (
+                            <button
+                              className={`state-ii delete`}
+                              type="button"
+                              onClick={() => handleDeleteItem("horario", index)}
+                            >
+                              <i className="fa-solid fa-x" />
+                            </button>
+                          )
+                        ) : null}
                       </div>
                     ))}
                     {/* Este bloque solo se muestra si no hay datos agregados previamente */}
@@ -335,7 +342,6 @@ const Negocio = () => {
                           maxLength={35}
                           placeholder="Ingrese Horario 1"
                           autoComplete="off"
-                          required
                           onChange={(e) => {
                             formik.setFieldValue(`horario`, [
                               {
@@ -345,7 +351,7 @@ const Negocio = () => {
                             ]);
                           }}
                         />
-                        {formik.values.horario[0].horario ? (
+                        {formik.values.horario[0]?.horario ? (
                           <button
                             className={`state-ii add`}
                             type="button"
@@ -473,16 +479,18 @@ const Negocio = () => {
                   </div>
                   <SwtichDimension
                     title="Filtrar Lista Principal Por :"
-                    onSwitch="Fecha"
-                    offSwitch="Pendientes"
+                    onSwitch="Pendientes"
+                    offSwitch="Otros"
                     name="filterListDefault"
                     defaultValue={
-                      formik.values.filterListDefault === "date" ? true : false
+                      formik.values.filterListDefault === "others"
+                        ? false
+                        : true
                     }
                     handleChange={(value) => {
                       formik.setFieldValue(
                         "filterListDefault",
-                        value === "Fecha" ? "date" : "pendiente"
+                        value === "Otros" ? "others" : "pendiente"
                       );
                     }}
                     colorOn="goldenrod"

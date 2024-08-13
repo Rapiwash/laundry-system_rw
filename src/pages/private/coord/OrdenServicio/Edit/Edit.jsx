@@ -3,7 +3,10 @@ import OrdenServicio from "../../../../../components/PRIVATE/OrdenServicio/Orden
 
 import { useDispatch, useSelector } from "react-redux";
 
-import { UpdateDetalleOrdenServices } from "../../../../../redux/actions/aOrdenServices";
+import {
+  UpdateDetalleOrdenServices,
+  // UpdateOrdenServices,
+} from "../../../../../redux/actions/aOrdenServices";
 
 import { PrivateRoutes } from "../../../../../models";
 import "./edit.scss";

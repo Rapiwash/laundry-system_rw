@@ -74,12 +74,30 @@ const Detalle = ({ infoD }) => {
         <h1>{ordern?.onWaiting.showText} en Espera</h1>
       </div>
       <h1 className="mod-ord">{ordern?.Modalidad}</h1>
-      <table className="product-t">
+      <table
+        className={`tabla-service ${
+          ordern?.Descuento.modoDescuento === "Manual" ? "" : "show-dsc-m"
+        }`}
+      >
         <thead>
           <tr>
             <th>Cantidad</th>
-            <th>Items</th>
-            <th>Descripción</th>
+
+            {ordern?.Descuento.modoDescuento === "Manual" ? (
+              <th>Item + Descripcion</th>
+            ) : (
+              <>
+                <th>Item</th>
+                <th> Descripcion</th>
+              </>
+            )}
+
+            {ordern?.Descuento.modoDescuento === "Manual" ? (
+              <>
+                <th>Monto</th>
+                <th>Dsct</th>
+              </>
+            ) : null}
             <th>Total</th>
           </tr>
         </thead>
@@ -87,76 +105,127 @@ const Detalle = ({ infoD }) => {
           {ordern?.DetalleOrden.map((p, index) => (
             <tr key={`${p._id}${index}`}>
               <td>{formatThousandsSeparator(p.cantidad)}</td>
-              <td>{p.item}</td>
-              <td className="tADescription">
-                <div className="contentDes">
-                  <div id={`${index}-dsp`} className="textarea-container">
-                    <textarea
-                      id={`${index}-txtA`}
-                      className="hide"
-                      rows={5}
-                      value={p.descripcion}
-                      readOnly={true}
-                    />
-                    <button
-                      type="button"
-                      className="expand-button"
-                      onClick={() => {
-                        const element = document.getElementById(`${index}-dsp`);
-                        const textArea = document.getElementById(
-                          `${index}-txtA`
-                        );
 
-                        if (element) {
-                          const hideElement = element.querySelector(".hide");
-                          const showElement = element.querySelector(".show");
-                          const iconElement =
-                            element.querySelector("#ico-action");
+              {ordern?.Descuento.modoDescuento === "Manual" ? (
+                <td>
+                  <div className="cell-produc-descrip">
+                    <span>{p.item}</span>
+                    <div className="tADescription">
+                      <div className="contentDes">
+                        <div id={`${index}-dsp`} className="textarea-container">
+                          <textarea
+                            className="hide"
+                            rows={5}
+                            placeholder="..."
+                            value={p.descripcion}
+                            readOnly={true}
+                          />
+                          <button
+                            type="button"
+                            className="expand-button"
+                            onClick={() => {
+                              const element = document.getElementById(
+                                `${index}-dsp`
+                              );
 
-                          let txtAreaShow = null;
-                          if (hideElement) {
-                            hideElement.classList.replace("hide", "show");
-                            iconElement.classList.replace(
-                              "fa-chevron-down",
-                              "fa-chevron-up"
-                            );
+                              if (element) {
+                                const hideElement =
+                                  element.querySelector(".hide");
+                                const showElement =
+                                  element.querySelector(".show");
+                                const iconElement =
+                                  element.querySelector("#ico-action");
 
-                            txtAreaShow = element.querySelector(".show");
-
-                            const width =
-                              window.getComputedStyle(txtAreaShow).width;
-                            const fontSize =
-                              window.getComputedStyle(txtAreaShow).fontSize;
-                            const padding =
-                              getComputedStyle(txtAreaShow).padding;
-                            const lineHeightValue =
-                              getComputedStyle(txtAreaShow).lineHeight;
-
-                            txtAreaShow.style.height = `${calculateHeight(
-                              p.descripcion,
-                              fontSize,
-                              width,
-                              padding,
-                              lineHeightValue
-                            )}px`;
-                          } else if (showElement) {
-                            txtAreaShow = element.querySelector(".show");
-                            showElement.classList.replace("show", "hide");
-                            txtAreaShow.style.height = null;
-                            iconElement.classList.replace(
-                              "fa-chevron-up",
-                              "fa-chevron-down"
-                            );
-                          }
-                        }
-                      }}
-                    >
-                      <i id="ico-action" className="fa-solid fa-chevron-down" />
-                    </button>
+                                if (hideElement) {
+                                  hideElement.classList.replace("hide", "show");
+                                  iconElement.classList.replace(
+                                    "fa-chevron-down",
+                                    "fa-chevron-up"
+                                  );
+                                } else if (showElement) {
+                                  showElement.classList.replace("show", "hide");
+                                  iconElement.classList.replace(
+                                    "fa-chevron-up",
+                                    "fa-chevron-down"
+                                  );
+                                }
+                              }
+                            }}
+                          >
+                            <i
+                              id="ico-action"
+                              className="fa-solid fa-chevron-down"
+                            />
+                          </button>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              </td>
-              <td>{formatThousandsSeparator(p.total)}</td>
+                </td>
+              ) : (
+                <>
+                  <td>{p.item}</td>
+                  <td className="tADescription space-dsc">
+                    <div className="contentDes">
+                      <div id={`${index}-dsp`} className="textarea-container">
+                        <textarea
+                          className="hide"
+                          rows={5}
+                          placeholder="..."
+                          value={p.descripcion}
+                          readOnly={true}
+                        />
+                        <button
+                          type="button"
+                          className="expand-button"
+                          onClick={() => {
+                            const element = document.getElementById(
+                              `${index}-dsp`
+                            );
+
+                            if (element) {
+                              const hideElement =
+                                element.querySelector(".hide");
+                              const showElement =
+                                element.querySelector(".show");
+                              const iconElement =
+                                element.querySelector("#ico-action");
+
+                              if (hideElement) {
+                                hideElement.classList.replace("hide", "show");
+                                iconElement.classList.replace(
+                                  "fa-chevron-down",
+                                  "fa-chevron-up"
+                                );
+                              } else if (showElement) {
+                                showElement.classList.replace("show", "hide");
+                                iconElement.classList.replace(
+                                  "fa-chevron-up",
+                                  "fa-chevron-down"
+                                );
+                              }
+                            }
+                          }}
+                        >
+                          <i
+                            id="ico-action"
+                            className="fa-solid fa-chevron-down"
+                          />
+                        </button>
+                      </div>
+                    </div>
+                  </td>
+                </>
+              )}
+              {ordern?.Descuento.modoDescuento === "Manual" ? (
+                <>
+                  <td>{formatThousandsSeparator(p.monto)}</td>
+                  <td>{formatThousandsSeparator(p.descuentoManual)}</td>
+                  <td>{formatThousandsSeparator(p.total)}</td>
+                </>
+              ) : (
+                <td>{formatThousandsSeparator(p.monto)}</td>
+              )}
             </tr>
           ))}
         </tbody>
@@ -170,7 +239,7 @@ const Detalle = ({ infoD }) => {
             <span>{ordern?.attendedBy.name.split(" ")[0]}</span>
           </div>
         </div>
-        {ordern?.Factura === true ? (
+        {ordern?.CargosExtras.impuesto.estado ? (
           <div className="item-extra fact">
             <div className="title">
               <span>Factura</span>
@@ -178,7 +247,7 @@ const Detalle = ({ infoD }) => {
             <div className="monto">
               <span>
                 {formatThousandsSeparator(
-                  ordern?.CargosExtras.igv.importe,
+                  ordern?.CargosExtras.impuesto.importe,
                   true
                 )}
               </span>

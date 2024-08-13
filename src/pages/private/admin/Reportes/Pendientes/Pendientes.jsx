@@ -141,7 +141,6 @@ const Pendientes = () => {
         FechaPago: d.datePago,
         FechaIngreso: d.dateRecepcion,
         FechaPrevista: d.datePrevista,
-        Factura: d.factura,
         CargosExtras: d.cargosExtras,
         Descuento: d.descuento,
         onWaiting: handleOnWaiting(

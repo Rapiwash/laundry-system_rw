@@ -1,3 +1,4 @@
+/* eslint-disable no-case-declarations */
 import { createSlice } from "@reduxjs/toolkit";
 import {
   AddOrdenServices,
@@ -8,6 +9,7 @@ import {
   FinalzarReservaOrdenService,
   GetOrdenServices_Date,
   GetOrdenServices_DateRange,
+  GetOrdenServices_Last,
   Nota_OrdenService,
   UpdateDetalleOrdenServices,
 } from "../actions/aOrdenServices";
@@ -23,9 +25,9 @@ const service_order = createSlice({
     lastRegister: null,
     orderServiceId: false,
     // filtros
-    filterBy: "date",
-    searhOptionByDate: "latest",
-    selectedMonth: moment().subtract(2, "months").toDate(),
+    filterBy: "pendiente",
+    searhOptionByOthers: "last",
+    selectedMonth: moment().toDate(),
     // ----------------- //
     isLoading: false,
     error: null,
@@ -35,8 +37,8 @@ const service_order = createSlice({
     setFilterBy: (state, action) => {
       state.filterBy = action.payload;
     },
-    setSearchOptionByDate: (state, action) => {
-      state.searhOptionByDate = action.payload;
+    setSearchOptionByOthers: (state, action) => {
+      state.searhOptionByOthers = action.payload;
     },
     setSelectedMonth: (state, action) => {
       state.selectedMonth = action.payload;
@@ -101,12 +103,12 @@ const service_order = createSlice({
       }
     },
     updateAnulacionOrden: (state, action) => {
-      const index = state.registered.findIndex(
+      const indexOnRegistered = state.registered.findIndex(
         (item) => item._id === action.payload._id
       );
 
-      if (index !== -1) {
-        const updatedOrder = state.registered[index];
+      if (indexOnRegistered !== -1) {
+        const updatedOrder = state.registered[indexOnRegistered];
         updatedOrder.estadoPrenda = action.payload.estadoPrenda;
       }
     },
@@ -134,13 +136,44 @@ const service_order = createSlice({
       });
     },
     // ---------------------- //
-    LS_newOrder: (state, action) => {
-      if (action.payload.estado === "reservado") {
-        state.reserved.push(action.payload);
+    changeOrder: (state, action) => {
+      const { tipo, info } = action.payload;
+      const stateMap = {
+        reservado: state.reserved,
+        registrado: state.registered,
+      };
+
+      const stateArray = stateMap[info.estado];
+      if (!stateArray) {
+        console.log("Estado no reconocido:", info.estado);
+        return;
       }
 
-      if (action.payload.estado === "registrado") {
-        state.registered.push(action.payload);
+      const findIndexById = (arr, id) =>
+        arr.findIndex((item) => item._id === id);
+
+      switch (tipo) {
+        case "add":
+          stateArray.push(info);
+          break;
+        case "update":
+          const updateIndex = findIndexById(stateArray, info._id);
+          if (updateIndex !== -1) {
+            stateArray[updateIndex] = info;
+          } else {
+            console.log("Orden no encontrada para actualizar:", info._id);
+          }
+          break;
+        case "delete":
+          const deleteIndex = findIndexById(stateArray, info._id);
+          if (deleteIndex !== -1) {
+            stateArray.splice(deleteIndex, 1);
+          } else {
+            console.log("Orden no encontrada para eliminar:", info._id);
+          }
+          break;
+        default:
+          console.log("Acción no reconocida:", tipo);
       }
     },
     LS_changePagoOnOrden: (state, action) => {
@@ -303,12 +336,12 @@ const service_order = createSlice({
       })
       .addCase(Anular_OrdenService.fulfilled, (state, action) => {
         state.isLoading = false;
-        const index = state.registered.findIndex(
+        const indexOnRegistered = state.registered.findIndex(
           (item) => item._id === action.payload._id
         );
 
-        if (index !== -1) {
-          const updatedOrder = state.registered[index];
+        if (indexOnRegistered !== -1) {
+          const updatedOrder = state.registered[indexOnRegistered];
           updatedOrder.estadoPrenda = action.payload.estadoPrenda;
         }
       })
@@ -348,6 +381,7 @@ const service_order = createSlice({
       .addCase(AnularRemplazar_OrdensService.fulfilled, (state, action) => {
         state.isLoading = false;
         const { newOrder, orderAnulado } = action.payload;
+
         const indexOrderToAnular = state.registered.findIndex(
           (item) => item._id === orderAnulado._id
         );
@@ -387,6 +421,27 @@ const service_order = createSlice({
         state.infoServiceOrder = false;
         state.error = action.error.message;
       })
+      // List Last
+      .addCase(GetOrdenServices_Last.pending, (state) => {
+        state.isLoading = true;
+        state.infoServiceOrder = false;
+        state.error = null;
+      })
+      .addCase(GetOrdenServices_Last.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.infoServiceOrder = action.payload.length > 0;
+        state.reserved = action.payload.filter(
+          (item) => item.estado === "reservado"
+        );
+        state.registered = action.payload.filter(
+          (item) => item.estado === "registrado"
+        );
+      })
+      .addCase(GetOrdenServices_Last.rejected, (state, action) => {
+        state.isLoading = false;
+        state.infoServiceOrder = false;
+        state.error = action.error.message;
+      })
       // List for Date
       .addCase(GetOrdenServices_Date.pending, (state) => {
         state.isLoading = true;
@@ -421,11 +476,11 @@ export const {
   updateCancelarEntregaOrden,
   updateAnulacionOrden,
   updateLastRegister,
-  LS_newOrder,
+  changeOrder,
   LS_changePagoOnOrden,
   // Filter
   setFilterBy,
-  setSearchOptionByDate,
+  setSearchOptionByOthers,
   setSelectedMonth,
 } = service_order.actions;
 export default service_order.reducer;

@@ -2,6 +2,7 @@
 import { createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import { Notify } from "../../utils/notify/Notify";
+import { socket } from "../../utils/socket/connect";
 
 // Obtener la lista de servicios
 export const getServicios = createAsyncThunk(
@@ -11,6 +12,7 @@ export const getServicios = createAsyncThunk(
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-servicios`
       );
+
       return response.data;
     } catch (error) {
       throw new Error(`No se pudieron obtener los servicios - ${error}`);
@@ -27,8 +29,16 @@ export const addServicio = createAsyncThunk(
         `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/add-servicio`,
         nuevoServicio
       );
-      return response.data;
+
+      const info = response.data;
+      const { data } = info;
+
+      socket.emit("client:cService", info);
+      Notify("Registro de Servicio Exitoso", "", "success");
+
+      return data;
     } catch (error) {
+      Notify("Error: No se pudo Registrar Servicio", "", "fail");
       throw new Error(`No se pudo agregar el servicio - ${error}`);
     }
   }
@@ -37,8 +47,8 @@ export const addServicio = createAsyncThunk(
 // Actualizar un servicio existente
 export const updateServicio = createAsyncThunk(
   "servicios/updateServicio",
-  async (data) => {
-    const { idServicio, servicioActualizado } = data;
+  async (infoToUpdated) => {
+    const { idServicio, servicioActualizado } = infoToUpdated;
 
     try {
       const response = await axios.put(
@@ -47,8 +57,15 @@ export const updateServicio = createAsyncThunk(
         }/api/lava-ya/update-servicio/${idServicio}`,
         servicioActualizado
       );
-      return response.data;
+
+      const info = response.data;
+      const { data } = info;
+      socket.emit("client:cService", info);
+
+      Notify("Actualizacion de Servicio Exitosa", "", "success");
+      return data;
     } catch (error) {
+      Notify("Error: No se pudo Actualizar Servicio", "", "fail");
       throw new Error(`No se pudo actualizar el servicio - ${error}`);
     }
   }
@@ -64,9 +81,13 @@ export const deleteServicio = createAsyncThunk(
           import.meta.env.VITE_BACKEND_URL
         }/api/lava-ya/delete-servicio/${idServicio}`
       );
-      const { idServicioEliminado, mensaje } = response.data;
-      Notify(mensaje, "", "success");
-      return idServicioEliminado;
+
+      const info = response.data;
+      const { data } = info;
+      socket.emit("client:cService", info);
+
+      Notify("Servicio eliminado con éxito", "", "success");
+      return data;
     } catch (error) {
       return rejectWithValue(error.response.data);
     }

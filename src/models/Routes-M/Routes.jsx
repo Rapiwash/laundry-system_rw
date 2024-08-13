@@ -38,6 +38,7 @@ export const PrivateRoutes = {
   PERSONAL: "personal",
   LIST_ORDER_SERVICE: "list-orden-servicio",
   EDIT_ORDER_SERVICE: "update-orden-servicio",
+  EDIT_ORDER_RECOJO: "update-orden-recojo",
   FINISH_ORDEN_SERVICE_PENDING: "finish-reserved-orden",
   REGISTER: "add-orden-servicio/registro",
   REGISTER_DELIVERY: "add-orden-servicio/registro-delivery",

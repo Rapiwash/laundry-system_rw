@@ -39,8 +39,6 @@ const FinishReserva = () => {
       subTotal,
       totalNeto,
       cargosExtras,
-      factura,
-      modoDescuento,
       gift_promo,
       attendedBy,
     } = infoOrden;
@@ -63,8 +61,6 @@ const FinishReserva = () => {
           subTotal,
           totalNeto,
           cargosExtras,
-          factura,
-          modoDescuento,
           gift_promo,
           attendedBy,
         },

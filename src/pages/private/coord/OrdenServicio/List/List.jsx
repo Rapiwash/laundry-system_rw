@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
-import { Box, MultiSelect, Text, Textarea, Tooltip } from "@mantine/core";
+import { Box, MultiSelect, Text, Tooltip } from "@mantine/core";
 import { MonthPickerInput } from "@mantine/dates";
 import { MantineReactTable } from "mantine-react-table";
 
@@ -15,7 +15,6 @@ import "./list.scss";
 import moment from "moment";
 import {
   DateCurrent,
-  GetFirstFilter,
   handleGetInfoPago,
   handleOnWaiting,
   handleItemsCantidad,
@@ -28,13 +27,13 @@ import { modals } from "@mantine/modals";
 
 import {
   GetOrdenServices_Date,
-  GetOrdenServices_DateRange,
+  GetOrdenServices_Last,
 } from "../../../../../redux/actions/aOrdenServices";
 import { GetMetas } from "../../../../../redux/actions/aMetas";
 import {
   setFilterBy,
   setLastRegister,
-  setSearchOptionByDate,
+  setSearchOptionByOthers,
   setSelectedMonth,
 } from "../../../../../redux/states/service_order";
 
@@ -48,7 +47,10 @@ import SwtichDimension from "../../../../../components/SwitchDimension/SwitchDim
 
 const List = () => {
   //Filtros de Fecha
-  const monthCurrentPrevious = GetFirstFilter();
+
+  const { maxConsultasDefault } = useSelector(
+    (state) => state.negocio.infoNegocio
+  );
   const selectedMonth = useSelector((state) => state.orden.selectedMonth);
 
   const { registered } = useSelector((state) => state.orden);
@@ -67,14 +69,14 @@ const List = () => {
 
   const filterBy = useSelector((state) => state.orden.filterBy);
   // ------------------------------------------------------>
-  // (date) -> "FECHA"
+  // (other) -> "OTROS"
   // (pendiente)   -> "PENDIENTES"
-  const searhOptionByDate = useSelector(
-    (state) => state.orden.searhOptionByDate
+  const searhOptionByOthers = useSelector(
+    (state) => state.orden.searhOptionByOthers
   );
   // ------------------------------------------------------>
-  // (selected) -> "MESES ANTERIORES"
-  // (latest)   -> "(ANTERIOR) - (MES ACTUAL)"
+  // (date) -> "FECHA"
+  // (last)   -> "500 ULTIMOS"
 
   const [detailEdit, setDetailEdit] = useState(false);
   const [changePago, setChangePago] = useState(false);
@@ -399,9 +401,9 @@ const List = () => {
       onConfirm: () => {
         if (confirmationEnabled) {
           confirmationEnabled = false;
-          dispatch(setSearchOptionByDate(option));
-          if (option === "latest") {
-            handleGetLatestMonth();
+          dispatch(setSearchOptionByOthers(option));
+          if (option === "last") {
+            handleGetLatest();
           } else {
             handleGetSelectedMonth(selectedMonth);
           }
@@ -417,13 +419,9 @@ const List = () => {
     dispatch(GetOrdenServices_Date(dateToFind));
   };
 
-  const handleGetLatestMonth = async () => {
+  const handleGetLatest = async () => {
     setOnLoadingTable(true);
-    const dateToFind = {
-      dateInicio: monthCurrentPrevious.formatoD[0],
-      dateFin: monthCurrentPrevious.formatoD[1],
-    };
-    dispatch(GetOrdenServices_DateRange(dateToFind));
+    dispatch(GetOrdenServices_Last());
   };
 
   const handleGetTotalPedidos = () => {
@@ -506,15 +504,17 @@ const List = () => {
 
   useEffect(() => {
     let infoFiltrada;
-    if (filterBy === "date") {
-      if (searhOptionByDate === "latest") {
-        const dateInicio = monthCurrentPrevious.formatoD[0];
-        const dateFin = monthCurrentPrevious.formatoD[1];
-
-        infoFiltrada = basicInformationSearched.filter((iFilter) => {
-          const fechaCreation = moment(iFilter.FechaCreation, "YYYY-MM-DD");
-          return fechaCreation.isBetween(dateInicio, dateFin, "days", "[]");
+    if (filterBy === "others") {
+      if (searhOptionByOthers === "last") {
+        // Ordena los documentos por el timestamp del campo _id
+        const reOrdenar = [...basicInformationSearched].sort((a, b) => {
+          return getObjectIdTimestamp(b.Id) - getObjectIdTimestamp(a.Id);
         });
+
+        // Selecciona solo los últimos x cantidad
+        const ultimos = reOrdenar.slice(0, maxConsultasDefault);
+
+        infoFiltrada = ultimos;
       } else {
         // Usamos moment para obtener el primer y último día del mes de fechaSeleccionada
         const dateInicio = moment(selectedMonth)
@@ -552,22 +552,22 @@ const List = () => {
             <div className="sw-filter">
               <SwtichDimension
                 // title=""
-                onSwitch="Fecha"
-                offSwitch="Pendientes"
+                onSwitch="Pendientes"
+                offSwitch="Otros"
                 name="defaultFilter"
-                defaultValue={filterBy === "date" ? true : false}
+                defaultValue={filterBy === "others" ? false : true}
                 handleChange={(value) => {
-                  const option = value === "Fecha" ? "date" : "pendiente";
+                  const option = value === "Otros" ? "others" : "pendiente";
                   if (option === "pendiente") {
                     if (
-                      filterBy === "date" &&
-                      searhOptionByDate === "selected"
+                      filterBy === "others" &&
+                      searhOptionByOthers === "date"
                     ) {
-                      handleGetLatestMonth();
+                      handleGetLatest();
                     }
                   }
                   setOnLoadingTable(true);
-                  dispatch(setSearchOptionByDate("latest"));
+                  dispatch(setSearchOptionByOthers("last"));
                   dispatch(setFilterBy(option));
                 }}
                 colorOn="goldenrod"
@@ -575,34 +575,45 @@ const List = () => {
                 // disabled=""
               />
               {filterBy === "pendiente" ? (
-                <div className="cicle-cant">{ListOrdenes.length}</div>
+                <div className="cicle-cant l-pos">{ListOrdenes.length}</div>
               ) : null}
             </div>
 
-            {filterBy === "date" ? (
+            {filterBy === "others" ? (
               <div className="filter-date">
-                <SwtichDimension
-                  // title=""
-                  onSwitch={monthCurrentPrevious.formatoS}
-                  offSwitch="MESES ANTERIORES"
-                  name="switchFC"
-                  defaultValue={searhOptionByDate === "selected" ? false : true}
-                  handleChange={(value) => {
-                    const option =
-                      value === "MESES ANTERIORES" ? "selected" : "latest";
-                    handleValidarConsulta(option);
-                  }}
-                  colorOn="goldenrod"
-                  // colorOff=""
-                  // disabled=""
-                />
-                {searhOptionByDate === "selected" ? (
+                <div className="sw-filter">
+                  <SwtichDimension
+                    // title=""
+                    onSwitch="ULTIMOS"
+                    offSwitch="FECHA"
+                    name="switchFC"
+                    defaultValue={searhOptionByOthers === "date" ? false : true}
+                    handleChange={(value) => {
+                      const option = value === "FECHA" ? "date" : "last";
+                      handleValidarConsulta(option);
+                    }}
+                    colorOn="goldenrod"
+                    // colorOff=""
+                    // disabled=""
+                  />
+                  <div
+                    className={`cicle-cant ${
+                      searhOptionByOthers === "date" ? "r-pos" : "l-pos"
+                    }`}
+                  >
+                    {searhOptionByOthers === "others"
+                      ? maxConsultasDefault
+                      : ListOrdenes.length}
+                  </div>
+                </div>
+
+                {searhOptionByOthers === "date" ? (
                   <MonthPickerInput
                     className="date-m"
                     size="md"
                     placeholder="Pick date"
                     value={selectedMonth}
-                    maxDate={moment().subtract(2, "months").toDate()}
+                    maxDate={moment().toDate()}
                     onChange={handleGetSelectedMonth}
                     mx="auto"
                     maw={400}
@@ -680,6 +691,7 @@ const List = () => {
                 width: "100%",
                 height: "100%",
                 maxHeight: "calc(100% - 56px)",
+                overflow: onLoadingTable ? "unset" : "auto",
                 zIndex: "2",
               },
             }}

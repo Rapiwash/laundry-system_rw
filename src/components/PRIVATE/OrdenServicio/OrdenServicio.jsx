@@ -21,6 +21,7 @@ import InfoPuntos from "./InfoPuntos/InfoPuntos";
 import InfoPago from "./InfoPago/InfoPago";
 import {
   defaultHoraPrevista,
+  defaultHoraRecojo,
   showFactura,
   simboloMoneda,
 } from "../../../services/global";
@@ -62,14 +63,12 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
 
   const [sidePanelVisible, setSidePanelVisible] = useState(false);
 
-  const [listCupones, setListCupones] = useState([]);
-
   const [infoCliente, setInfoCliente] = useState(null);
   const [infoPagos, setInfoPagos] = useState([]);
 
   const [currentPago, setCurrentPago] = useState();
 
-  const [onDescuento, setOnDescuento] = useState(false);
+  // descuento cupon promocion
   const [onPromocion, setOnPromocion] = useState(false);
 
   const validationSchema = Yup.object().shape({
@@ -105,17 +104,16 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
         descripcion: item.descripcion,
         expanded: false, // Valor estático para el ejemplo
         price: item.precio,
-        total: item.total, // Similar para 'total'
+        monto: item.monto,
+        descuentoManual: item.descuentoManual,
+        total: item.total,
         disable: {
           cantidad: isDelivery ? true : mode !== "UPDATE" ? false : true,
           item: true,
           descripcion: isDelivery,
-          total:
-            mode !== "UPDATE"
-              ? false
-              : isDelivery && mode !== "UPDATE"
-              ? false
-              : true,
+          monto: true,
+          descuentoManual: mode === "UPDATE",
+          total: true,
           action: isDelivery ? true : mode !== "UPDATE" ? false : true,
         },
       };
@@ -129,24 +127,22 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
       Modalidad: "Tienda",
       direccion: "",
       celular: "",
+      dateIngreso: new Date(),
       dateRecojo: new Date(),
+      hourRecojo: defaultHoraRecojo,
       datePrevista: new Date(),
-      dayhour: defaultHoraPrevista,
+      hourPrevista: defaultHoraPrevista,
       Items: [],
-      descuento: 0,
-      modoDescuento: "Promocion",
-      factura: false,
+      descuento: {
+        estado: true,
+        modoDescuento: "Manual", // Puntos | Promocion | Manual | Ninguno
+        info: null,
+        monto: 0,
+      },
       subTotal: 0,
       cargosExtras: {
-        beneficios: {
-          puntos: 0,
-          promociones: [],
-        },
-        descuentos: {
-          puntos: 0,
-          promocion: 0,
-        },
-        igv: {
+        impuesto: {
+          estado: false,
           valor: iImpuesto.IGV,
           importe: 0,
         },
@@ -156,15 +152,17 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
     },
     validationSchema: validationSchema,
     onSubmit: async (values) => {
-      let correcciones = [];
-      const promociones = values.cargosExtras.beneficios.promociones;
-      const existPromocion = promociones.length > 0 ? true : false;
-
-      if (values.modoDescuento === "Promocion" && existPromocion) {
-        correcciones = await validItems(promociones);
+      let correcciones;
+      if (
+        values.descuento.info !== null &&
+        values.descuento.modoDescuento === "Promocion" &&
+        values.descuento.estado
+      ) {
+        correcciones = await validItems(values.descuento.info);
       }
-      if (correcciones.length > 0) {
-        alert(`La Promoción Exige:\n\n${correcciones.join("\n")}`);
+
+      if (correcciones) {
+        alert(`La Promoción Exige:\n\n${correcciones}`);
       } else {
         if (mode === "NEW") {
           const thereIsPromo = iPromocion.length > 0;
@@ -203,40 +201,26 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
 
   const validItems = async (promociones) => {
     const listItems = formik.values.Items;
-    const ListCorrecciones = [];
 
-    // si la promo es la misma reducirla a 1 sola
-    const listP = promociones.reduce((result, item) => {
-      const codigoPromocion = item.codigoPromocion;
-      if (!result.some((r) => r.codigoPromocion === codigoPromocion)) {
-        result.push(item);
-      }
+    const idServicios = promociones.prenda;
 
-      return result;
-    }, []);
+    let servicios = [];
 
-    for (const p of listP) {
-      let infoCupon;
-
-      infoCupon = {
-        alcance: p.alcance,
-        cantidadMin: p.cantidadMin || 0,
-        codigo: p.codigoPromocion,
-        descripcion: p.descripcion,
-        descuento: p.descuento,
-        prenda: p.prenda,
-        tipoDescuento: p.tipoDescuento,
-        tipoPromocion: p.tipoPromocion,
-      };
-      const idServicios = infoCupon.prenda;
-
-      let servicios = [];
-
-      // Crear un arreglo con la información de los servicios asociados a cada identificador
+    // Crear un arreglo con la información de los servicios asociados
+    if (promociones.alcance === "Todos") {
+      // Si el alcance es "Todos", se agregan todos los servicios
+      iServicios.forEach((infoService) => {
+        servicios.push({
+          identificador: infoService._id,
+          servicio: infoService.nombre,
+          simbolo: infoService.simboloMedida,
+        });
+      });
+    } else {
+      // Si el alcance no es "Todos", se agregan solo los servicios que coinciden con los IDs
       idServicios.forEach((serviceID) => {
         const infoService = iServicios.find((i) => i._id === serviceID);
         if (infoService) {
-          // Verificar si se encontró la información del servicio
           servicios.push({
             identificador: infoService._id,
             servicio: infoService.nombre,
@@ -244,67 +228,63 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
           });
         }
       });
+    }
 
-      const identificadoresReferencia = servicios.map(
-        (item) => item.identificador
-      );
+    const identificadoresReferencia = servicios.map(
+      (item) => item.identificador
+    );
 
-      // Filtrar los elementos de la lista base que coinciden con los identificadores de la lista de referencia
-      const itemsValidos = listItems.filter((item) =>
-        identificadoresReferencia.includes(item.identificador)
-      );
+    // Filtrar los elementos de la lista base que coinciden con los identificadores de la lista de referencia
+    const itemsValidos = listItems.filter((item) =>
+      identificadoresReferencia.includes(item.identificador)
+    );
 
-      const cantMin = infoCupon.cantidadMin;
+    const cantMin = promociones.cantidadMin;
 
-      const handleGetCaActual = (atributo) =>
-        itemsValidos.reduce((total, item) => total + +item[atributo], 0);
+    const handleGetCaActual = (atributo) =>
+      itemsValidos.reduce((total, item) => total + +item[atributo], 0);
 
-      let infoFaltante = "";
-      let cantActual = 0;
-      if (infoCupon.tipoPromocion === "Varios") {
-        // Varios
-        if (infoCupon.tipoDescuento === "Porcentaje") {
-          // Pocentaje
-          cantActual = handleGetCaActual("cantidad");
-        } else {
-          // Monto
-          cantActual = handleGetCaActual("total");
-        }
-      } else {
-        // Unico
+    let infoFaltante = "";
+    let cantActual = 0;
+    if (promociones.tipoPromocion === "Varios") {
+      // Varios
+      if (promociones.tipoDescuento === "Porcentaje") {
+        // Pocentaje
         cantActual = handleGetCaActual("cantidad");
+      } else {
+        // Monto
+        cantActual = handleGetCaActual("total");
       }
+    } else {
+      // Unico
+      cantActual = handleGetCaActual("cantidad");
+    }
 
-      const res = cantActual >= cantMin;
+    const res = cantActual >= cantMin;
 
-      if (infoCupon.tipoPromocion === "Unico") {
-        if (!res) {
-          infoFaltante = `${`Minimo ${cantMin}${
-            servicios[0].simbolo
-          } del servicio "${servicios[0].servicio}" y ${
+    if (promociones.tipoPromocion === "Unico") {
+      if (!res) {
+        infoFaltante = `${`Minimo ${cantMin}${
+          servicios[0].simbolo
+        } del servicio "${servicios[0].servicio}" y ${
+          cantActual === 0
+            ? "no registraste ninguno"
+            : `solo registraste : ${cantActual}${servicios[0].simbolo}`
+        }`}`;
+      }
+    } else {
+      if (!res) {
+        if (promociones.tipoDescuento === "Monto") {
+          infoFaltante = `${`Minimo ${simboloMoneda}${cantMin} en gastos de servicio y ${
             cantActual === 0
               ? "no registraste ninguno"
-              : `solo registraste : ${cantActual}${servicios[0].simbolo}`
+              : `solo registro : ${simboloMoneda}${cantActual}`
           }`}`;
         }
-      } else {
-        if (!res) {
-          if (infoCupon.tipoDescuento === "Monto") {
-            infoFaltante = `${`Minimo ${simboloMoneda}${cantMin} en gastos de servicio y ${
-              cantActual === 0
-                ? "no registraste ninguno"
-                : `solo registro : ${simboloMoneda}${cantActual}`
-            }`}`;
-          }
-        }
-      }
-
-      if (infoFaltante) {
-        ListCorrecciones.push(infoFaltante);
       }
     }
 
-    return ListCorrecciones;
+    return infoFaltante;
   };
 
   const openModal = async (cups) => {
@@ -336,8 +316,8 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
     });
   };
 
-  const handleGetInfo = async (info) => {
-    const infoIntem = info.Items.map((p) => ({
+  const handleGetInfo = async (data) => {
+    const infoIntem = data.Items.map((p) => ({
       identificador: p.identificador,
       tipo: p.tipo,
       cantidad: p.cantidad,
@@ -345,8 +325,54 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
       simboloMedida: p.simboloMedida,
       descripcion: p.descripcion,
       precio: p.price,
+      monto: p.monto,
+      descuentoManual: p.descuentoManual,
       total: p.total,
     }));
+
+    let descuentoUpdated;
+    if (!data.descuento.info || !data.descuento.estado) {
+      descuentoUpdated = {
+        estado: false,
+        modoDescuento: "Ninguno",
+        info: null,
+        monto: 0,
+      };
+    } else {
+      if (data.descuento.modoDescuento === "Manual") {
+        if (!data.descuento.info.some((item) => item.descuentoMonto > 0)) {
+          descuentoUpdated = {
+            estado: false,
+            modoDescuento: "Ninguno",
+            info: null,
+            monto: 0,
+          };
+        } else {
+          const newInfo = data.descuento.info.filter(
+            (item) => item.descuentoMonto > 0
+          );
+          descuentoUpdated = {
+            ...data.descuento,
+            info: newInfo,
+          };
+        }
+      } else {
+        descuentoUpdated = data.descuento;
+      }
+    }
+
+    let cargosExtrasUpdated;
+    if (!data.cargosExtras.impuesto.estado) {
+      cargosExtrasUpdated = {
+        impuesto: {
+          estado: false,
+          valor: iImpuesto.IGV,
+          importe: 0,
+        },
+      };
+    } else {
+      cargosExtrasUpdated = data.cargosExtras;
+    }
 
     const infoPago = currentPago
       ? {
@@ -360,44 +386,36 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
         }
       : null;
 
-    let finalUpdatePromo = JSON.parse(JSON.stringify(info.cargosExtras));
-    if (info.modoDescuento === "Promocion" && mode !== "UPDATE") {
-      finalUpdatePromo.beneficios.promociones = listCupones;
-      finalUpdatePromo.beneficios.puntos = 0;
-      finalUpdatePromo.descuentos.puntos = 0;
-    } else if (info.modoDescuento === "Puntos" && mode !== "UPDATE") {
-      finalUpdatePromo.beneficios.promociones = [];
-      finalUpdatePromo.descuentos.promocion = 0;
-    }
-
     const infoOrden = {
       dateRecepcion: {
-        fecha: formatFecha(info.dateRecojo),
-        hora: formatHora(info.dateRecojo),
+        fecha: formatFecha(data.dateIngreso),
+        hora: formatHora(data.dateIngreso),
       },
-      Modalidad: info.Modalidad,
-      Nombre: info.name,
+      Modalidad: data.Modalidad,
+      Nombre: data.name,
       idCliente: infoCliente ? infoCliente._id : "",
       Items: infoIntem,
-      celular: info.celular,
-      direccion: info.direccion,
+      celular: data.celular,
+      direccion: data.direccion,
       datePrevista: {
-        fecha: formatFecha(info.datePrevista),
-        hora: info.dayhour,
+        fecha: formatFecha(data.datePrevista),
+        hora: data.hourPrevista,
+      },
+      dateRecojo: {
+        fecha: "",
+        hora: "",
       },
       dateEntrega: {
         fecha: "",
         hora: "",
       },
-      descuento: info.descuento,
-      dni: info.dni,
-      factura: info.factura,
-      subTotal: info.subTotal,
-      cargosExtras: finalUpdatePromo,
-      totalNeto: info.totalNeto,
+      descuento: descuentoUpdated,
+      dni: data.dni,
+      subTotal: data.subTotal,
+      cargosExtras: cargosExtrasUpdated,
+      totalNeto: data.totalNeto,
       modeRegistro: "nuevo",
-      modoDescuento: info.modoDescuento,
-      gift_promo: info.gift_promo,
+      gift_promo: data.gift_promo,
       attendedBy: {
         name: iUsuario.name,
         rol: iUsuario.rol,
@@ -428,145 +446,131 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
     }, 0);
   };
 
-  const recalculatePromoDescuento = () => {
-    let updateCupon = listCupones;
+  const MontoxPoints = (xpoints) => {
+    const puntos = parseFloat(iPuntos.score);
+    const valor = parseFloat(iPuntos.valor);
+    const equivalenteEnSoles = (xpoints / puntos) * valor;
 
-    const cupTypeDsc = listCupones.filter(
-      (cupon) => cupon.tipoDescuento === "Porcentaje"
-    );
+    return equivalenteEnSoles;
+  };
 
-    // Agrupacion de cupones segun codigo
-    const groupCupon = [
-      ...new Set(cupTypeDsc.map((item) => item.codigoPromocion)),
-    ].map((codigoPromocion) =>
-      cupTypeDsc.filter((item) => item.codigoPromocion === codigoPromocion)
-    );
-
-    // Iterar a través de grupos de cupones
-    if (groupCupon.length > 0) {
-      for (const grupo of groupCupon) {
-        for (const dsc of grupo) {
-          let itemsConsideradas;
-          if (dsc.tipoPromocion === "Varios") {
-            if (dsc.alcance === "Todos") {
-              itemsConsideradas = formik.values.Items;
-            } else {
-              itemsConsideradas = formik.values.Items.filter((elemento) =>
-                dsc.prenda.includes(elemento.identificador)
-              );
-            }
-
-            let sumaTotales = sumaTotalesItems(itemsConsideradas);
-
-            const dscFinal = +parseFloat(
-              sumaTotales * dsc.nMultiplicador
-            ).toFixed(1);
-            updateCupon = updateCupon.map((c) => {
-              if (c.codigoCupon === dsc.codigoCupon) {
-                return { ...c, descuento: dscFinal };
-              }
-              return c;
-            });
-            sumaTotales -= dscFinal;
-          } else {
-            const prenda = grupo[0].prenda[0];
-            itemsConsideradas = formik.values.Items.filter(
-              (i) => i.identificador === prenda
-            );
-            if (itemsConsideradas.length > 0) {
-              let sumaTotales = sumaTotalesItems(itemsConsideradas);
-
-              // Calcular descuentos y actualizar sumaTotales
-
-              const dscFinal = +parseFloat(
-                sumaTotales * dsc.nMultiplicador
-              ).toFixed(1);
-              // Actualizar el descuento en cada registro según su código de cupón
-              updateCupon = updateCupon.map((c) => {
-                if (c.codigoCupon === dsc.codigoCupon) {
-                  return { ...c, descuento: dscFinal };
-                }
-                return c;
-              });
-              sumaTotales -= dscFinal;
-            } else {
-              updateCupon = updateCupon.map((c) => {
-                if (c.codigoCupon === dsc.codigoCupon) {
-                  return { ...c, descuento: 0 };
-                }
-                return c;
-              });
-            }
-          }
-
-          formik.setFieldValue(
-            "cargosExtras.beneficios.promociones",
-            updateCupon
+  const recalculatePromoDescuento = (dataPromo) => {
+    if (dataPromo.tipoDescuento === "Porcentaje") {
+      let itemsConsideradas;
+      if (dataPromo.tipoPromocion === "Varios") {
+        if (dataPromo.alcance === "Todos") {
+          itemsConsideradas = formik.values.Items;
+        } else {
+          itemsConsideradas = formik.values.Items.filter((elemento) =>
+            dataPromo.prenda.includes(elemento.identificador)
           );
-          setListCupones(updateCupon);
         }
+
+        let sumaTotales = sumaTotalesItems(itemsConsideradas);
+
+        const dscFinal = +parseFloat(
+          sumaTotales * dataPromo.nMultiplicador
+        ).toFixed(1);
+
+        return dscFinal;
+      } else {
+        // TIPO PROMOCION = UNICO
+
+        // obtener el id de la prenda x q puede haber mas de 1 del mismo id
+        itemsConsideradas = formik.values.Items.filter(
+          (i) => i.identificador === dataPromo.prenda[0]
+        );
+
+        // suma los montos del mismo item
+        if (itemsConsideradas.length > 0) {
+          let sumaTotales = sumaTotalesItems(itemsConsideradas);
+
+          // Calcular descuentos y actualizar sumaTotales
+
+          const dscFinal = +parseFloat(
+            sumaTotales * dataPromo.nMultiplicador
+          ).toFixed(1);
+
+          return dscFinal;
+        }
+        return 0;
+      }
+    } else {
+      if (dataPromo.tipoDescuento === "Gratis") {
+        const prendaEncontrada = iServicios.find(
+          (p) => p._id === dataPromo.prenda[0]
+        );
+        const dscFinal =
+          prendaEncontrada.precioVenta * dataPromo.nMultiplicador;
+        return dscFinal;
+      } else {
+        // TIPO DESCUENTO = Monto
+        return dataPromo.nMultiplicador;
       }
     }
-
-    const LCupones = updateCupon.length > 0 ? updateCupon : listCupones;
-
-    const sumaTotales = LCupones.reduce((total, cupon) => {
-      const descuentoTotal = parseFloat(cupon.descuento);
-      return isNaN(descuentoTotal) ? total : total + descuentoTotal;
-    }, 0);
-
-    formik.setFieldValue("cargosExtras.descuentos.promocion", sumaTotales);
-    formik.setFieldValue("descuento", sumaTotales);
   };
 
   useEffect(() => {
-    recalculatePromoDescuento();
-  }, [formik.values.Items, listCupones.length, formik.values.modoDescuento]);
-
-  useEffect(() => {
-    if (onDescuento === true) {
-      if (formik.values.modoDescuento === "Promocion" && mode !== "UPDATE") {
-        if (listCupones.length > 0) {
+    if (formik.values.descuento.estado && mode !== "UPDATE") {
+      if (formik.values.descuento.modoDescuento === "Promocion") {
+        setSidePanelVisible(true);
+      } else if (formik.values.descuento.modoDescuento === "Puntos") {
+        if (infoCliente && formik.values.descuento.info) {
           setSidePanelVisible(true);
         } else {
           setSidePanelVisible(false);
         }
-      }
-      if (formik.values.modoDescuento === "Puntos" && mode !== "UPDATE") {
-        if (infoCliente) {
-          setSidePanelVisible(true);
-        } else {
-          setSidePanelVisible(false);
-        }
+      } else {
+        setSidePanelVisible(false);
       }
     } else {
       setSidePanelVisible(false);
     }
-  }, [onDescuento, formik.values.modoDescuento, listCupones.length]);
+  }, [formik.values.descuento.estado, formik.values.descuento.modoDescuento]);
 
   useEffect(() => {
     const subTotal = formik.values.subTotal;
 
     let montoIGV = 0;
-    if (formik.values.factura === true) {
-      montoIGV = +(subTotal * formik.values.cargosExtras.igv.valor).toFixed(2);
+    if (formik.values.cargosExtras.impuesto.estado === true) {
+      montoIGV = +(
+        subTotal * formik.values.cargosExtras.impuesto.valor
+      ).toFixed(2);
     }
-    formik.setFieldValue("cargosExtras.igv.importe", montoIGV);
+    formik.setFieldValue("cargosExtras.impuesto.importe", montoIGV);
     const total = subTotal + montoIGV;
-    const descuento =
-      formik.values.modoDescuento === "Puntos"
-        ? formik.values.cargosExtras.descuentos.puntos
-        : formik.values.cargosExtras.descuentos.promocion;
-    formik.setFieldValue("descuento", descuento);
+
+    let descuento = 0;
+    // Calcular Descuento
+    if (formik.values.descuento.estado) {
+      if (formik.values.descuento.modoDescuento === "Promocion") {
+        if (formik.values.descuento.info) {
+          descuento = recalculatePromoDescuento(formik.values.descuento.info);
+        } else {
+          descuento = 0;
+        }
+      } else if (formik.values.descuento.modoDescuento === "Puntos") {
+        const puntosUsados = formik.values.descuento.info?.puntosUsados;
+
+        descuento = Number(MontoxPoints(puntosUsados).toFixed(2)) || 0;
+      } else if (formik.values.descuento.modoDescuento === "Manual") {
+        descuento = 0;
+      } else {
+        // Ninguno
+        descuento = 0;
+      }
+    }
+    formik.setFieldValue("descuento.monto", descuento);
+
     const totalNeto = total - descuento;
     formik.setFieldValue("totalNeto", +formatRoundedNumber(totalNeto));
   }, [
-    formik.values.cargosExtras.igv,
     formik.values.Items,
-    formik.values.modoDescuento,
-    formik.values.cargosExtras.descuentos,
-    formik.values.cargosExtras.descuento,
-    formik.values.factura,
+    formik.values.descuento.estado,
+    formik.values.descuento.modoDescuento,
+    formik.values.descuento.info,
+    formik.values.cargosExtras.impuesto.estado,
+    formik.values.cargosExtras.impuesto.valor,
     formik.values.subTotal,
   ]);
 
@@ -582,42 +586,51 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
       handleChageValue("direccion", infoDefault.direccion);
       handleChageValue("celular", infoDefault.celular);
       handleChageValue(
-        "dateRecojo",
+        "dateIngreso",
         moment(infoDefault.dateRecepcion.fecha, "YYYY-MM-DD").toDate()
       );
       handleChageValue(
         "datePrevista",
         moment(infoDefault.datePrevista.fecha, "YYYY-MM-DD").toDate()
       );
-      handleChageValue("dayhour", infoDefault.datePrevista.hora);
-      handleChageValue("Items", getItemsAdaptados(infoDefault.Items));
-      handleChageValue("factura", infoDefault.factura);
+      handleChageValue(
+        "dateRecojo",
+        moment(infoDefault.dateRecojo?.fecha, "YYYY-MM-DD").toDate()
+      );
+      handleChageValue("hourPrevista", infoDefault.datePrevista.hora);
+      handleChageValue("hourRecojo", infoDefault.dateRecojo?.hora);
       handleChageValue("subTotal", infoDefault.subTotal);
+      handleChageValue("cargosExtras", infoDefault.cargosExtras);
       handleChageValue("totalNeto", infoDefault.totalNeto);
       handleChageValue("gift_promo", infoDefault.gift_promo);
-      handleChageValue("modoDescuento", infoDefault.modoDescuento);
       handleChageValue("descuento", infoDefault.descuento);
-      handleChageValue("cargosExtras", infoDefault.cargosExtras);
 
       setInfoPagos(infoDefault.ListPago);
       const dCliente = listClientes.find(
         (cli) => cli._id === infoDefault.idCliente
       );
 
-      if (infoDefault.descuento > 0) {
-        setOnDescuento(true);
-      }
-      if (infoDefault.modoDescuento === "Promocion") {
-        setListCupones(infoDefault.cargosExtras.beneficios.promociones);
+      if (infoDefault.descuento.estado && infoDefault.descuento.info) {
+        if (infoDefault.descuento.modoDescuento === "Promocion") {
+          setInfoCliente(dCliente);
+          setSidePanelVisible(true);
+        } else if (infoDefault.descuento.modoDescuento === "Puntos") {
+          setInfoCliente({
+            ...dCliente,
+            scoreTotal:
+              dCliente.scoreTotal + infoDefault.descuento.info.puntosUsados,
+          });
+          setSidePanelVisible(true);
+        } else {
+          setInfoCliente(dCliente);
+        }
+      } else {
         setInfoCliente(dCliente);
       }
-      if (infoDefault.modoDescuento === "Puntos") {
-        setInfoCliente({
-          ...dCliente,
-          scoreTotal:
-            dCliente.scoreTotal + infoDefault.cargosExtras.beneficios.puntos,
-        });
-      }
+
+      setTimeout(() => {
+        handleChageValue("Items", getItemsAdaptados(infoDefault.Items));
+      }, 1000);
     }
   }, [infoDefault]);
 
@@ -634,7 +647,6 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
               {titleMode}&nbsp;-&nbsp;ORDEN SERVICIO N°&nbsp;
               {infoDefault ? `${infoDefault.codRecibo} ` : iCodigo}
             </h1>
-            <span></span>
           </div>
           <Button className="btn-saved" type="submit">
             {titleMode}
@@ -657,16 +669,20 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
                       identificador: iDelivery._id,
                       tipo: "servicio",
                       cantidad: 1,
-                      item: "Delivery",
-                      simboloMedida: "vj",
+                      item: iDelivery.nombre,
+                      simboloMedida: iDelivery.simboloMedida,
                       descripcion: "Movilidad",
                       price: iDelivery.precioVenta,
+                      monto: iDelivery.precioVenta,
+                      descuentoManual: 0,
                       total: iDelivery.precioVenta,
                       disable: {
                         cantidad: true,
                         item: true,
                         descripcion: false,
-                        total: false,
+                        monto: false,
+                        total: true,
+                        descuentoManual: false,
                         action: true,
                       },
                     },
@@ -706,7 +722,6 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
             iDelivery={iDelivery}
             iPuntos={iPuntos}
             iServicios={iServicios}
-            onDescuento={onDescuento}
             // ------------------------------------- //
             mode={mode}
             changeValue={handleChageValue}
@@ -719,6 +734,13 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
           />
         </div>
         <div className="other-info">
+          {/* <InfoRecojo
+            mode={mode}
+            changeValue={handleChageValue}
+            values={formik.values}
+            paso="3"
+            descripcion="Fecha de Recojo"
+          /> */}
           <InfoEntrega
             mode={mode}
             changeValue={handleChageValue}
@@ -731,26 +753,20 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
               mode={mode}
               changeValue={handleChageValue}
               values={formik.values}
-              paso={showFactura ? "4" : "5"}
+              paso="4"
               descripcion="Agregar Factura"
             />
           ) : null}
+
           {mode !== "UPDATE" ? (
             <>
               <InfoDescuento
-                setListCupones={(value) => {
-                  setListCupones(value);
-                }}
                 iCliente={infoCliente}
-                listCupones={listCupones}
-                onDescuento={onDescuento}
-                setOnDescuento={setOnDescuento}
-                validCupon={validCupon}
                 // ------------------------------------- //
                 changeValue={handleChageValue}
                 values={formik.values}
                 // ------------------------------------- //
-                paso="4"
+                paso={showFactura ? "5" : "4"}
                 descripcion="¿Deseas Agregar Descuento?"
               />
               <InfoPago
@@ -759,7 +775,7 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
                 // ------------------------------------- //
                 values={formik.values}
                 // ------------------------------------- //
-                paso="5"
+                paso={showFactura ? "6" : "5"}
                 descripcion="Agregar Pago"
               />
             </>
@@ -774,40 +790,45 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
           )}
         </div>
       </div>
-      {((formik.values.modoDescuento === "Promocion" &&
-        listCupones.length > 0) ||
-        (formik.values.modoDescuento === "Puntos" && infoCliente)) &&
-      mode !== "UPDATE" ? (
-        <div
-          className={`side-info-extra ${
-            sidePanelVisible ? "show-panel" : "hide-panel"
-          }`}
-        >
-          <div className="content-body">
-            {formik.values.modoDescuento === "Puntos" && infoCliente ? (
-              <InfoPuntos iCliente={infoCliente} />
-            ) : null}
-            {formik.values.modoDescuento === "Promocion" &&
-            listCupones.length > 0 ? (
-              <InfoPromociones
-                listCupones={listCupones}
-                changeValue={handleChageValue}
-                setListCupones={(value) => {
-                  setListCupones(value);
-                }}
-              />
-            ) : null}
-          </div>
+      {
+        // (
+        (formik.values.descuento.modoDescuento === "Promocion" ||
+          // && formik.values.descuento.info)
+          (formik.values.descuento.modoDescuento === "Puntos" &&
+            infoCliente)) &&
+        mode !== "UPDATE" ? (
+          <div
+            className={`side-info-extra ${
+              sidePanelVisible ? "show-panel" : "hide-panel"
+            }`}
+          >
+            <div className="content-body">
+              {formik.values.descuento.modoDescuento === "Puntos" &&
+              infoCliente ? (
+                <InfoPuntos iCliente={infoCliente} />
+              ) : null}
+              {formik.values.descuento.modoDescuento === "Promocion" ? (
+                //  && formik.values.descuento.info
+                <InfoPromociones
+                  validCupon={validCupon}
+                  recalculatePromoDescuento={recalculatePromoDescuento}
+                  // ----------------------- //
+                  values={formik.values}
+                  changeValue={handleChageValue}
+                />
+              ) : null}
+            </div>
 
-          <Button onClick={toggleSidePanel} className="btn-toggleside">
-            {sidePanelVisible ? (
-              <i className="fa-solid fa-angle-left" />
-            ) : (
-              <i className="fa-solid fa-angle-right" />
-            )}
-          </Button>
-        </div>
-      ) : null}
+            <Button onClick={toggleSidePanel} className="btn-toggleside">
+              {sidePanelVisible ? (
+                <i className="fa-solid fa-angle-left" />
+              ) : (
+                <i className="fa-solid fa-angle-right" />
+              )}
+            </Button>
+          </div>
+        ) : null
+      }
       <Modal
         opened={mPromocion}
         onClose={() => {

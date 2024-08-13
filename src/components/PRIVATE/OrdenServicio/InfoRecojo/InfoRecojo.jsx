@@ -1,35 +1,35 @@
 /* eslint-disable react/prop-types */
 /* eslint-disable no-unused-vars */
 import React from "react";
-import "./infoEntrega.scss";
+import "./infoRecojo.scss";
 import { DateInput } from "@mantine/dates";
 import TimePicker from "react-time-picker";
 import moment from "moment";
 
-const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
+const InfoRecojo = ({ mode, paso, descripcion, changeValue, values }) => {
   const handleGetDay = (date) => {
     const formattedDayOfWeek = moment(date).format("dddd");
     return `${formattedDayOfWeek} : `;
   };
 
   return (
-    <div className="info-entrega">
+    <div className="info-recojo">
       <div className="title">
         <h1>PASO {paso}</h1>
         <h2>{descripcion}</h2>
       </div>
       <div className="body">
         <div className="content-date">
-          <label htmlFor="">Entrega:</label>
+          <label htmlFor="">Recojo:</label>
           <div className="date-ma">
             <DateInput
-              name="datePrevista"
-              value={values.datePrevista}
+              name="dateRecojo"
+              value={values.dateRecojo}
               onChange={(date) => {
-                changeValue("datePrevista", date);
+                changeValue("dateRecojo", date);
               }}
               placeholder="Ingrese Fecha"
-              minDate={values.dateRecojo}
+              minDate={new Date()}
               disabled={mode === "UPDATE"}
             />
             <div className="actions-date">
@@ -37,14 +37,15 @@ const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
                 type="button"
                 className="btn-preview"
                 onClick={() => {
-                  const currentDate = values.dateRecojo;
+                  const currentDate = new Date();
                   const newDate = new Date(
                     Math.max(
-                      values.datePrevista.getTime() - 24 * 60 * 60 * 1000,
+                      values.dateRecojo.getTime() - 24 * 60 * 60 * 1000,
                       currentDate.getTime()
                     )
                   );
                   changeValue("datePrevista", newDate);
+                  changeValue("dateRecojo", newDate);
                 }}
                 disabled={mode === "UPDATE"}
               >
@@ -54,14 +55,13 @@ const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
                 type="button"
                 className="btn-next"
                 tabIndex="6"
-                onClick={() =>
-                  changeValue(
-                    "datePrevista",
-                    new Date(
-                      values.datePrevista.getTime() + 24 * 60 * 60 * 1000
-                    )
-                  )
-                }
+                onClick={() => {
+                  const newDate = new Date(
+                    values.dateRecojo.getTime() + 24 * 60 * 60 * 1000
+                  );
+                  changeValue("datePrevista", newDate);
+                  changeValue("dateRecojo", newDate);
+                }}
                 disabled={mode === "UPDATE"}
               >
                 {">"}
@@ -73,16 +73,16 @@ const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
           <label htmlFor=""></label>
           <div className="date-dh">
             <TimePicker
-              name="hourPrevista"
+              name="hourRecojo"
               className="hour-date"
               onChange={(newTime) => {
                 const timeMoment = moment(newTime, "HH:mm");
                 const timeString = timeMoment.format("HH:mm");
-                changeValue("hourPrevista", timeString);
+                changeValue("hourRecojo", timeString);
               }}
               value={
-                moment(values.hourPrevista, "HH:mm").isValid()
-                  ? moment(values.hourPrevista, "HH:mm").toDate()
+                moment(values.hourRecojo, "HH:mm").isValid()
+                  ? moment(values.hourRecojo, "HH:mm").toDate()
                   : null
               }
               disabled={mode === "UPDATE"}
@@ -90,10 +90,11 @@ const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
               clockIcon={null} // Esto oculta el icono del reloj, si lo deseas
               clearIcon={null} // Esto oculta el icono de limpieza, si lo deseas
               disableClock={true}
+              required
               format="h:mm a"
             />
             <label className="day-date">
-              {handleGetDay(values.datePrevista)}
+              {handleGetDay(values.dateRecojo)}
             </label>
           </div>
         </div>
@@ -102,4 +103,4 @@ const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
   );
 };
 
-export default InfoEntrega;
+export default InfoRecojo;

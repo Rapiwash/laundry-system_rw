@@ -8,7 +8,6 @@ import { NumberInput, TextInput } from "@mantine/core";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
 
-// import Factura from "../../../../../Data/ReusableComponent/Factura/Factura";
 import OrdenServicio from "../../../../../components/PRIVATE/OrdenServicio/OrdenServicio";
 import LoaderSpiner from "../../../../../components/LoaderSpinner/LoaderSpiner";
 import { DateCurrent } from "../../../../../utils/functions";
@@ -138,8 +137,6 @@ const Replace = () => {
       celular,
       Items,
       descuento,
-      modoDescuento,
-      factura,
       cargosExtras,
       subTotal,
       totalNeto,
@@ -163,8 +160,6 @@ const Replace = () => {
       },
       Items,
       descuento,
-      modoDescuento,
-      factura,
       subTotal,
       cargosExtras,
       totalNeto,

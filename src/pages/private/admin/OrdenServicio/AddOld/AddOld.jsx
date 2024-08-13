@@ -127,20 +127,16 @@ const AddOld = () => {
       dateRecojo: "",
       datePrevista: "",
       items: [],
-      descuento: "",
-      factura: false,
+      descuento: {
+        estado: false,
+        modoDescuento: "Ninguno",
+        info: null,
+        monto: 0,
+      },
       subTotal: "",
       cargosExtras: {
-        beneficios: {
-          puntos: 0,
-          promociones: [],
-        },
-        descuentos: {
-          redondeo: 0,
-          puntos: 0,
-          promocion: 0,
-        },
-        igv: {
+        impuesto: {
+          estado: false,
           valor: impuesto,
           importe: 0,
         },
@@ -196,6 +192,9 @@ const AddOld = () => {
 
     const newRow = {
       cantidad: 1,
+      identificador: IService._id,
+      simboloMedida: IService.simboloMedida,
+      tipo: "servicio",
       item:
         IService.nombre === "Otros" && ICategory.name === "Unico"
           ? ""
@@ -203,14 +202,15 @@ const AddOld = () => {
       descripcion: "",
       expanded: false,
       price: IService.precioVenta,
+      monto: IService.precioVenta,
+      descuentoManual: 0,
       total: IService.precioVenta,
-      tipo: "servicio",
-      identificador: IService._id,
-      simboloMedida: IService.simboloMedida,
       disable: {
         cantidad: isDelivery ? true : false,
         item: isDelivery ? true : isOtros ? false : true,
         descripcion: isDelivery,
+        monto: false,
+        descuentoManual: false,
         total: false,
         action: isDelivery,
       },
@@ -250,8 +250,23 @@ const AddOld = () => {
       simboloMedida: p.simboloMedida,
       descripcion: p.descripcion,
       precio: p.price,
+      monto: p.monto,
+      descuentoManual: p.descuentoManual,
       total: p.total,
     }));
+
+    let cargosExtrasUpdated;
+    if (!info.cargosExtras.impuesto.estado) {
+      cargosExtrasUpdated = {
+        impuesto: {
+          estado: false,
+          valor: 0,
+          importe: 0,
+        },
+      };
+    } else {
+      cargosExtrasUpdated = info.cargosExtras;
+    }
 
     const infoPago = currentPago
       ? {
@@ -285,15 +300,13 @@ const AddOld = () => {
         fecha: "",
         hora: "",
       },
-      descuento: info.descuento,
       estado: "registrado",
+      descuento: info.descuento,
       dni: info.dni,
-      factura: info.factura,
       subTotal: info.subTotal,
-      cargosExtras: info.cargosExtras,
+      cargosExtras: cargosExtrasUpdated,
       totalNeto: info.totalNeto,
       modeRegistro: "antiguo",
-      modoDescuento: "Promocion",
       gift_promo: [],
       attendedBy: {
         name: InfoUsuario.name,
@@ -317,18 +330,6 @@ const AddOld = () => {
     );
 
     navigate(`/${PrivateRoutes.PRIVATE}/${PrivateRoutes.LIST_ORDER_SERVICE}`);
-  };
-
-  const handleGetClientes = async (dni) => {
-    try {
-      const response = await axios.get(
-        `${import.meta.env.VITE_BACKEND_URL}/api/lava-ya/get-clientes/${dni}`
-      );
-      const data = response.data;
-      setInfoClientes(data);
-    } catch (error) {
-      console.error("Error al obtener los datos:", error.message);
-    }
   };
 
   const validIco = (mensaje) => {
@@ -360,7 +361,7 @@ const AddOld = () => {
   useEffect(() => {
     setVScore(InfoPuntos);
 
-    formik.setFieldValue("cargosExtras.igv.valor", InfoImpuesto.IGV);
+    formik.setFieldValue("cargosExtras.impuesto.valor", InfoImpuesto.IGV);
     setImpuesto(InfoImpuesto.IGV);
   }, [InfoPuntos, InfoImpuesto]);
 
@@ -373,20 +374,18 @@ const AddOld = () => {
   useEffect(() => {
     const subTotal = formik.values.subTotal;
     let montoImpuesto = 0;
-    if (formik.values.factura === true) {
+    if (formik.values.cargosExtras.impuesto.estado === true) {
       montoImpuesto = +(subTotal * impuesto).toFixed(2);
     }
-    formik.setFieldValue("cargosExtras.igv.importe", montoImpuesto);
+    formik.setFieldValue("cargosExtras.impuesto.importe", montoImpuesto);
     const total = subTotal + montoImpuesto;
-    const descuento = formik.values.cargosExtras.descuentos.puntos;
-    formik.setFieldValue("descuento", descuento);
+    const descuento = 0;
     const totalNeto = total - descuento;
     formik.setFieldValue("totalNeto", +formatRoundedNumber(totalNeto));
   }, [
-    formik.values.cargosExtras.igv,
+    formik.values.cargosExtras.impuesto.estado,
+    formik.values.cargosExtras.impuesto.valor,
     formik.values.items,
-    formik.values.cargosExtras.descuentos,
-    formik.values.factura,
     formik.values.subTotal,
   ]);
 
@@ -598,7 +597,7 @@ const AddOld = () => {
                   colorBackground="#F9777F" // COLOR FONDO
                   onChange={(value) => {
                     // value = (TRUE O FALSE)
-                    formik.setFieldValue("factura", value);
+                    formik.setFieldValue("cargosExtras.impuesto.estado", value);
                   }}
                 />
               </div>
@@ -864,14 +863,14 @@ const AddOld = () => {
                   </tr>
                   <tr>
                     <td></td>
-                    {formik.values.factura ? (
+                    {formik.values.cargosExtras.impuesto.estado ? (
                       <>
                         <td>
                           {nameImpuesto} ({(impuesto * 100).toFixed(0)} %) :
                         </td>
                         <td>
                           {formatThousandsSeparator(
-                            formik.values.cargosExtras.igv.importe,
+                            formik.values.cargosExtras.impuesto.importe,
                             true
                           )}
                         </td>

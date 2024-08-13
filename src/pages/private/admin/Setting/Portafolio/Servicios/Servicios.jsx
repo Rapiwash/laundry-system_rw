@@ -7,7 +7,6 @@ import { Box, Button, Text } from "@mantine/core";
 import { modals } from "@mantine/modals";
 
 import "./servicios.scss";
-import { simboloMoneda } from "../../../../../../services/global";
 import Portal from "../../../../../../components/PRIVATE/Portal/Portal";
 import Maintenance from "./accion/Maintenance";
 import { getInfoCategoria } from "../utilsPortafolio";
@@ -108,12 +107,11 @@ const Servicios = () => {
               // Aquí manejamos el error de la eliminación
               const { mensaje, codigos } = error;
               if (codigos?.length > 0) {
-                Notify("NO SE PUDO ELIMINAR EL SERVICIO", "", "fail");
-
                 setTimeout(() => {
                   alert(`${mensaje}: ${codigos.join(", ")}`);
                 }, 1500);
               }
+              Notify("NO SE PUDO ELIMINAR EL SERVICIO", "", "fail");
             });
           handleCloseAction();
         }

@@ -24,7 +24,7 @@ import { RoleGuard } from "../Guard/index";
 import RoutesWithNotFound from "../NotFound/RoutesWithNotFound";
 import CuadreCaja from "../../pages/private/coord/CuadreCaja/CuadreCaja";
 import AddOld from "../../pages/private/admin/OrdenServicio/AddOld/AddOld";
-// import Graficos from '../../pages/private/admin/Graficos/Graficos';
+
 import Promociones from "../../pages/private/admin/Promociones/Promociones";
 
 import Reportes from "../../pages/private/admin/Reportes/Reportes";

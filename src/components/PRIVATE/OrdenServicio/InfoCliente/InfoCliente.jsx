@@ -83,10 +83,10 @@ const InfoCliente = ({
         <DateInput
           className="input-info"
           label="Fecha de Ingreso"
-          name="dateRecojo"
-          value={values.dateRecojo}
+          name="dateIngreso"
+          value={values.dateIngreso}
           onChange={(date) => {
-            changeValue("dateRecojo", date);
+            changeValue("dateIngreso", date);
           }}
           style={{ paddingBottom: "8px" }}
           readOnly

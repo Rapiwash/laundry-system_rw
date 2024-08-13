@@ -2,6 +2,8 @@
 export const timeZone = "America/Lima";
 // Default Hora Prevista
 export const defaultHoraPrevista = "17:00";
+// Default Hora Recojo
+export const defaultHoraRecojo = "11:00";
 // Roles validaos
 export const allowedRoles = [
   {
@@ -32,7 +34,7 @@ export const tipoMoneda = "PEN";
 export const confMoneda = "es-PE";
 export const simboloMoneda = "S/";
 export const nameMoneda = "Soles";
-export const ingresoDigital = ["YAPE"];
+export const ingresoDigital = ["Transferencia Movil"];
 
 export const politicaAbandono = {
   mResaltado: "El plazo máximo para retirar las prendas es de 20 días ",
