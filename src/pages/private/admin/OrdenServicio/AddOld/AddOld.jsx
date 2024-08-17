@@ -81,15 +81,7 @@ const AddOld = () => {
   );
   const InfoNegocio = useSelector((state) => state.negocio.infoNegocio);
 
-  const getInfoDelivery = () => {
-    const ICategory = InfoCategorias.find((cat) => cat.nivel === "primario");
-    const IService = InfoServicios.find(
-      (service) =>
-        service.idCategoria === ICategory._id && service.nombre === "Delivery"
-    );
-
-    return IService;
-  };
+  const iDelivery = useSelector((state) => state.servicios.serviceDelivery);
 
   const validationSchema = Yup.object().shape({
     codigo: Yup.string().required("Campo Numerico obligatorio (1 - 1000)"),
@@ -102,9 +94,7 @@ const AddOld = () => {
         "categoria",
         "Debe haber al menos un item - Delivery no cuenta",
         function (value) {
-          return value.some(
-            (item) => item.identificador !== getInfoDelivery()._id
-          );
+          return value.some((item) => item.identificador !== iDelivery._id);
         }
       )
       .of(
@@ -560,7 +550,7 @@ const AddOld = () => {
                     if (value === true) {
                       formik.setFieldValue("swModalidad", "Tienda");
                       const updatedItems = formik.values.items.filter(
-                        (item) => item.identificador !== getInfoDelivery()._id
+                        (item) => item.identificador !== iDelivery._id
                       );
                       formik.setFieldValue("items", updatedItems);
                     } else {
@@ -568,14 +558,16 @@ const AddOld = () => {
                       formik.setFieldValue("items", [
                         ...formik.values.items,
                         {
-                          identificador: getInfoDelivery()._id,
+                          identificador: iDelivery._id,
                           tipo: "servicio",
                           cantidad: 1,
-                          item: "Delivery",
-                          simboloMedida: "vj",
+                          item: iDelivery.nombre,
+                          simboloMedida: iDelivery.simboloMedida,
                           descripcion: "Transporte",
-                          price: getInfoDelivery().precioVenta,
-                          total: getInfoDelivery().precioVenta,
+                          price: iDelivery.precioVenta,
+                          monto: iDelivery.precioVenta,
+                          descuentoManual: 0,
+                          total: iDelivery.precioVenta,
                           disable: {
                             cantidad: true,
                             item: true,
@@ -837,7 +829,7 @@ const AddOld = () => {
                         onClick={() => {
                           if (
                             formik.values.items[index].identificador !==
-                            getInfoDelivery()._id
+                            iDelivery._id
                           ) {
                             const updatedItems = [...formik.values.items];
                             updatedItems.splice(index, 1);

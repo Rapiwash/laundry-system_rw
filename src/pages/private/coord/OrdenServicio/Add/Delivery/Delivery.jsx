@@ -96,7 +96,7 @@ const Delivery = () => {
           item: iDelivery.nombre,
           simboloMedida: iDelivery.simboloMedida,
           descripcion: "Transporte",
-          price: iDelivery.precioVenta,
+          precio: iDelivery.precioVenta,
           monto: iDelivery.precioVenta,
           descuentoManual: 0,
           total: iDelivery.precioVenta,
@@ -122,8 +122,8 @@ const Delivery = () => {
         hora: "",
       },
       descuento: {
-        estado: false,
-        modoDescuento: "Ninguno",
+        estado: true,
+        modoDescuento: "Manual", // Puntos | Promocion | Manual | Ninguno
         info: null,
         monto: 0,
       },
@@ -242,7 +242,7 @@ const Delivery = () => {
           item: iDelivery?.nombre,
           simboloMedida: iDelivery?.simboloMedida,
           descripcion: "Transporte",
-          price: iDelivery?.precioVenta,
+          precio: iDelivery?.precioVenta,
           monto: iDelivery?.precioVenta,
           descuentoManual: 0,
           total: iDelivery?.precioVenta,
@@ -258,8 +258,8 @@ const Delivery = () => {
         },
       ],
       descuento: {
-        estado: false,
-        modoDescuento: "Ninguno",
+        estado: true,
+        modoDescuento: "Manual", // Puntos | Promocion | Manual | Ninguno
         info: null,
         monto: 0,
       },

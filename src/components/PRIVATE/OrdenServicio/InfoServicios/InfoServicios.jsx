@@ -468,7 +468,11 @@ const InfoServicios = ({
                             );
                           }}
                           precision={2}
-                          min={+values.Items[index].monto}
+                          min={(function () {
+                            const price = values.Items[index].price;
+                            const monto = values.Items[index].cantidad * price;
+                            return monto;
+                          })()}
                           step={1}
                           hideControls
                           autoComplete="off"
@@ -541,7 +545,11 @@ const InfoServicios = ({
                           );
                         }}
                         precision={2}
-                        min={+values.Items[index].monto}
+                        min={(function () {
+                          const price = values.Items[index].price;
+                          const monto = values.Items[index].cantidad * price;
+                          return monto;
+                        })()}
                         step={1}
                         hideControls
                         autoComplete="off"

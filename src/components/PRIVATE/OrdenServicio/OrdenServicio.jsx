@@ -111,7 +111,7 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
           cantidad: isDelivery ? true : mode !== "UPDATE" ? false : true,
           item: true,
           descripcion: isDelivery,
-          monto: true,
+          monto: mode !== "UPDATE" ? false : true,
           descuentoManual: mode === "UPDATE",
           total: true,
           action: isDelivery ? true : mode !== "UPDATE" ? false : true,

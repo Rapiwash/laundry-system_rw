@@ -16,7 +16,6 @@ import { ReactComponent as Logo } from "../../../../../../../utils/img/Logo/logo
 import moment from "moment";
 import axios from "axios";
 import {
-  // nameImpuesto,
   politicaAbandono,
   showPuntosOnTicket,
   simboloMoneda,
