@@ -16,7 +16,7 @@ import { ReactComponent as Logo } from "../../../../../../../utils/img/Logo/logo
 import moment from "moment";
 import axios from "axios";
 import {
-  nameImpuesto,
+  // nameImpuesto,
   politicaAbandono,
   showPuntosOnTicket,
   simboloMoneda,
@@ -405,7 +405,7 @@ const Ticket = React.forwardRef((props, ref) => {
                           <td>{formatThousandsSeparator(montoDelivery())}</td>
                         </tr>
                       ) : null}
-                      {infoOrden?.cargosExtras.impuesto.estado ? (
+                      {/* {infoOrden?.cargosExtras.impuesto.estado ? (
                         <tr>
                           <td>
                             {nameImpuesto} (
@@ -417,7 +417,7 @@ const Ticket = React.forwardRef((props, ref) => {
                             )}
                           </td>
                         </tr>
-                      ) : null}
+                      ) : null} */}
                       <tr>
                         <td>Descuento :</td>
                         <td>
