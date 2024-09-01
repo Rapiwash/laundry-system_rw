@@ -590,7 +590,7 @@ const Ticket = React.forwardRef((props, ref) => {
                     </h2>
                   ) : null}
                   <h2 className="cangeo-factura">
-                    Canjear Orden de Servicio por Boleta o Factura
+                    Canjear Orden de Servicio por Boleta
                   </h2>
                 </div>
                 <p className="aviso">
