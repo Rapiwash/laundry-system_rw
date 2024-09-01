@@ -56,6 +56,11 @@ const InfoDescuento = ({
   };
 
   const handleCancelarDescuento = () => {
+    values.Items.forEach((row, index) => {
+      changeValue(`Items.${index}.descuentoManual`, 0);
+      changeValue(`Items.${index}.total`, row.monto);
+    });
+
     changeValue("descuento", {
       ...defaultDescuento,
       estado: false,
