@@ -52,9 +52,12 @@ const EndProcess = ({ IdCliente, onClose }) => {
     infoCliente?.totalNeto
   );
 
-  const handleCancelarEntregar = () => {
-    dispatch(CancelEntrega_OrdenService(infoCliente._id));
-    onClose(false);
+  const handleCancelarEntregar = async () => {
+    let confirmationEnabled = true;
+    if (confirmationEnabled) {
+      dispatch(CancelEntrega_OrdenService(infoCliente._id));
+      onClose(false);
+    }
   };
 
   const handleAnular = async (infoAnulacion) => {
@@ -71,7 +74,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
     onClose(false);
   };
 
-  const openModalPagar = (values) => {
+  const openModalPagar = (values, actions) => {
     let confirmationEnabled = true;
     modals.openConfirmModal({
       title: "Confirmar Pago",
@@ -85,7 +88,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
       onConfirm: () => {
         if (confirmationEnabled) {
           confirmationEnabled = false;
-          handleEditPago(values);
+          handleEditPago(values, actions);
         }
       },
     });
@@ -112,7 +115,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
   };
 
   // Pago
-  const handleEditPago = (values) => {
+  const handleEditPago = (values, actions) => {
     const newPago = {
       ...values,
       idOrden: IdCliente,
@@ -138,7 +141,9 @@ const EndProcess = ({ IdCliente, onClose }) => {
       },
     };
 
+    actions.resetForm();
     dispatch(AddPago({ newPago, extraInfo }));
+    onClose(false);
   };
 
   // Entregado
@@ -171,7 +176,6 @@ const EndProcess = ({ IdCliente, onClose }) => {
         infoGastoByDelivery,
       })
     );
-
     onClose(false);
   };
 
@@ -290,12 +294,10 @@ const EndProcess = ({ IdCliente, onClose }) => {
             validationSchema={validationSchema}
             onSubmit={(values, actions) => {
               if (estadoPago.estado !== "Completo") {
-                openModalPagar(values);
+                openModalPagar(values, actions);
               } else {
                 openModalEntregar(values);
               }
-              actions.resetForm();
-              onClose();
             }}
           >
             {({ handleSubmit, setFieldValue, values, errors, touched }) => (

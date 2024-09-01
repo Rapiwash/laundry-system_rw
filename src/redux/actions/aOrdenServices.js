@@ -413,7 +413,7 @@ export const Nota_OrdenService = createAsyncThunk(
 
 export const AnularRemplazar_OrdensService = createAsyncThunk(
   "service_order/AnularRemplazar_OrdensService",
-  async ({ dataToNewOrden, dataToAnular }) => {
+  async ({ dataToNewOrden, dataToAnular, infoUser }) => {
     try {
       const { infoOrden, infoPago, infoGastoByDelivery } = dataToNewOrden;
       const dataSend = {
@@ -433,15 +433,16 @@ export const AnularRemplazar_OrdensService = createAsyncThunk(
       const res = response.data;
       const { newOrder, orderAnulado } = res;
 
-      if ("listNewsPagos" in res) {
-        const { listNewsPagos } = res;
-        listNewsPagos.map((p) => {
-          const pago = {
-            tipo: "added",
-            info: p,
-          };
-          socket.emit("client:cPago", pago);
-        });
+      if ("newPago" in res) {
+        const { newPago } = res;
+        const pago = {
+          tipo: "added",
+          info: {
+            ...newPago,
+            infoUser,
+          },
+        };
+        socket.emit("client:cPago", pago);
       }
 
       if ("newGasto" in res) {
@@ -464,7 +465,10 @@ export const AnularRemplazar_OrdensService = createAsyncThunk(
       socket.emit("client:updateOrder(ANULACION)", orderAnulado);
       socket.emit("client:changeOrder", {
         tipo: "add",
-        info: newOrder,
+        info: {
+          ...newOrder,
+          ListPago: newOrder.ListPago.map((pago) => ({ ...pago, infoUser })),
+        },
       });
 
       Notify("Exitoso", "Anulacion y Remplazo Exitoso", "success");

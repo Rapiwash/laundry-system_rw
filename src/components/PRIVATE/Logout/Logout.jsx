@@ -6,10 +6,10 @@ import { modals } from "@mantine/modals";
 
 import { PublicRoutes } from "../../../models/Routes-M/Routes";
 import "./logout.scss";
-// import { LogoutUser } from '../../../services/default.services';
-import IcoClose from "./logout.png";
+
 import IcoUsuario from "./usuario.png";
 import { useSelector } from "react-redux";
+import { clearLocalStorage } from "../../../utils/persistence.local-storage/localStorage.util";
 
 const Logout = () => {
   const navigate = useNavigate();
@@ -29,14 +29,8 @@ const Logout = () => {
     });
 
   const handleLogout = async () => {
-    //clearLocalStorage(userKey);
+    clearLocalStorage("cuadreCaja");
 
-    // const persistenceInfo = JSON.parse(localStorage.getItem("user"));
-    // if (persistenceInfo) {
-    //   await LogoutUser(persistenceInfo.token);
-    // }
-
-    //dispatch(resetUser());
     navigate(`/${PublicRoutes.LOGIN}`, { replace: true });
   };
 

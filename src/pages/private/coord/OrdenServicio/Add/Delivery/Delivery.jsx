@@ -114,8 +114,8 @@ const Delivery = () => {
       celular: "",
       direccion: "",
       datePrevista: {
-        fecha: DateCurrent().format4,
-        hora: defaultHoraPrevista,
+        fecha: "",
+        hora: "",
       },
       dateEntrega: {
         fecha: "",

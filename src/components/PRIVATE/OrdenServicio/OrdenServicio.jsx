@@ -402,8 +402,8 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
         hora: data.hourPrevista,
       },
       dateRecojo: {
-        fecha: "",
-        hora: "",
+        fecha: formatFecha(data.dateIngreso),
+        hora: formatHora(data.dateIngreso),
       },
       dateEntrega: {
         fecha: "",
@@ -591,14 +591,28 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
       );
       handleChageValue(
         "datePrevista",
-        moment(infoDefault.datePrevista.fecha, "YYYY-MM-DD").toDate()
+        infoDefault.datePrevista.fecha
+          ? moment(infoDefault.datePrevista.fecha, "YYYY-MM-DD").toDate()
+          : moment().toDate()
       );
       handleChageValue(
         "dateRecojo",
-        moment(infoDefault.dateRecojo?.fecha, "YYYY-MM-DD").toDate()
+        infoDefault.dateRecojo.fecha
+          ? moment(infoDefault.dateRecojo.fecha, "YYYY-MM-DD").toDate()
+          : moment().toDate()
       );
-      handleChageValue("hourPrevista", infoDefault.datePrevista.hora);
-      handleChageValue("hourRecojo", infoDefault.dateRecojo?.hora);
+      handleChageValue(
+        "hourPrevista",
+        infoDefault.datePrevista.hora
+          ? infoDefault.datePrevista.hora
+          : defaultHoraPrevista
+      );
+      handleChageValue(
+        "hourRecojo",
+        infoDefault.dateRecojo.hora
+          ? infoDefault.dateRecojo.hora
+          : defaultHoraRecojo
+      );
       handleChageValue("subTotal", infoDefault.subTotal);
       handleChageValue("cargosExtras", infoDefault.cargosExtras);
       handleChageValue("totalNeto", infoDefault.totalNeto);

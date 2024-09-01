@@ -77,7 +77,16 @@ const Replace = () => {
     };
 
     await dispatch(
-      AnularRemplazar_OrdensService({ dataToAnular, dataToNewOrden })
+      AnularRemplazar_OrdensService({
+        dataToAnular,
+        dataToNewOrden,
+        infoUser: {
+          _id: InfoUsuario._id,
+          name: InfoUsuario.name,
+          usuario: InfoUsuario.usuario,
+          rol: InfoUsuario.rol,
+        },
+      })
     ).then((res) => {
       if (res.error) {
         console.error(

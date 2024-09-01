@@ -160,6 +160,11 @@
               width: 50px;
             }
           }
+          .item-cell {
+            word-break: break-word;
+            white-space: normal;
+            overflow-wrap: break-word;
+          }
           .cell-produc-descrip {
             display: grid;
             width: 100%;

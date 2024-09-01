@@ -138,7 +138,7 @@ const Details = ({ IdCliente }) => {
                   {infoCliente?.descuento.modoDescuento === "Manual" ? (
                     <td>
                       <div className="cell-produc-descrip">
-                        <span>{p.item}</span>
+                        <span className="item-cell">{p.item}</span>
                         <div className="tADescription">
                           <div className="contentDes">
                             <div
@@ -202,7 +202,7 @@ const Details = ({ IdCliente }) => {
                     </td>
                   ) : (
                     <>
-                      <td>{p.item}</td>
+                      <td className="item-cell">{p.item}</td>
                       <td className="tADescription space-dsc">
                         <div className="contentDes">
                           <div
@@ -271,7 +271,7 @@ const Details = ({ IdCliente }) => {
                       <td>{formatThousandsSeparator(p.total)}</td>
                     </>
                   ) : (
-                    <td>{formatThousandsSeparator(p.monto)}</td>
+                    <td>{formatThousandsSeparator(p.total)}</td>
                   )}
                 </tr>
               ))}

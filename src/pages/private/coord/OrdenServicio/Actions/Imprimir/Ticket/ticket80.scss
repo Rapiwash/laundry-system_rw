@@ -1,6 +1,8 @@
 @import "@fontsource/source-sans-pro";
 
-$sizeBase: 16px;
+$sizeTicket: "large"; // samll large
+
+$sizeBase: if($sizeTicket == "small", 14px, 16px);
 $widthG_mm: 80mm;
 $sImgPromo: 120px;
 $sH1: 25px;
@@ -34,14 +36,14 @@ $capitalizacion: lowercase;
       .info-table {
         width: 100%;
         border-collapse: collapse;
-        line-height: 1.3;
+        line-height: 1.2;
         .u-line {
           display: flex;
         }
         .m-line {
           display: grid;
           line-height: 1;
-          margin-bottom: 3px;
+          margin-top: 1px;
         }
 
         tr {
@@ -77,15 +79,29 @@ $capitalizacion: lowercase;
           font-size: 16px;
           line-height: 1;
           padding: 5px 0;
-          padding-bottom: 0;
-          display: grid;
-          place-content: center;
+          @if $sizeTicket == "small" {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+          } @else {
+            padding-bottom: 0;
+            display: grid;
+            place-content: center;
+          }
+
           .title-o {
             font-size: $sH2;
             line-height: 1;
+            @if $sizeTicket == "small" {
+              padding-top: 5px;
+            }
           }
           .number-o {
-            font-size: 45px;
+            @if $sizeTicket == "small" {
+              font-size: 30px;
+            } @else {
+              font-size: 45px;
+            }
           }
         }
       }
@@ -125,7 +141,7 @@ $capitalizacion: lowercase;
             border-bottom: solid 1px #000;
             padding: 2px 0;
             tbody {
-              line-height: 1.4;
+              line-height: 1.2;
               tr {
                 width: $widthG_mm;
                 display: grid;
@@ -139,13 +155,25 @@ $capitalizacion: lowercase;
                 }
               }
               .f-direccion {
-                grid-template-columns: 20mm calc($widthG_mm - 20mm);
+                @if $sizeTicket == "small" {
+                  grid-template-columns: 17mm calc($widthG_mm - 17mm);
+                } @else {
+                  grid-template-columns: 20mm calc($widthG_mm - 20mm);
+                }
               }
               .f-telf {
-                grid-template-columns: 20mm calc($widthG_mm - 20mm);
+                @if $sizeTicket == "small" {
+                  grid-template-columns: 16mm calc($widthG_mm - 16mm);
+                } @else {
+                  grid-template-columns: 20mm calc($widthG_mm - 20mm);
+                }
               }
               .f-attend {
-                grid-template-columns: 26mm calc($widthG_mm - 26mm);
+                @if $sizeTicket == "small" {
+                  grid-template-columns: 23mm calc($widthG_mm - 23mm);
+                } @else {
+                  grid-template-columns: 26mm calc($widthG_mm - 26mm);
+                }
               }
             }
           }
@@ -179,6 +207,7 @@ $capitalizacion: lowercase;
           tfoot {
             tr {
               display: grid;
+              max-width: $widthG_mm;
               grid-template-columns: 5mm auto 20mm 14mm;
               line-height: 1;
               // &:first-child {
@@ -213,7 +242,7 @@ $capitalizacion: lowercase;
             tr {
               background: #fff;
               border-bottom: 1px dotted #000;
-              padding: 3px 0;
+              padding: 2px 0;
 
               &:last-child {
                 border-bottom: none;
@@ -223,7 +252,15 @@ $capitalizacion: lowercase;
               }
               td {
                 &:nth-child(2) {
-                  font-size: $sizeBase;
+                  word-break: break-word;
+                  white-space: normal;
+                  overflow-wrap: break-word;
+                  text-align: center;
+                  @if $sizeTicket == "small" {
+                    font-size: 13px;
+                  } @else {
+                    font-size: $sizeBase;
+                  }
                   display: flex;
                   line-height: 1;
                   // justify-content: flex-start;
@@ -294,12 +331,16 @@ $capitalizacion: lowercase;
                 align-items: center;
                 justify-content: flex-end;
                 font-weight: bold;
-                font-size: 18px;
+                @if $sizeTicket == "small" {
+                  font-size: 15px;
+                } @else {
+                  font-size: 18px;
+                }
                 &:first-child {
                   text-align: right;
                 }
                 &:nth-child(2) {
-                  justify-content: center;
+                  justify-content: right;
                 }
               }
             }
@@ -500,12 +541,20 @@ $capitalizacion: lowercase;
       text-align: justify;
       color: #000;
       font-weight: 500;
-      font-size: 3.5mm;
+      @if $sizeTicket == "small" {
+        font-size: 3mm;
+      } @else {
+        font-size: 3.5mm;
+      }
       line-height: 1;
       margin-top: 5px;
       margin-bottom: 0;
       span {
-        font-size: 3.8mm;
+        @if $sizeTicket == "small" {
+          font-size: 3.5mm;
+        } @else {
+          font-size: 3.8mm;
+        }
         font-weight: 800;
         line-height: 1.2;
       }
@@ -530,7 +579,6 @@ $capitalizacion: lowercase;
     }
     .info-promo {
       display: grid;
-      border-top: 1.5px solid;
       padding-top: 5px;
       gap: 5px;
       align-items: center;
@@ -540,7 +588,11 @@ $capitalizacion: lowercase;
       padding-bottom: 10px;
 
       h1 {
-        font-size: 20px;
+        @if $sizeTicket == "small" {
+          font-size: 18px;
+        } @else {
+          font-size: 20px;
+        }
       }
       .cod-i {
         border: 1px solid silver;
@@ -551,14 +603,22 @@ $capitalizacion: lowercase;
       h2 {
         margin: 0;
         color: #000;
-        font-size: 16px;
+        @if $sizeTicket == "small" {
+          font-size: 14px;
+        } @else {
+          font-size: 16px;
+        }
         line-height: 1;
         padding-bottom: 5px;
       }
 
       img {
         width: 100%;
-        height: 100px;
+        @if $sizeTicket == "small" {
+          height: 85px;
+        } @else {
+          height: 100px;
+        }
         max-height: $sImgPromo;
         float: right;
         transform: scaleX(-1);

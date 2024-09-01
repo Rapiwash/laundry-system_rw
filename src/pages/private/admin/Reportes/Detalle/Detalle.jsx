@@ -224,7 +224,7 @@ const Detalle = ({ infoD }) => {
                   <td>{formatThousandsSeparator(p.total)}</td>
                 </>
               ) : (
-                <td>{formatThousandsSeparator(p.monto)}</td>
+                <td>{formatThousandsSeparator(p.total)}</td>
               )}
             </tr>
           ))}

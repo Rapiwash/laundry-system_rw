@@ -457,6 +457,14 @@ const InfoServicios = ({
                           // readOnly
                           value={+values.Items[index].monto}
                           formatter={(value) => formatThousandsSeparator(value)}
+                          onFocus={() => {
+                            const inputElement = document.querySelector(
+                              `[name='Items.${index}.monto']`
+                            );
+                            if (inputElement) {
+                              inputElement.select();
+                            }
+                          }}
                           onChange={(value) => {
                             changeValue(`Items.${index}.monto`, value);
                             const descuento =
@@ -476,6 +484,24 @@ const InfoServicios = ({
                           step={1}
                           hideControls
                           autoComplete="off"
+                          onBlur={(e) => {
+                            const price = values.Items[index].price;
+                            const cantidad = values.Items[index].cantidad;
+                            const montoCalculado = cantidad * price;
+                            const inputValue = parseFloat(e.target.value);
+
+                            // Verifica si el valor es NaN, un texto no numérico, o menor que el monto actual
+                            if (
+                              isNaN(inputValue) ||
+                              inputValue < montoCalculado ||
+                              inputValue < +values.Items[index].monto
+                            ) {
+                              changeValue(
+                                `Items.${index}.monto`,
+                                montoCalculado
+                              );
+                            }
+                          }}
                           required
                         />
                       </td>
@@ -528,33 +554,102 @@ const InfoServicios = ({
                   ) : (
                     <td>
                       {/* Monto Fingiendo ser total */}
-                      <NumberInput
-                        name={`Items.${index}.monto`}
-                        className="txtTotal"
-                        disabled={row.disable.monto}
-                        // readOnly
-                        value={+values.Items[index].monto}
-                        formatter={(value) => formatThousandsSeparator(value)}
-                        onChange={(value) => {
-                          changeValue(`Items.${index}.monto`, value);
-                          const descuento = values.Items[index].descuentoManual;
-                          const total = value - value * (descuento / 100);
-                          changeValue(
-                            `Items.${index}.total`,
-                            redondeoMin(total)
-                          );
-                        }}
-                        precision={2}
-                        min={(function () {
-                          const price = values.Items[index].price;
-                          const monto = values.Items[index].cantidad * price;
-                          return monto;
-                        })()}
-                        step={1}
-                        hideControls
-                        autoComplete="off"
-                        required
-                      />
+                      {mode === "UPDATE" ? (
+                        <NumberInput
+                          name={`Items.${index}.total`}
+                          className="txtTotal"
+                          disabled={row.disable.total}
+                          // readOnly
+                          value={+values.Items[index].total}
+                          formatter={(value) => formatThousandsSeparator(value)}
+                          onFocus={() => {
+                            const inputElement = document.querySelector(
+                              `[name='Items.${index}.monto']`
+                            );
+                            if (inputElement) {
+                              inputElement.select();
+                            }
+                          }}
+                          precision={2}
+                          min={0}
+                          step={1}
+                          onBlur={(e) => {
+                            const price = values.Items[index].price;
+                            const cantidad = values.Items[index].cantidad;
+                            const montoCalculado = cantidad * price;
+                            const inputValue = parseFloat(e.target.value);
+
+                            // Verifica si el valor es NaN, un texto no numérico, o menor que el monto actual
+                            if (
+                              isNaN(inputValue) ||
+                              inputValue < montoCalculado ||
+                              inputValue < +values.Items[index].monto
+                            ) {
+                              changeValue(
+                                `Items.${index}.monto`,
+                                montoCalculado
+                              );
+                            }
+                          }}
+                          hideControls
+                          readOnly
+                        />
+                      ) : (
+                        <NumberInput
+                          name={`Items.${index}.monto`}
+                          className="txtTotal"
+                          disabled={row.disable.monto}
+                          // readOnly
+                          value={+values.Items[index].monto}
+                          formatter={(value) => formatThousandsSeparator(value)}
+                          onFocus={() => {
+                            const inputElement = document.querySelector(
+                              `[name='Items.${index}.monto']`
+                            );
+                            if (inputElement) {
+                              inputElement.select();
+                            }
+                          }}
+                          onChange={(value) => {
+                            changeValue(`Items.${index}.monto`, value);
+                            const descuento =
+                              values.Items[index].descuentoManual;
+                            const total = value - value * (descuento / 100);
+                            changeValue(
+                              `Items.${index}.total`,
+                              redondeoMin(total)
+                            );
+                          }}
+                          precision={2}
+                          min={(function () {
+                            const price = values.Items[index].price;
+                            const monto = values.Items[index].cantidad * price;
+                            return monto;
+                          })()}
+                          step={1}
+                          onBlur={(e) => {
+                            const price = values.Items[index].price;
+                            const cantidad = values.Items[index].cantidad;
+                            const montoCalculado = cantidad * price;
+                            const inputValue = parseFloat(e.target.value);
+
+                            // Verifica si el valor es NaN, un texto no numérico, o menor que el monto actual
+                            if (
+                              isNaN(inputValue) ||
+                              inputValue < montoCalculado ||
+                              inputValue < +values.Items[index].monto
+                            ) {
+                              changeValue(
+                                `Items.${index}.monto`,
+                                montoCalculado
+                              );
+                            }
+                          }}
+                          hideControls
+                          autoComplete="off"
+                          required
+                        />
+                      )}
                     </td>
                   )}
                   <td
