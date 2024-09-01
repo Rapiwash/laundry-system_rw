@@ -597,8 +597,8 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
       );
       handleChageValue(
         "dateRecojo",
-        infoDefault.dateRecojo.fecha
-          ? moment(infoDefault.dateRecojo.fecha, "YYYY-MM-DD").toDate()
+        infoDefault.dateRecojo?.fecha
+          ? moment(infoDefault.dateRecojo?.fecha, "YYYY-MM-DD").toDate()
           : moment().toDate()
       );
       handleChageValue(
@@ -609,8 +609,8 @@ const OrdenServicio = ({ mode, onAction, infoDefault, titleMode }) => {
       );
       handleChageValue(
         "hourRecojo",
-        infoDefault.dateRecojo.hora
-          ? infoDefault.dateRecojo.hora
+        infoDefault.dateRecojo?.hora
+          ? infoDefault.dateRecojo?.hora
           : defaultHoraRecojo
       );
       handleChageValue("subTotal", infoDefault.subTotal);
