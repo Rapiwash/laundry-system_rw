@@ -38,7 +38,6 @@ const InfoEntrega = ({ mode, paso, descripcion, changeValue, values }) => {
                 className="btn-preview"
                 onClick={() => {
                   const currentDate = values.dateRecojo;
-
                   const newDate = new Date(
                     Math.max(
                       values.datePrevista.getTime() - 24 * 60 * 60 * 1000,

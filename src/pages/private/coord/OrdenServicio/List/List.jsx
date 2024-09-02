@@ -44,6 +44,7 @@ import { Roles } from "../../../../../models";
 import { documento } from "../../../../../services/global";
 import { useRef } from "react";
 import SwtichDimension from "../../../../../components/SwitchDimension/SwitchDimension";
+import axios from "axios";
 
 const List = () => {
   //Filtros de Fecha
@@ -424,34 +425,20 @@ const List = () => {
     dispatch(GetOrdenServices_Last());
   };
 
-  const handleGetTotalPedidos = () => {
-    const resultado = {
-      Tienda: 0,
-      Delivery: 0,
-      Total: 0,
-    };
+  const handleGetTotalPedidos = async () => {
+    try {
+      const fechaSeleccionada = moment(selectedMonth).format("YYYY-MM-DD");
 
-    const currentYearMonth = moment().format("YYYY-MM"); // Obtiene el año y mes actual en el formato deseado (sin el día)
+      const response = await axios.get(
+        `${
+          import.meta.env.VITE_BACKEND_URL
+        }/api/lava-ya/count-orders/${fechaSeleccionada}`
+      );
 
-    for (const registro of registered) {
-      const fechaRegistro = moment(registro.dateRecepcion.fecha).format(
-        "YYYY-MM"
-      ); // Formatea la fecha del registro en el mismo formato (sin el día)
-
-      if (
-        registro.estadoPrenda !== "anulado" &&
-        fechaRegistro === currentYearMonth
-      ) {
-        if (registro.Modalidad === "Tienda") {
-          resultado.Tienda++;
-        } else if (registro.Modalidad === "Delivery") {
-          resultado.Delivery++;
-        }
-      }
+      setCPedidos(response.data);
+    } catch (error) {
+      console.error("Error al obtener el total de pedidos: ", error);
     }
-    resultado.Total = resultado.Tienda + resultado.Delivery;
-
-    setCPedidos(resultado);
   };
 
   const handleSelectRow = (rowInfo) => {

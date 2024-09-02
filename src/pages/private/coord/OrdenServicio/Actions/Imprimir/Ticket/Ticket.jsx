@@ -490,82 +490,56 @@ const Ticket = React.forwardRef((props, ref) => {
                           )}{" "}
                       ¡
                     </h2>
-                    {
-                      infoOrden?.descuento.modoDescuento === "Promocion" ? (
-                        <div className="info-promo">
-                          <span>Usando nuestras promociones :</span>
-                          <div className="body-ahorro">
-                            <div className="list-promo">
-                              <ul>
-                                <li key={infoOrden?.descuento.info.codigoCupon}>
-                                  {infoOrden?.descuento.info.descripcion}
-                                </li>
-                              </ul>
-                            </div>
-                            {sizePaper80 ? (
-                              <div className="img-pet">
-                                <img src={AhorroPet} alt="" />
-                              </div>
-                            ) : null}
+                    {infoOrden?.descuento.modoDescuento === "Promocion" ? (
+                      <div className="info-promo">
+                        <span>Usando nuestras promociones :</span>
+                        <div className="body-ahorro">
+                          <div className="list-promo">
+                            <ul>
+                              <li key={infoOrden?.descuento.info.codigoCupon}>
+                                {infoOrden?.descuento.info.descripcion}
+                              </li>
+                            </ul>
                           </div>
+                          {sizePaper80 ? (
+                            <div className="img-pet">
+                              <img src={AhorroPet} alt="" />
+                            </div>
+                          ) : null}
                         </div>
-                      ) : infoOrden?.descuento.modoDescuento === "Puntos" ? (
-                        <div className="info-point">
-                          <span>Usando nuestro sistema de puntos :</span>
-                          <div className="body-ahorro">
-                            <div className="detalle-puntos">
-                              <div className="content-items">
-                                <div className="item-dt">
-                                  <span>PUNTOS USADOS</span>
-                                  <strong>
-                                    {formatThousandsSeparator(
-                                      infoOrden?.descuento.info?.puntosUsados
-                                    )}
-                                  </strong>
-                                </div>
-                                <div className="item-dt">
-                                  <span>PUNTOS RESTANTES</span>
-                                  <strong>
-                                    {formatThousandsSeparator(
-                                      infoOrden?.descuento.info?.puntosRestantes
-                                    )}
-                                  </strong>
-                                </div>
+                      </div>
+                    ) : infoOrden?.descuento.modoDescuento === "Puntos" ? (
+                      <div className="info-point">
+                        <span>Usando nuestro sistema de puntos :</span>
+                        <div className="body-ahorro">
+                          <div className="detalle-puntos">
+                            <div className="content-items">
+                              <div className="item-dt">
+                                <span>PUNTOS USADOS</span>
+                                <strong>
+                                  {formatThousandsSeparator(
+                                    infoOrden?.descuento.info?.puntosUsados
+                                  )}
+                                </strong>
+                              </div>
+                              <div className="item-dt">
+                                <span>PUNTOS RESTANTES</span>
+                                <strong>
+                                  {formatThousandsSeparator(
+                                    infoOrden?.descuento.info?.puntosRestantes
+                                  )}
+                                </strong>
                               </div>
                             </div>
-                            {sizePaper80 && (
-                              <div className="img-pet">
-                                <img src={AhorroPet} alt="" />
-                              </div>
-                            )}
                           </div>
+                          {sizePaper80 && (
+                            <div className="img-pet">
+                              <img src={AhorroPet} alt="" />
+                            </div>
+                          )}
                         </div>
-                      ) : null
-                      //  (
-                      //   <div className="info-manual">
-                      //     <span>Descuento directo :</span>
-                      //     <div className="body-ahorro">
-                      //       <div className="list-descuentos">
-                      //         <ul>
-                      //           {infoOrden?.descuento.info.map((dsc, index) => (
-                      //             <li key={index}>
-                      //               <span>
-                      //                 {dsc.item}&nbsp; {simboloMoneda}
-                      //                 {dsc.descuentoPorcentaje}&nbsp; desct.
-                      //               </span>
-                      //             </li>
-                      //           ))}
-                      //         </ul>
-                      //       </div>
-                      //       {sizePaper80 ? (
-                      //         <div className="img-pet">
-                      //           <img src={AhorroPet} alt="" />
-                      //         </div>
-                      //       ) : null}
-                      //     </div>
-                      //   </div>
-                      // )
-                    }
+                      </div>
+                    ) : null}
                   </div>
                 ) : null}
               </div>

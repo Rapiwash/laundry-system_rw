@@ -176,6 +176,7 @@ const EndProcess = ({ IdCliente, onClose }) => {
         infoGastoByDelivery,
       })
     );
+
     onClose(false);
   };
 

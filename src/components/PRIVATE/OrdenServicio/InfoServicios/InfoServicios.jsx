@@ -455,6 +455,7 @@ const InfoServicios = ({
                           className="txtTotal"
                           disabled={row.disable.monto}
                           // readOnly
+                          onDragStart={(event) => event.preventDefault()}
                           value={+values.Items[index].monto}
                           formatter={(value) => formatThousandsSeparator(value)}
                           onFocus={() => {
@@ -466,10 +467,18 @@ const InfoServicios = ({
                             }
                           }}
                           onChange={(value) => {
-                            changeValue(`Items.${index}.monto`, value);
+                            const price = values.Items[index].price;
+                            const cantidad = values.Items[index].cantidad;
+                            const montoCalculado = cantidad * price;
+
+                            const valor = value > 0 ? value : montoCalculado;
+
+                            changeValue(`Items.${index}.monto`, valor);
+
                             const descuento =
                               +values.Items[index].descuentoManual;
-                            const total = value - value * (descuento / 100);
+                            const total = valor - valor * (descuento / 100);
+
                             changeValue(
                               `Items.${index}.total`,
                               redondeoMin(total)
@@ -510,9 +519,17 @@ const InfoServicios = ({
                           name={`Items.${index}.descuentoManual`}
                           className="txtDescuento"
                           disabled={row.disable.descuentoManual}
+                          onDragStart={(event) => event.preventDefault()}
                           value={+values.Items[index].descuentoManual}
+                          onFocus={() => {
+                            const inputElement = document.querySelector(
+                              `[name='Items.${index}.descuentoManual']`
+                            );
+                            if (inputElement) {
+                              inputElement.select();
+                            }
+                          }}
                           onChange={(value) => {
-                            // setModeDescuento("Manual");
                             changeValue(
                               `Items.${index}.descuentoManual`,
                               value
@@ -539,6 +556,7 @@ const InfoServicios = ({
                           name={`Items.${index}.total`}
                           disabled={row.disable.total}
                           // readOnly
+                          onDragStart={(event) => event.preventDefault()}
                           className="txtMontoFinal"
                           value={+values.Items[index].total}
                           precision={2}
@@ -600,6 +618,7 @@ const InfoServicios = ({
                           className="txtTotal"
                           disabled={row.disable.monto}
                           // readOnly
+                          onDragStart={(event) => event.preventDefault()}
                           value={+values.Items[index].monto}
                           formatter={(value) => formatThousandsSeparator(value)}
                           onFocus={() => {
@@ -611,10 +630,18 @@ const InfoServicios = ({
                             }
                           }}
                           onChange={(value) => {
-                            changeValue(`Items.${index}.monto`, value);
+                            const price = values.Items[index].price;
+                            const cantidad = values.Items[index].cantidad;
+                            const montoCalculado = cantidad * price;
+
+                            const valor = value > 0 ? value : montoCalculado;
+
+                            changeValue(`Items.${index}.monto`, valor);
+
                             const descuento =
-                              values.Items[index].descuentoManual;
-                            const total = value - value * (descuento / 100);
+                              +values.Items[index].descuentoManual;
+                            const total = valor - valor * (descuento / 100);
+
                             changeValue(
                               `Items.${index}.total`,
                               redondeoMin(total)
